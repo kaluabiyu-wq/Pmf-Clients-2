@@ -1,1 +1,78 @@
 /* You can add global styles to this file, and also import other style files */
+/* You can add global styles to this file, and also import other style files */
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+ 
+  --pmafs-teal: #0D9488;
+  --pmafs-teal-dark: #0F766E;
+  --pmafs-teal-light: #CCFBF1;
+
+  --pmafs-amber: #F59E0B;
+  --pmafs-amber-dark: #B45309;
+  --pmafs-amber-light: #FEF3C7;
+
+  --pmafs-red: #DC2626;
+  --pmafs-red-light: #FEE2E2;
+
+  --pmafs-ink: #1E293B;
+  --pmafs-ink-muted: #475569;
+  --pmafs-ink-faint: #94A3B8;
+  --pmafs-border: #E2E8F0;
+  --pmafs-surface: #FFFFFF;
+  --pmafs-bg: #F8FAFC;
+
+  --pmafs-font-display: 'Manrope', 'Segoe UI', sans-serif;
+  --pmafs-font-body: 'Inter', 'Segoe UI', sans-serif;
+
+  --pmafs-radius-sm: 8px;
+  --pmafs-radius-md: 12px;
+
+  --pmafs-space-1: 0.5rem;
+  --pmafs-space-2: 0.75rem;
+  --pmafs-space-3: 1rem;
+  --pmafs-space-4: 1.5rem;
+  --pmafs-space-5: 2rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--pmafs-font-body);
+  background: var(--pmafs-bg);
+  color: var(--pmafs-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--pmafs-font-display);
+  color: var(--pmafs-ink);
+  margin: 0 0 var(--pmafs-space-2);
+  line-height: 1.25;
+}
+
+p {
+  margin: 0 0 var(--pmafs-space-2);
+  color: var(--pmafs-ink-muted);
+  line-height: 1.5;
+}
+
+button {
+  font-family: inherit;
+}
+
+a {
+  color: var(--pmafs-teal-dark);
+}

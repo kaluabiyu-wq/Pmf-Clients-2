@@ -1,0 +1,43 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: var(--pmafs-bg);
+}
+
+.navbar {
+  background: var(--pmafs-surface);
+  border-bottom: 1px solid var(--pmafs-border);
+  padding: 0 var(--pmafs-space-4);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.nav-list {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  gap: var(--pmafs-space-1);
+}
+
+.nav-btn {
+  border: none;
+  background: transparent;
+  font-family: var(--pmafs-font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--pmafs-ink-muted);
+  padding: var(--pmafs-space-3) var(--pmafs-space-2);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    color: var(--pmafs-teal-dark);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pmafs-teal);
+    outline-offset: 2px;
+  }
+}

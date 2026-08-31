@@ -28,4 +28,6 @@ export const routes: Routes = [
       ),
   },
   { path: '', redirectTo: 'pharmacy-dashboard', pathMatch: 'full' },
+
+  { path: '**', redirectTo: 'pharmacy-dashboard' },
 ];

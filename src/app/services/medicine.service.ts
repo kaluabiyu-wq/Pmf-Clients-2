@@ -18,9 +18,7 @@ export class MedicineService {
   }
 
   getById(id: number): Observable<Medicine> {
-    // was `${this.baseUrl}/medicine/${id}` -> /api/medicine/medicine/{id} (404).
-    // baseUrl already ends in /medicine, so just append the id.
-    return this.http.get<Medicine>(`${this.baseUrl}/${id}`);
+     return this.http.get<Medicine>(`${this.baseUrl}/${id}`);
   }
 
   create(payload: CreateMedicineRequest): Observable<Medicine> {
