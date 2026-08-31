@@ -1,0 +1,21 @@
+@if (medicineResource.isLoading()) {
+  <div class="spinner">Fetching medicine details...</div>
+} @else if (medicineResource.error(); as err) {
+  <div class="error-banner" role="alert">
+    Could not load this medicine. Make sure your .NET API is running.
+  </div>
+} @else if (medicineResource.value(); as medicine) {
+  <div class="detail-card">
+    <a routerLink="/medicine">&larr; Back to catalog</a>
+
+    <h2>{{ medicine.genericName }}</h2>
+    <p><strong>Brand:</strong> {{ medicine.brandName }}</p>
+    <p><strong>Category:</strong> {{ medicine.category }}</p>
+    <p><strong>Dosage form:</strong> {{ medicine.dosageForm }}</p>
+    <p><strong>Strength:</strong> {{ medicine.strength }}</p>
+    <p><strong>Requires prescription:</strong> {{ medicine.requiresPrescription ? 'Yes' : 'No' }}</p>
+    <p><strong>Active:</strong> {{ medicine.isActive ? 'Yes' : 'No' }}</p>
+
+    <button (click)="onFavoriteClick()">☆ Favorite</button>
+  </div>
+}

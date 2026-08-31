@@ -1,0 +1,80 @@
+<h2>Add Medicine</h2>
+<p>Add a new medicine to your inventory.</p>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="row">
+    <div class="field">
+      <label for="genericName">Generic name</label>
+      <input id="genericName" type="text" formControlName="genericName" placeholder="e.g. Paracetamol" />
+      @if (form.controls.genericName.invalid && form.controls.genericName.touched) {
+        <span class="error">Generic name is required.</span>
+      }
+    </div>
+
+    <div class="field">
+      <label for="brandName">Brand name (optional)</label>
+      <input id="brandName" type="text" formControlName="brandName" placeholder="e.g. Panadol" />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="field">
+      <label for="category">Category</label>
+      <select id="category" formControlName="category">
+        <option value="" disabled>Select category</option>
+        <option value="Pain Relief > Analgesics > NSAIDs">Pain Relief &gt; Analgesics &gt; NSAIDs</option>
+        <option value="Antibiotics > Penicillin">Antibiotics &gt; Penicillin</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="dosageForm">Dosage form</label>
+      <select id="dosageForm" formControlName="dosageForm">
+        <option value="Tablet">Tablet</option>
+        <option value="Syrup">Syrup</option>
+        <option value="Injection">Injection</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="field">
+      <label for="strength">Strength</label>
+      <input id="strength" type="text" formControlName="strength" placeholder="e.g. 500mg" />
+    </div>
+
+    <div class="field">
+      <label for="price">Price (ETB)</label>
+      <input id="price" type="number" formControlName="price" placeholder="e.g. 38" />
+      @if (form.controls.price.invalid && form.controls.price.touched) {
+        <span class="error">Enter a valid price.</span>
+      }
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="quantityEstimate">Quantity estimate</label>
+    <input id="quantityEstimate" type="number" formControlName="quantityEstimate" placeholder="Optional rough count" />
+  </div>
+
+  <div class="toggle-field">
+    <label for="requiresPrescription">Requires prescription</label>
+    <input id="requiresPrescription" type="checkbox" formControlName="requiresPrescription" />
+  </div>
+
+  <div class="field">
+    <label for="notes">Notes</label>
+    <textarea id="notes" formControlName="notes" placeholder="e.g. Morning only, call ahead"></textarea>
+  </div>
+
+  @if (submitError(); as error) {
+    <div class="error-banner" role="alert">{{ error }}</div>
+  }
+
+  <div class="actions">
+    <button type="submit" [disabled]="isSubmitting()">
+      {{ isSubmitting() ? 'Adding…' : 'Add medicine' }}
+    </button>
+    <button type="button" (click)="onCancel()">Cancel</button>
+  </div>
+</form>

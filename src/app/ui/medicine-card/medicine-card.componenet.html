@@ -1,0 +1,28 @@
+<a class="card" [routerLink]="['/medicine', medicine.id]">
+  <div class="card-header">
+    <h3>{{ medicine.genericName }}</h3>
+    <button class="fav-btn" type="button" (click)="onFavoriteClick($event)" aria-label="Toggle favorite">
+      ☆
+    </button>
+  </div>
+
+  @if (medicine.brandName) {
+    <p class="brand">{{ medicine.brandName }}</p>
+  }
+
+  <div class="meta">
+    @if (medicine.strength) {
+      <span>{{ medicine.strength }}</span>
+    }
+    @if (medicine.dosageForm) {
+      <span>{{ medicine.dosageForm }}</span>
+    }
+    @if (medicine.price) {
+      <span>{{ medicine.price }} ETB</span>
+    }
+  </div>
+
+  @if (medicine.requiresPrescription) {
+    <span class="badge">Prescription required</span>
+  }
+</a>

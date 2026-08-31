@@ -1,0 +1,20 @@
+<h2>Medicine Catalog</h2>
+
+@if (medicinesResource.isLoading()) {
+  <div class="spinner">Fetching medicines from the server...</div>
+} @else if (medicinesResource.error(); as err) {
+  <div class="error-banner" role="alert">
+    Could not load medicines. Make sure your .NET API is running.
+  </div>
+} @else {
+  <div class="grid">
+    @for (medicine of medicinesResource.value()!; track medicine.id) {
+      <app-medicine-card
+        [medicine]="medicine"
+        (favoriteToggled)="onFavoriteToggle($event)" />
+    }
+    @empty {
+      <p>No medicines are available for this search.</p>
+    }
+  </div>
+}
