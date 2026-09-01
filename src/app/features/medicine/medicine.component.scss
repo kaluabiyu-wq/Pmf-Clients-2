@@ -2,6 +2,13 @@
     display: contents;
 }
 
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--pmafs-space-3);
+  align-items: start; 
+}
+
 .card {
   display: flex;
   flex-direction: column;

@@ -1,1 +1,70 @@
-<p>pharmacy-dashboard works!</p>
+<div class="dashboard">
+  <!-- Verification + plan summary -->
+  <section class="overview-card">
+    <div class="overview-card__top">
+      <div class="verification">
+        <span class="verification__dot" [class.is-approved]="verificationStatus === 'approved'"
+              [class.is-pending]="verificationStatus === 'pending'"
+              [class.is-rejected]="verificationStatus === 'rejected'"></span>
+        <div>
+          <p class="verification__label">{{ verificationLabel }}</p>
+            </div>
+      </div>
+      <span class="plan-pill">{{ planName }}</span>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card" *ngFor="let stat of stats">
+        <p class="stat-card__label">{{ stat.label }}</p>
+        <p class="stat-card__value">
+          {{ stat.value }}<span *ngIf="stat.unit" class="stat-card__unit">{{ stat.unit }}</span>
+        </p>
+        <p class="stat-card__helper">{{ stat.helper }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Schedule -->
+  <section class="schedule">
+    <h2 class="schedule__title">Schedule</h2>
+    <p class="schedule__subtitle">
+      Opening hours shown to patients — mark holidays or one-off closures as needed.
+    </p>
+
+    <form class="schedule-card" [formGroup]="scheduleForm" (ngSubmit)="saveChanges()">
+      <div class="schedule-row" *ngFor="let day of days; let last = last" [class.is-last]="last">
+        <span class="schedule-row__day">{{ day.label }}</span>
+
+        <div class="schedule-row__times" [formGroup]="dayGroup(day.key)">
+          <label class="time-field">
+            <input type="text" formControlName="open" aria-label="{{ day.label }} opening time" />
+            <svg class="time-field__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" />
+              <path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+            </svg>
+          </label>
+
+          <span class="schedule-row__dash">–</span>
+
+          <label class="time-field">
+            <input type="text" formControlName="close" aria-label="{{ day.label }} closing time" />
+            <svg class="time-field__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" />
+              <path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+            </svg>
+          </label>
+        </div>
+      </div>
+
+      <div class="schedule-actions">
+        <button type="submit" class="btn btn--primary" [disabled]="savingSchedule">
+          {{ savingSchedule ? 'Saving…' : 'Save changes' }}
+        </button>
+        <button type="button" class="btn btn--secondary" (click)="markHolidayClosure()">
+          Mark holiday closure
+        </button>
+        <span class="schedule-actions__confirm" *ngIf="savedJustNow">Saved</span>
+      </div>
+    </form>
+  </section>
+</div>
