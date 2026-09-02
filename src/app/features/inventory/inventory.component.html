@@ -1,0 +1,96 @@
+<div class="inventory-page">
+
+  
+  <div class="page-header">
+
+    <div>
+      <h1>Inventory</h1>
+    <p>Browse every medicine and the pharmacies currently stocking it. </p>
+    </div>
+
+    <div class="header-actions">
+
+      <button type="button" class="refresh-button"
+        (click)="refresh()">Refresh</button>
+
+      <button type="button"  class="add-button"
+        (click)="addInventory()">Add Inventory
+      </button>
+
+    </div>
+
+  </div>
+
+
+ 
+  @if (loading()) {
+
+    <div class="state-card">
+    <div class="spinner"></div>
+
+      <p> Loading inventory... </p>
+
+    </div>
+
+  }
+
+
+ 
+  @if (error() && !loading()) {
+
+    <div class="error-card">
+
+      <div class="error-icon">!</div>
+
+      <div>
+        <h3> Unable to load inventory </h3>
+
+        <p> {{ error() }}</p>
+
+        <button type="button" (click)="refresh()">
+          Try Again</button>
+
+      </div>
+
+    </div>
+
+  }
+
+
+ 
+  @if (!loading() && !error() && medicines().length === 0) {
+
+    <div class="empty-card">
+
+      <div class="empty-icon"> 💊  </div>
+
+      <h2>
+        No inventory found
+      </h2>
+
+      <p>There are currently no medicines in inventory anywhere.</p>
+
+      <button type="button" class="add-button" (click)="addInventory()">
+         Add Inventory </button>
+        </div>
+
+  }
+
+
+ 
+  @if (!loading() && !error() && medicines().length > 0) {
+
+    <div class="inventory-grid">
+
+      @for (medicine of medicines(); track medicine.medicineId) {
+
+        <app-inventory-card [medicine]="medicine"
+          (view)="viewInventory($event)"/>
+
+      }
+
+    </div>
+
+  }
+
+</div>

@@ -27,6 +27,18 @@ export const routes: Routes = [
         (m) => m.MedicineDetailComponent,
       ),
   },
+  {
+    path: 'inventory',
+    loadComponent: () =>
+      import('./features/inventory/inventory.component')
+    .then((m) => m.InventoryComponent),
+  },
+  {
+    path: 'inventory/:pharmacyId/:id',
+    loadComponent: () =>
+      import('./features/inventory-detail/inventory-detail.component').then(
+        (m) => m.InventoryDetailComponent),
+  },
   { path: '', redirectTo: 'pharmacy-dashboard', pathMatch: 'full' },
 
   { path: '**', redirectTo: 'pharmacy-dashboard' },

@@ -1,0 +1,247 @@
+.inventory-card {
+  display: flex;
+  flex-direction: column;
+
+  min-height: 350px;
+
+  padding: var(--pmafs-space-4);
+
+  border: 1px solid var(--pmafs-border);
+  border-radius: var(--pmafs-radius-md);
+
+  background: var(--pmafs-surface);
+
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.04);
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: var(--pmafs-teal);
+
+    box-shadow:
+      0 8px 20px rgba(13, 148, 136, 0.12);
+  }
+}
+
+
+
+
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: var(--pmafs-space-4);
+}
+
+
+.medicine-icon {
+  width: 48px;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: var(--pmafs-radius-md);
+
+  background: var(--pmafs-teal-light);
+
+  font-size: 23px;
+}
+
+
+
+
+.status {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 5px 11px;
+
+  border-radius: 999px;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status-available {
+  background: var(--pmafs-teal-light);
+  color: var(--pmafs-teal-dark);
+}
+
+.status-low {
+  background: var(--pmafs-amber-light);
+  color: var(--pmafs-amber-dark);
+}
+
+.status-out,
+.status-expired {
+  background: var(--pmafs-red-light);
+  color: var(--pmafs-red);
+}
+
+.status-default {
+  background: var(--pmafs-bg);
+  color: var(--pmafs-ink-muted);
+}
+
+
+
+
+.medicine-info {
+  margin-bottom: var(--pmafs-space-4);
+}
+
+.medicine-info h2 {
+  font-family: var(--pmafs-font-display);
+  margin: 0 0 5px;
+
+  color: var(--pmafs-ink);
+
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.brand-name {
+  margin: 0;
+
+  color: var(--pmafs-ink-muted);
+
+  font-size: 14px;
+}
+
+
+
+
+.details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  gap: var(--pmafs-space-3);
+
+  margin-bottom: var(--pmafs-space-4);
+}
+
+.detail {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.label {
+  color: var(--pmafs-ink-faint);
+
+  font-size: 11px;
+  font-weight: 600;
+
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.value {
+  color: var(--pmafs-ink-muted);
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+
+
+
+.prescription {
+  display: inline-block;
+
+  padding: 3px 7px;
+
+  border-radius: 5px;
+
+  font-size: 11px;
+}
+
+.required {
+  background: var(--pmafs-amber-light);
+  color: var(--pmafs-amber-dark);
+}
+
+.not-required {
+  background: var(--pmafs-teal-light);
+  color: var(--pmafs-teal-dark);
+}
+
+
+
+
+.price-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: auto;
+
+  padding-top: var(--pmafs-space-3);
+
+  border-top: 1px solid var(--pmafs-border);
+}
+
+.price-label {
+  color: var(--pmafs-ink-muted);
+
+  font-size: 13px;
+}
+
+.price {
+  font-family: var(--pmafs-font-display);
+  color: var(--pmafs-teal-dark);
+
+  font-size: 20px;
+  font-weight: 700;
+}
+
+
+
+
+.view-button {
+  width: 100%;
+
+  margin-top: var(--pmafs-space-3);
+
+  padding: 10px;
+
+  border: 1px solid var(--pmafs-teal);
+  border-radius: var(--pmafs-radius-sm);
+
+  background: var(--pmafs-surface);
+  color: var(--pmafs-teal-dark);
+
+  font-family: var(--pmafs-font-display);
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    background: var(--pmafs-teal);
+    color: var(--pmafs-surface);
+  }
+}
+
+
+
+
+@media (max-width: 500px) {
+
+  .details {
+    grid-template-columns: 1fr;
+  }
+}

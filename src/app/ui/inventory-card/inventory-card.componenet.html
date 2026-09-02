@@ -1,0 +1,103 @@
+<div class="inventory-card">
+
+ 
+  <div class="medicine-info">
+
+    <h2>
+      {{ medicine().genericName || 'Unknown Medicine' }}
+    </h2>
+
+    <p class="brand-name">
+      {{ medicine().brandName || 'No brand name' }}
+    </p>
+
+  </div>
+
+
+  
+  <div class="details">
+
+    <div class="detail">
+      <span class="label">Category</span>
+      <span class="value">{{ medicine().category || '-' }}</span>
+    </div>
+
+    <div class="detail">
+      <span class="label">Dosage Form</span>
+      <span class="value">{{ medicine().dosageForm || '-' }}</span>
+    </div>
+
+    <div class="detail">
+      <span class="label">Strength</span>
+      <span class="value">{{ medicine().strength || '-' }}</span>
+    </div>
+
+    <div class="detail">
+      <span class="label">Prescription</span>
+      <span class="value">
+        @if (medicine().requiresPrescription) {
+          <span class="prescription required">Required</span>
+        } @else {
+          <span class="prescription not-required">Not Required</span>
+        }
+      </span>
+    </div>
+
+  </div>
+
+
+  
+  <div class="pharmacies-section">
+
+    <span class="pharmacies-label">
+      Available at {{ medicine().pharmacies.length }}
+      {{ medicine().pharmacies.length === 1 ? 'pharmacy' : 'pharmacies' }}
+    </span>
+
+    @if (medicine().pharmacies.length === 0) {
+
+      <p class="no-pharmacies"> No pharmacy currently has this medicine in stock.</p>
+
+    } @else {
+
+      <div class="pharmacy-list">
+
+        @for (stock of medicine().pharmacies; track stock.pharmacyId) {
+
+          <div class="pharmacy-row">
+
+            <div class="pharmacy-row-main">
+              <span class="pharmacy-id">
+                Pharmacy {{ stock.pharmacyId }}
+              </span>
+
+              <span
+                class="status"
+                [class]="getStatusClass(stock.status)">
+                {{ stock.status || 'Unknown' }}
+              </span>
+            </div>
+
+            <div class="pharmacy-row-details">
+              <span class="price">
+                {{ stock.price | number:'1.2-2' }}
+              </span>
+
+              <span class="updated-at"> Updated {{ stock.lastUpdatedAt | date:'short' }}
+              </span>
+            </div>
+
+            <button type="button" class="view-button"
+            (click)="onViewPharmacy(stock.pharmacyId)" > View </button>
+
+          </div>
+
+        }
+
+      </div>
+
+    }
+
+  </div>
+
+</div>
