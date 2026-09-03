@@ -1,4 +1,4 @@
-/** Mirrors PmfApi.Domain.Entities.Coordinate — a plain lat/lng pair, not a full geo type. */
+
 export interface Coordinate {
   latitude: number;
   longitude: number;
@@ -18,10 +18,7 @@ export interface CreateLocationRequest {
   coordinate: Coordinate;
 }
 
-/**
- * Mirrors PmfApi.Application.Dtos.PagedRequest — the query params
- * LocationController's GET /api/location action accepts.
- */
+
 export interface PagedLocationQuery {
   page?: number;
   pageSize?: number;

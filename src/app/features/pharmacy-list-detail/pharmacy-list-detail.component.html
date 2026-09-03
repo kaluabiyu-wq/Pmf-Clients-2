@@ -1,0 +1,59 @@
+<section class="detail-page">
+  <button type="button" class="back-link" (click)="onBack()">← Back to pharmacies</button>
+
+  @if (isLoading()) {
+    <div class="spinner">Loading pharmacy…</div>
+  }
+
+  @if (loadError()) {
+    <p class="error-banner">{{ loadError() }}</p>
+  }
+
+  @if (pharmacy(); as item) {
+    <article class="detail-card">
+      <header class="detail-header">
+        <h1>{{ item.name }}</h1>
+        <span class="status-badge" [class]="item.isActive ? 'active' : 'inactive'">
+          {{ item.isActive ? 'Active' : 'Inactive' }}
+        </span>
+      </header>
+
+      <hr class="divider" />
+
+      <dl class="detail-list">
+        <div class="detail-row">
+          <dt>License number</dt>
+          <dd>{{ item.licenseNumber }}</dd>
+        </div>
+        <div class="detail-row">
+          <dt>Phone</dt>
+          <dd>{{ item.phoneNumber }}</dd>
+        </div>
+        @if (item.email) {
+          <div class="detail-row">
+            <dt>Email</dt>
+            <dd>{{ item.email }}</dd>
+          </div>
+        }
+        <div class="detail-row">
+          <dt>Verified</dt>
+          <dd>{{ item.isVerified ? 'Yes' : 'No' }}</dd>
+        </div>
+        <div class="detail-row">
+          <dt>Reliability score</dt>
+          <dd>{{ item.reliabilityScore }}</dd>
+        </div>
+        @if (item.location; as loc) {
+          <div class="detail-row">
+            <dt>Location</dt>
+            <dd>{{ loc.label }} · {{ loc.subcity }}, {{ loc.woreda }}</dd>
+          </div>
+        }
+        <div class="detail-row">
+          <dt>Last inventory update</dt>
+          <dd>{{ item.lastInventoryUpdateAt | date: 'medium' }}</dd>
+        </div>
+      </dl>
+    </article>
+  }
+</section>

@@ -41,11 +41,13 @@ export class MedicineSearchCardComponent {
 
   readonly isOutOfStock = computed(() => this.statusLabel() === 'Out of stock');
 
-  onDirectionsClick(): void {
+  onDirectionsClick(event: Event): void {
+    event.stopPropagation();
     this.directions.emit(this.result());
   }
 
-  onNotifyClick(): void {
+  onNotifyClick(event: Event): void {
+ event.stopPropagation();
     this.notifyMe.emit(this.result());
   }
 

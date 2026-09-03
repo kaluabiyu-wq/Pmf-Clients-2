@@ -10,8 +10,7 @@
   border: 1px solid var(--pmafs-border);
   border-radius: var(--pmafs-radius-md);
   padding: var(--pmafs-space-3);
-  text-decoration: none;
-  color: inherit;
+  cursor: pointer;
   transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 
   &:hover,
@@ -39,26 +38,16 @@
   }
 }
 
-.pharmacy-name {
+.pharmacy-location {
   font-size: 0.85rem;
   color: var(--pmafs-ink-muted);
   margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.distance {
-  font-size: 0.8rem;
-  color: var(--pmafs-ink-faint);
-  white-space: nowrap;
 }
 
 .meta {
   display: flex;
   flex-wrap: wrap;
   gap: var(--pmafs-space-1);
-  margin-top: var(--pmafs-space-1);
 
   span {
     font-size: 0.8rem;
@@ -70,56 +59,28 @@
   }
 }
 
-.price {
-  font-family: var(--pmafs-font-display);
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: var(--pmafs-ink);
-  margin-top: var(--pmafs-space-1);
-
-  .unit {
-    font-family: var(--pmafs-font-body);
-    font-weight: 500;
-    font-size: 0.8rem;
-    color: var(--pmafs-ink-muted);
-    margin-left: 2px;
-  }
-}
-
-
 .status-badge {
-  align-self: flex-start;
-  margin-top: var(--pmafs-space-1);
   font-size: 0.75rem;
   font-weight: 600;
   border-radius: 999px;
   padding: 3px 10px;
+  white-space: nowrap;
 
-  &.in-stock {
+  &.active {
     color: var(--pmafs-teal-dark);
     background: var(--pmafs-teal-light);
   }
 
-  &.low-stock {
-    color: var(--pmafs-amber-dark);
-    background: var(--pmafs-amber-light);
-  }
-
-  &.out-of-stock {
+  &.inactive {
     color: var(--pmafs-red);
     background: var(--pmafs-red-light);
   }
 }
 
-.badge {
-  align-self: flex-start;
-  margin-top: var(--pmafs-space-1);
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--pmafs-amber-dark);
-  background: var(--pmafs-amber-light);
-  border-radius: 999px;
-  padding: 3px 10px;
+.divider {
+  border: none;
+  border-top: 1px solid var(--pmafs-border);
+  margin: var(--pmafs-space-2) 0 0;
 }
 
 .card-footer {
@@ -127,10 +88,6 @@
   align-items: center;
   justify-content: space-between;
   margin-top: var(--pmafs-space-2);
-}
-
-.divider {
-  border: none;
-  border-top: 1px solid var(--pmafs-border);
-  margin: var(--pmafs-space-2) 0 0;
+  font-size: 0.85rem;
+  color: var(--pmafs-ink-muted);
 }
