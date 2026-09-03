@@ -2,12 +2,13 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable, catchError, tap, throwError } from 'rxjs';
 import { SearchRequest, SearchResponse, SearchResultItem } from '../model/search.model';
+import { environment } from '../../environments/environment';
 
 
 @Injectable({ providedIn: 'root' })
 export class SearchService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = '/api/user';
+  private readonly baseUrl = `${environment.apiBaseUrl}/user`;
 
   readonly isSearching = signal(false);
   readonly searchError = signal<string | null>(null);
@@ -43,12 +44,23 @@ export class SearchService {
   }
 
   private extractErrorMessage(err: HttpErrorResponse): string {
-    if (err.status === 404) {
+    if (err.status === 0) {
+      return 'Could not reach the server. Check that the API is running and that CORS allows this origin.';
+    }
+    if (err.status === 404 && this.isLocationNotFound(err)) {
       return 'That location could not be found. Try picking a location again.';
+    }
+    if (err.status === 404) {
+      return 'Search endpoint not found. Check the API base URL configuration.';
     }
     if (err.status === 400 && err.error?.errors) {
       return 'That search could not be validated. Check the medicine name and location.';
     }
     return 'Something went wrong while searching. Please try again.';
+  }
+ 
+ 
+  private isLocationNotFound(err: HttpErrorResponse): boolean {
+    return typeof err.error === 'object' && err.error !== null;
   }
 }

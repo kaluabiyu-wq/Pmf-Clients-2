@@ -1,7 +1,8 @@
 <section class="detail-page">
   @if (result(); as item) {
-    <button type="button" class="back-link" (click)="onBack()">Back to results</button>
-
+    <a routerLink="/search" class="back-button">
+        Back to Search
+       </a>
     <article class="detail-card">
       <header class="detail-header">
         <div class="pharmacy-info">

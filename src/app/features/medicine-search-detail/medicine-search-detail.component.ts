@@ -1,13 +1,13 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { SearchService } from '../../services/search.service';
 
 @Component({
   selector: 'app-medicine-search-detail',
-  imports: [CurrencyPipe, DatePipe],
+  imports: [CurrencyPipe, DatePipe,RouterLink],
   styleUrl: './medicine-search-detail.component.scss',
   templateUrl: './medicine-search-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
