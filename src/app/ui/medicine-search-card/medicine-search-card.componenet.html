@@ -1,0 +1,24 @@
+<article class="pharmacy-card">
+  <header class="card-header" role="button"
+    tabindex="0" (click)="onViewDetailsClick()"
+    (keyup.enter)="onViewDetailsClick()"
+  >
+    <div class="pharmacy-info">
+      <h3 class="pharmacy-name">{{ result().pharmacyName }}</h3>
+      <p class="pharmacy-location"> {{ result().distanceKm.toFixed(1) }} km · {{ result().locationLabel }}</p>
+    </div>
+    <span class="status-badge" [class]="statusClass()">{{ statusLabel() }}</span>
+  </header>
+
+  <hr class="divider" />
+
+  <footer class="card-footer">
+    <span class="price">{{ result().price | currency: 'ETB ' }}</span>
+
+    @if (isOutOfStock()) {
+      <button type="button" class="btn btn-notify" (click)="onNotifyClick()">Notify me</button>
+    } @else {
+      <button type="button" class="btn btn-directions" (click)="onDirectionsClick()">Directions</button>
+    }
+  </footer>
+</article>
