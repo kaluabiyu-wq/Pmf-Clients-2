@@ -16,13 +16,7 @@ export interface PharmacyListItem extends Pharmacy {
   location: PmfLocation | null;
 }
 
-/**
- * PharmaciesController's GetPharmacy action binds [FromQuery] PagedRequest —
- * the same shared PmfApi.Application.Dtos.PagedRequest used by
- * LocationController, so page/pageSize/search/orderBy/descending all apply.
- * orderBy values below are a best guess at Pharmacy's sortable columns —
- * confirm against PagedRequest's actual validation/allow-list on the backend.
- */
+
 export interface PagedPharmacyQuery {
   page?: number;
   pageSize?: number;
@@ -30,3 +24,29 @@ export interface PagedPharmacyQuery {
   orderBy?: 'Name' | 'ReliabilityScore' | 'LastInventoryUpdateAt';
   descending?: boolean;
 }
+export interface PharmacyDetail {
+  id: number;
+  name: string;
+  licenseNumber: string;
+  locationId: number;
+  isVerified: boolean;
+  reliablityScore: number;
+  freshnessThreshold: number;
+  lastInventoryUpdatedAt: string;
+  registeredAt: string;
+}
+
+export interface PharmacyMedicine {
+  medicineId: number;
+  genericName: string;
+  brandName: string;
+  category?: string | null;
+  dosageForm?: string | null;
+  strength?: string | null;
+  requiresPrescription: boolean;
+  price: number;
+  status: string;
+  lastUpdatedAt: string;
+}
+
+
