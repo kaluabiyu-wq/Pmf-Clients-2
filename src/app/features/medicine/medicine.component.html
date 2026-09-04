@@ -10,8 +10,7 @@
   <div class="grid">
     @for (medicine of medicinesResource.value()!; track medicine.id) {
       <app-medicine-card
-        [medicine]="medicine"
-        (favoriteToggled)="onFavoriteToggle($event)" />
+        [medicine]="medicine"/>
     }
     @empty {
       <p>No medicines are available for this search.</p>

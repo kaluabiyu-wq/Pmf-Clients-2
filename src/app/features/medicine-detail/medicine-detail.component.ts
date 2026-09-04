@@ -20,7 +20,4 @@ export class MedicineDetailComponent {
     stream: ({ params }) => this.api.getById(Number(params.id)),
   });
 
-  onFavoriteClick() {
-    console.log('favorite toggled:', this.id());
-  }
 }

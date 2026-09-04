@@ -10,8 +10,7 @@ export interface Medicine {
   isActive: boolean;
 }
 
-// Separate request DTO — the add-medicine form should never post an `id`
-// or `isActive`, so it gets its own shape rather than reusing Medicine.
+
 export interface CreateMedicineRequest {
   genericName: string;
   brandName?: string;

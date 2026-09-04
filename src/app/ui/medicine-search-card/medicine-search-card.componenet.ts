@@ -46,10 +46,7 @@ export class MedicineSearchCardComponent {
     this.directions.emit(this.result());
   }
 
-  onNotifyClick(event: Event): void {
- event.stopPropagation();
-    this.notifyMe.emit(this.result());
-  }
+  
 
   onViewDetailsClick(): void {
     this.viewDetails.emit(this.result());

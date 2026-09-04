@@ -25,10 +25,9 @@
       <span class="unit">/ unit</span>
     </span>
 
-    @if (isOutOfStock()) {
-      <button type="button" class="btn btn-notify" (click)="onNotifyClick($event)">Notify me</button>
-    } @else {
+     <div class="card-actions">
       <button type="button" class="btn btn-directions" (click)="onDirectionsClick($event)">Directions</button>
-    }
+     <button type="button" class="btn btn-view-details" (click)="onViewDetailsClick()">View Detail</button>
+  </div>
   </footer>
 </article>

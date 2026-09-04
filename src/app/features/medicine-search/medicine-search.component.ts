@@ -16,7 +16,7 @@ export class MedicineSearchComponent {
   private readonly searchService = inject(SearchService);
   private readonly router = inject(Router);
 
-  // Signed-in for Yonas Tesfaye (Patient), seeded as the 4th user -> id 4.
+  // Signed-in for Yonas Tesfaye (Patient), seeded as the 4th user -> id 4. 
   private readonly userId = signal(4);
 
   // Yonas Tesfaye seeded location: Locations[3] "Arada Branch Area" -> the 4th location seeded -> id 4.

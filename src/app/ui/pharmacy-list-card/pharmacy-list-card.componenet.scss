@@ -10,7 +10,6 @@
   border: 1px solid var(--pmafs-border);
   border-radius: var(--pmafs-radius-md);
   padding: var(--pmafs-space-3);
-  cursor: pointer;
   transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 
   &:hover,
@@ -90,4 +89,35 @@
   margin-top: var(--pmafs-space-2);
   font-size: 0.85rem;
   color: var(--pmafs-ink-muted);
+}
+.footer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.85rem;
+  color: var(--pmafs-ink-muted);
+}
+
+.btn {
+  font-family: var(--pmafs-font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: var(--pmafs-radius-sm, 6px);
+  padding: 6px 14px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-view-details {
+ background: var(--pmafs-teal);
+  color: var(--pmafs-surface);
+  border-color: var(--pmafs-border);
+
+  &:hover {
+  
+   background: var(--pmafs-teal-dark);
+    border-color: var(--pmafs-teal-dark);
+  }
 }

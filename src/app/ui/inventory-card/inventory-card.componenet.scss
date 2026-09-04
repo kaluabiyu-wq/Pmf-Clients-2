@@ -217,8 +217,9 @@
   border: 1px solid var(--pmafs-teal);
   border-radius: var(--pmafs-radius-sm);
 
-  background: var(--pmafs-surface);
-  color: var(--pmafs-teal-dark);
+  background: var(--pmafs-teal);
+  color: var(--pmafs-surface);
+  
 
   font-family: var(--pmafs-font-display);
   font-size: 13px;
@@ -231,8 +232,8 @@
     color 0.15s ease;
 
   &:hover {
-    background: var(--pmafs-teal);
-    color: var(--pmafs-surface);
+    background: var(--pmafs-teal-dark);
+    border-color: var(--pmafs-teal-dark);
   }
 }
 

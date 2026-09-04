@@ -18,7 +18,5 @@ export class MedicineComponent {
     stream: () => this.api.getAll(),
   });
 
-  onFavoriteToggle(medicine: Medicine) {
-    console.log('favorite toggled:', medicine.id);
-  }
+ 
 }
