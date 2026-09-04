@@ -9,23 +9,7 @@ import {
   PharmacyMedicineDetail,
 } from '../model/inventory.model';
 
-/**
- * Maps 1:1 onto PmfApi.Api.Controllers.InventoryController.
- *
- * That controller is mounted at [Route("api/pharmacies/{pharmacyId:int}/inventory")],
- * with the literal "api/" segment baked into the C# attribute itself --
- * unlike TmsApi, PMFApi has no {version:apiVersion} route token at all.
- * That means `environment.apiBaseUrl` here must be the bare host + port
- * (e.g. 'http://localhost:5135'), NOT 'http://localhost:5135/api' --
- * if apiBaseUrl already contains a trailing /api, every request below
- * doubles it to /api/api/pharmacies/... and 404s. Worth confirming
- * against the actual environment.ts, which wasn't part of what was
- * uploaded here.
- *
- * PmfDbContext seeds no API versioning and CORS is locked to
- * http://localhost:4200 (see Program.cs AddCors "AllowAngular"), so this
- * only works against `ng serve`'s default port as-is.
- */
+
 @Injectable({ providedIn: 'root' })
 export class InventoryService {
   private http = inject(HttpClient);
@@ -65,6 +49,13 @@ export class InventoryService {
     );
   }
 
+   
+    getInventoryByPharmacyAndMedicine(pharmacyId: number,
+      medicineId: number): Observable<InventoryRecord> {
+  return this.http.get<InventoryRecord>(this.inventoryUrl(pharmacyId), {
+    params: { medicineId: medicineId.toString() },
+  });
+}
   
   create(pharmacyId: number, payload: CreateInventoryRequest): Observable<InventoryRecord> {
     return this.http.post<InventoryRecord>(this.inventoryUrl(pharmacyId), payload);

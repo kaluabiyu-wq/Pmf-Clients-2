@@ -1,41 +1,88 @@
 <section class="detail-page">
-  @if (result(); as item) {
+  @if (isLoading()) {
+    <p class="status-text">Loading medicine details…</p>
+  } @else if (loadError()) {
+    <p class="status-text status-error">{{ loadError() }}</p>
+    <button type="button" class="back-link" (click)="onBack()">← Back to search</button>
+  } @else if (result()) {
     <a routerLink="/search" class="back-button">
-        Back to Search
-       </a>
+      Back to Search
+    </a>
     <article class="detail-card">
-      <header class="detail-header">
+
+         <header class="detail-header">
         <div class="pharmacy-info">
-          <h1 class="pharmacy-name">{{ item.pharmacyName }}</h1>
-          <p class="pharmacy-location">{{ item.distanceKm.toFixed(1) }} km · {{ item.locationLabel }}</p>
+          <h1 class="pharmacy-name">{{ pharmacyName() }}</h1>
+          @if (distanceKm() !== null) {
+            <p class="pharmacy-location">{{ distanceKm()!.toFixed(1) }} km · {{ locationLabel() }}</p>
+          } @else {
+            <p class="pharmacy-location">{{ locationLabel() }}</p>
+          }
         </div>
         <span class="status-badge" [class]="statusClass()">{{ statusLabel() }}</span>
       </header>
 
       <hr class="divider" />
 
-      <dl class="detail-list">
+       <dl class="detail-list">
+
         <div class="detail-row">
           <dt>Medicine</dt>
-          <dd>{{ item.genericName }}{{ item.brandName ? ' (' + item.brandName + ')' : '' }}</dd>
+          <dd>{{ genericName() }}{{ brandName() ? ' (' + brandName() + ')' : '' }}</dd>
         </div>
+
+        @if (category()) {
+          <div class="detail-row">
+            <dt>Category</dt>
+            <dd>{{ category() }}</dd>
+          </div>
+        }
+
+        @if (dosageForm()) {
+          <div class="detail-row">
+            <dt>Dosage form</dt>
+            <dd>{{ dosageForm() }}</dd>
+          </div>
+        }
+
+        @if (strength()) {
+          <div class="detail-row">
+            <dt>Strength</dt>
+            <dd>{{ strength() }}</dd>
+          </div>
+        }
+
         <div class="detail-row">
-          <dt>Price</dt>
-          <dd>{{ item.price | currency: 'ETB ' }}</dd>
+          <dt>Status</dt>
+          <dd>
+            <span class="status-badge" [class]="statusClass()">{{ statusLabel() }}</span>
+          </dd>
         </div>
-        <div class="detail-row">
-          <dt>Last updated</dt>
-          <dd>{{ item.lastUpdatedAt | date: 'medium' }}</dd>
-        </div>
+
+        @if (price() !== null) {
+          <div class="detail-row">
+            <dt>Price</dt>
+            <dd>{{ price() | currency: 'ETB ' }}</dd>
+          </div>
+        }
+
+        @if (lastUpdatedAt()) {
+          <div class="detail-row">
+            <dt>Last updated</dt>
+            <dd>{{ lastUpdatedAt() | date: 'medium' }}</dd>
+          </div>
+        }
+
       </dl>
 
-      <footer class="detail-footer">
+        <footer class="detail-footer">
         @if (isOutOfStock()) {
           <button type="button" class="btn btn-notify" (click)="onNotifyMe()">Notify me</button>
         } @else {
           <button type="button" class="btn btn-directions" (click)="onDirections()">Directions</button>
         }
       </footer>
+
     </article>
   } @else if (isMissingData()) {
     <p class="status-text status-error">

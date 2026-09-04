@@ -8,7 +8,7 @@ export type InventoryStatus =
   | 'Expired'
   | (string & {});
 
-/** One line in a pharmacy's own stock list — from GET /pharmacies/{id}/inventory/medicines */
+/** pharmacy's own stock list **/
 export interface PharmacyMedicineDetail {
   medicineId: number;
   genericName: string;
@@ -20,6 +20,10 @@ export interface PharmacyMedicineDetail {
   price: number;
   status: InventoryStatus;
   lastUpdatedAt: string;
+  pharmacyName?: string | null;   
+  pharmacyId?: number | null;     
+  locationLabel?: string | null;  
+  distanceKm?: number | null; 
 }
 export interface PharmacyInventoryDetail {
   pharmacyId: number;
@@ -42,7 +46,7 @@ export interface MedicinePharmacyInventoryResponse {
 
 
 
-/** A single inventory row — from GET/POST /pharmacies/{id}/inventory/... */
+/** A single inventory row —  */
 export interface InventoryRecord {
   id: number;
   medicineId: number;
@@ -53,19 +57,12 @@ export interface InventoryRecord {
   lastUpdatedAt: string;
 }
 
-/** Body for POST /pharmacies/{pharmacyId}/inventory — mirrors InventoryRequest */
+
 export interface CreateInventoryRequest {
   medicineId: number;
   updatebyUserId: number;
   price: number;
   status: InventoryStatus;
-}
-
-/** Body for an eventual PUT /pharmacies/{pharmacyId}/inventory/{id} (not yet in the API) */
-export interface UpdateInventoryRequest {
-  price: number;
-  status: InventoryStatus;
-  updatebyUserId: number;
 }
 
 export interface PagedResponse<T> {

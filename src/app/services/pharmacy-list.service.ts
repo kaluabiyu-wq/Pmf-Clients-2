@@ -8,6 +8,7 @@ import { PagedPharmacyQuery, Pharmacy, PharmacyListItem } from '../model/pharmac
 import { LocationService } from './location.service';
 
 import { PharmacyMedicine } from '../model/pharmacy.model';
+import { PharmacyMedicineDetail } from '../model/inventory.model';
 
 
 
@@ -54,6 +55,20 @@ export class PharmacyListService {
       ),
     );
   }
+
+ 
+getMedicineDetailByIds(pharmacyId: number,
+   medicineId: number ): Observable<PharmacyMedicineDetail> {
+  return this.http.get<PharmacyMedicineDetail[]>(
+    `${this.baseUrl}/${pharmacyId}/inventory/medicines`
+  ).pipe(
+    map(medicines => {
+      const found = medicines.find(m => m.medicineId === medicineId);
+      if (!found) throw new Error(`Medicine ${medicineId} not found at pharmacy ${pharmacyId}`);
+      return found;
+    })
+  );
+}
  
   getMedicinesByPharmacy(id: number): Observable<PharmacyMedicine[]> {
     return this.http.get<PharmacyMedicine[]>(

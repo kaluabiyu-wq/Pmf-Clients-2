@@ -22,7 +22,8 @@
   font-weight: 500;
 }
 
-.back-link {
+.back-link,
+.back-button {
   display: inline-block;
   font-size: 0.9rem;
   color: var(--pmafs-teal-dark);
@@ -52,6 +53,31 @@
     color: var(--pmafs-ink-muted);
     margin-bottom: var(--pmafs-space-3);
   }
+  .pharmacy-location {
+    font-size: 0.9m;
+    color: var(--pmafs-ink-muted);
+    margin: 0 0 var(--pmafs-space-2) 0;
+  }
+}
+
+.detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--pmafs-space-3);
+
+  .pharmacy-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+  }
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--pmafs-border);
+  margin: var(--pmafs-space-3) 0;
 }
 
 .status-badge {
@@ -62,21 +88,120 @@
   padding: 3px 10px;
   margin-bottom: var(--pmafs-space-2);
 
-  &.in-stock {
+  &.in-stock,
+  &.badge-in-stock {
     color: var(--pmafs-teal-dark);
     background: var(--pmafs-teal-light);
   }
 
-  &.low-stock {
+  &.low-stock,
+  &.badge-low-stock {
     color: var(--pmafs-amber-dark);
     background: var(--pmafs-amber-light);
   }
 
-  &.out-of-stock {
+  &.out-of-stock ,
+  &.badge-oit-of-stock {
     color: var(--pmafs-red);
     background: var(--pmafs-red-light);
   }
+
+  &.badge-in-stock {
+    color: var(--pmafs-ink-muted);
+    background: var(--pmafs-bg);
+
+  }
 }
+.detail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.detail-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: var(--pmafs-space-1) var(--pmafs-space-2);
+  padding: var(--pmafs-space-2) 0;
+  border-bottom: 1px solid var(--pmafs-border);
+  align-items: baseline;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  dt {
+    font-weight: 600;
+    color: var(--pmafs-ink-muted);
+    font-size: 0.875rem;
+  }
+
+  dd {
+    margin: 0;
+    color: var(--pmafs-ink);
+    font-size: 0.9rem;
+
+    .brand {
+      color: var(--pmafs-ink-muted);
+      font-style: italic;
+    }
+     .status-badge {
+      margin-bottom: 0;
+    }
+  }
+}
+.detail-footer {
+  display: flex;
+  gap: var(--pmafs-space-2);
+  margin-top: var(--pmafs-space-3);
+  padding-top: var(--pmafs-space-3);
+  border-top: 1px solid var(--pmafs-border);
+}
+
+.btn {
+  text-decoration: none;
+  text-align: center;
+  border-radius: var(--pmafs-radius-sm);
+  padding: var(--pmafs-space-2) var(--pmafs-space-4);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  border: 1px solid transparent;
+}
+
+.btn-directions {
+  background: var(--pmafs-teal);
+  border-color: var(--pmafs-teal);
+  color: #fff;
+   &:hover {
+    background: var(--pmafs-teal-dark);
+    border-color: var(--pmafs-teal-dark);
+  }
+}
+
+.btn-notify {
+  background: var(--pmafs-amber-light);
+  color: var(--pmafs-amber-dark);
+  border-color: var(--pmafs-amber);
+
+  &:hover {
+    background: var(--pmafs-amber);
+    color: #fff;
+  }
+}
+.status-text {
+  color: var(--pmafs-ink-muted);
+  padding: var(--pmafs-space-4);
+  text-align: center;
+
+  &.status-error {
+    color: var(--pmafs-red);
+  }
+}
+
 
 .price-row {
   display: flex;
