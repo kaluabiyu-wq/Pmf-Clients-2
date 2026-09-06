@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router,ActivatedRoute } from '@angular/router';
 import { MedicineSearchCardComponent } from '../../ui/medicine-search-card/medicine-search-card.componenet';
 import { SearchResultItem } from '../../model/search.model';
 import { SearchService } from '../../services/search.service';
@@ -15,6 +15,7 @@ import { SearchService } from '../../services/search.service';
 export class MedicineSearchComponent {
   private readonly searchService = inject(SearchService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   // Signed-in for Yonas Tesfaye (Patient), seeded as the 4th user -> id 4. 
   private readonly userId = signal(4);
@@ -30,6 +31,14 @@ export class MedicineSearchComponent {
 
   readonly isSearching = this.searchService.isSearching;
   readonly searchError = this.searchService.searchError;
+
+  constructor() {
+    const initialTerm = this.route.snapshot.queryParamMap.get('q');
+    if (initialTerm) {
+      this.searchTerm.set(initialTerm);
+      this.onSearch();
+    }
+  }
 
   onSearch(): void {
     const term = this.searchTerm().trim();

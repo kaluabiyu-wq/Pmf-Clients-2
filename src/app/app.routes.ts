@@ -66,6 +66,14 @@ export const routes: Routes = [
         (m) => m.PharmacyListDetailComponent,
       ),
   },
+  {
+    path: 'patient-dashboard',
+    loadComponent: () =>
+      import('./features/patient-dashboard/patient-dashboard.component').then(
+        (m) => m.PatientDashboardComponent,
+      ),
+       
+  },
  
   { path: '', redirectTo: 'pharmacy-dashboard', pathMatch: 'full' },
 
