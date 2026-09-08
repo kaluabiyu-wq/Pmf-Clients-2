@@ -1,24 +1,24 @@
+@use '@angular/material' as mat;
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap');
 
 :root {
- 
-  --pmafs-teal: #0D9488;
-  --pmafs-teal-dark: #0F766E;
-  --pmafs-teal-light: #CCFBF1;
+  --pmafs-teal: #0d9488;
+  --pmafs-teal-dark: #0f766e;
+  --pmafs-teal-light: #ccfbf1;
 
-  --pmafs-amber: #F59E0B;
-  --pmafs-amber-dark: #B45309;
-  --pmafs-amber-light: #FEF3C7;
+  --pmafs-amber: #f59e0b;
+  --pmafs-amber-dark: #b45309;
+  --pmafs-amber-light: #fef3c7;
 
-  --pmafs-red: #DC2626;
-  --pmafs-red-light: #FEE2E2;
+  --pmafs-red: #dc2626;
+  --pmafs-red-light: #fee2e2;
 
-  --pmafs-ink: #1E293B;
+  --pmafs-ink: #1e293b;
   --pmafs-ink-muted: #475569;
-  --pmafs-ink-faint: #94A3B8;
-  --pmafs-border: #E2E8F0;
-  --pmafs-surface: #FFFFFF;
-  --pmafs-bg: #F8FAFC;
+  --pmafs-ink-faint: #94a3b8;
+  --pmafs-border: #e2e8f0;
+  --pmafs-surface: #ffffff;
+  --pmafs-bg: #f8fafc;
 
   --pmafs-font-display: 'Manrope', 'Segoe UI', sans-serif;
   --pmafs-font-body: 'Inter', 'Segoe UI', sans-serif;
@@ -37,17 +37,27 @@
   box-sizing: border-box;
 }
 
-html,
-body {
+html {
   height: 100%;
-  margin: 0;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
 }
 
 body {
-  font-family: var(--pmafs-font-body);
-  background: var(--pmafs-bg);
-  color: var(--pmafs-ink);
-  -webkit-font-smoothing: antialiased;
+  color-scheme: light;
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  margin: 0;
+  height: 100%;
 }
 
 h1,

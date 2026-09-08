@@ -13,6 +13,12 @@
       <button type="button" class="clear-btn" (click)="onClear()" aria-label="Clear search">✕</button>
     }
   </div>
+  <div class="toolbar" matSort (matSortChange)="onSortChange($event)">
+    <span class="sort-label">Sort by:</span>
+    <button type="button" mat-sort-header="Name">Name</button>
+    <button type="button" mat-sort-header="ReliabilityScore">Reliability</button>
+
+  </div>
 
   @if (isLoading()) {
     <div class="spinner">Loading pharmacies…</div>
@@ -34,5 +40,13 @@
         <app-pharmacy-list-card [pharmacy]="item" (viewDetails)="onViewDetails($event)" />
       }
     </div>
+    <mat-paginator
+      [length]="totalCount()"
+      [pageIndex]="pageIndex"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[10, 20, 50]"
+      showFirstLastButtons
+      (page)="onPageChange($event)">
+    </mat-paginator>
   }
 </section>
