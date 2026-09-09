@@ -1,0 +1,77 @@
+<h2>Users</h2>
+<p>Browse registered PMF accounts.</p>
+
+<div class="search-bar">
+  <input
+    type="search"
+    class="search-input"
+    placeholder="Search by email…"
+    [(ngModel)]="searchTerm"
+    (keyup.enter)="onSearch()"
+  />
+  @if (searchTerm()) {
+    <button type="button" class="clear-btn" (click)="onClear()" aria-label="Clear search">✕</button>
+  }
+</div>
+
+<div class="toolbar" matSort (matSortChange)="onSortChange($event)">
+  <span class="sort-label">Sort by:</span>
+  <button type="button" mat-sort-header="FullName">Full name</button>
+  <button type="button" mat-sort-header="Email">Email</button>
+</div>
+
+@if (isLoading()) {
+  <div class="spinner">Loading users…</div>
+}
+
+@if (loadError()) {
+  <p class="error-banner">{{ loadError() }}</p>
+}
+
+@if (!isLoading() && !loadError()) {
+  @if (users().length === 0) {
+    <div class="empty-state">
+      <p>No users found.</p>
+    </div>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Full name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of users(); track user.id) {
+            <tr>
+              <td>{{ user.fullName }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ roleName(user.roleId) }}</td>
+              <td>{{ locationLabel(user.locationId) }}</td>
+              <td>
+                <span class="status" [class.active]="user.isActive" [class.inactive]="!user.isActive">
+                  {{ user.isActive ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td>{{ user.createdAt | date: 'mediumDate' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <mat-paginator
+      [length]="totalCount()"
+      [pageIndex]="pageIndex"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 20]"
+      showFirstLastButtons
+      (page)="onPageChange($event)">
+    </mat-paginator>
+  }
+}
