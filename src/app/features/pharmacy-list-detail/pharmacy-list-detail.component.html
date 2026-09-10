@@ -99,8 +99,15 @@
   }
 
   @if (!medicinesLoading() && medicines().length > 0) {
+    <div class="medicine-toolbar" matSort>
+      <span class="sort-label">Sort by:</span>
+      <button mat-sort-header="genericName">Name</button>
+      <button mat-sort-header="price">Price</button>
+      <button mat-sort-header="lastUpdatedAt">Last updated</button>
+    </div>
+
     <div class="medicine-list">
-      @for (medicine of medicines(); track medicine.medicineId) {
+      @for (medicine of pagedMedicines(); track medicine.medicineId) {
         <article class="medicine-card">
           <div class="medicine-card-header">
             <div>
@@ -176,6 +183,11 @@
         </article>
       }
     </div>
+     <mat-paginator
+      class="medicine-paginator"
+      [pageSizeOptions]="[2, 6, 10]"
+      showFirstLastButtons
+    ></mat-paginator>
   }
 </section>
 

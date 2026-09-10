@@ -1,14 +1,17 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap, tap } from 'rxjs';
 import { PharmacyListService } from '../../services/pharmacy-list.service';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { PharmacyMedicine } from '../../model/pharmacy.model';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
   selector: 'app-pharmacy-list-detail',
-  imports: [DatePipe,DecimalPipe],
+  imports: [DatePipe,DecimalPipe,MatPaginator, MatSortModule],
   templateUrl: './pharmacy-list-detail.component.html',
   styleUrl: './pharmacy-list-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,6 +26,28 @@ export class PharmacyListDetailComponent {
   readonly medicinesError = signal<string | null>(null);
   readonly isLoading = signal(true);
   readonly loadError = signal<string | null>(null);
+
+  readonly medicinesDataSource = new MatTableDataSource<PharmacyMedicine>([]);
+
+  readonly paginator = viewChild.required(MatPaginator);
+  readonly sort = viewChild.required(MatSort);
+
+  readonly pagedMedicines = toSignal(this.medicinesDataSource.connect(), {
+    initialValue: [] as PharmacyMedicine[],
+  });
+
+  constructor() {
+   
+    effect(() => {
+      this.medicinesDataSource.data = this.medicines();
+    });
+
+   
+    effect(() => {
+      this.medicinesDataSource.paginator = this.paginator();
+      this.medicinesDataSource.sort = this.sort();
+    });
+  }
 
   private loadMedicines(pharmacyId: number): void { 
     this.medicinesLoading.set(true);
