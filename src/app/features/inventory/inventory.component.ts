@@ -1,15 +1,19 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, effect, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { InventoryService } from '../../services/inventory.service';
 import { InventoryCardComponent, PharmacyStockSelection } from '../../ui/inventory-card/inventory-card.componenet';
 import { MedicinePharmacyInventoryResponse } from '../../model/inventory.model';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
   imports: [
-    InventoryCardComponent,
+    InventoryCardComponent,MatPaginator, MatSortModule
   ],
   templateUrl: './inventory.component.html',
   styleUrl: './inventory.component.scss',
@@ -24,6 +28,39 @@ export class InventoryComponent implements OnInit {
 
   loading = signal(false);
   error = signal('');
+
+  readonly medicinesDataSource = new MatTableDataSource<MedicinePharmacyInventoryResponse>([]);
+
+  readonly paginator = viewChild.required(MatPaginator);
+  readonly sort = viewChild.required(MatSort);
+
+  readonly pagedMedicines = toSignal(this.medicinesDataSource.connect(), {
+    initialValue: [] as MedicinePharmacyInventoryResponse[],
+  });
+
+  constructor() {
+  this.medicinesDataSource.sortingDataAccessor = (item, property) => {
+     switch (property) {
+       case 'availableCount':
+          return item.pharmacies?.length ?? 0;
+       case 'genericName':
+          return item.genericName ?? '';
+       case 'category':
+         return item.category ?? '';
+       default:
+         return '';
+  }
+};
+
+    effect(() => {
+      this.medicinesDataSource.data = this.medicines();
+    });
+
+    effect(() => {
+      this.medicinesDataSource.paginator = this.paginator();
+      this.medicinesDataSource.sort = this.sort();
+       });
+  }
 
   ngOnInit(): void {
     this.loadInventory();

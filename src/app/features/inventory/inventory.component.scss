@@ -74,10 +74,8 @@
 
 .inventory-grid {
   display: grid;
-  grid-template-columns: repeat(
-    auto-fill,
-    minmax(300px, 1fr)
-  );
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: 1fr;
 
   gap: var(--pmafs-space-4);
 }
@@ -218,6 +216,41 @@
   color: var(--pmafs-ink-muted);
 }
 
+
+.inventory-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--pmafs-space-2);
+  margin-bottom: var(--pmafs-space-3);
+  flex-wrap: wrap;
+
+  .sort-label {
+    color: var(--pmafs-ink-muted);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  button[mat-sort-header] {
+    border: 1px solid var(--pmafs-border);
+    background: var(--pmafs-surface);
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--pmafs-teal-light);
+    }
+  }
+}
+
+.inventory-paginator {
+  margin-top: var(--pmafs-space-3);
+  background: transparent;
+  display: flex;
+  justify-content: center;
+}
 
 
 

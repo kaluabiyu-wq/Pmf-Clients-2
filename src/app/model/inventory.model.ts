@@ -27,6 +27,7 @@ export interface PharmacyMedicineDetail {
 }
 export interface PharmacyInventoryDetail {
   pharmacyId: number;
+  name?: string | null;
   price: number;
   status: InventoryStatus;
   lastUpdatedAt: string;
