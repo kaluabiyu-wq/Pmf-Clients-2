@@ -41,22 +41,6 @@
   gap: var(--pmafs-space-2);
 }
 
-.refresh-button {
-  font-family: var(--pmafs-font-display);
-  border: 1px solid var(--pmafs-border);
-  border-radius: var(--pmafs-radius-sm);
-  padding: 11px var(--pmafs-space-3);
-  background: var(--pmafs-surface);
-  color: var(--pmafs-ink-muted);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: border-color 0.15s ease;
-
-  &:hover {
-    border-color: var(--pmafs-ink-muted);
-  }
-}
 
 .rating-summary {
   display: flex;
@@ -144,8 +128,11 @@ textarea {
 textarea {
   resize: vertical;
 }
+a{
+  text-decoration: none;
+}
 
-.add-button {
+.add-button,.back-button {
   font-family: var(--pmafs-font-display);
   border: 1px solid var(--pmafs-teal);
   border-radius: var(--pmafs-radius-sm);

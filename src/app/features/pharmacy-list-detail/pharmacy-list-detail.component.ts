@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal, viewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, map, of, switchMap, tap } from 'rxjs';
 import { PharmacyListService } from '../../services/pharmacy-list.service';
@@ -8,16 +8,19 @@ import { PharmacyMedicine } from '../../model/pharmacy.model';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { FavoriteService } from '../../services/favorite.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-pharmacy-list-detail',
-  imports: [DatePipe,DecimalPipe,MatPaginator, MatSortModule],
+  imports: [DatePipe,DecimalPipe,MatPaginator, MatSortModule, RouterLink,FormsModule],
   templateUrl: './pharmacy-list-detail.component.html',
   styleUrl: './pharmacy-list-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PharmacyListDetailComponent {
   private readonly pharmacyListService = inject(PharmacyListService);
+  private readonly favoriteService = inject(FavoriteService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   
@@ -26,6 +29,11 @@ export class PharmacyListDetailComponent {
   readonly medicinesError = signal<string | null>(null);
   readonly isLoading = signal(true);
   readonly loadError = signal<string | null>(null);
+
+  favoriteUserId: number | null = null;
+  addingFavorite = signal(false);
+  favoriteMessage = signal('');
+  favoriteError = signal(false);
 
   readonly medicinesDataSource = new MatTableDataSource<PharmacyMedicine>([]);
 
@@ -91,5 +99,47 @@ export class PharmacyListDetailComponent {
 
   onBack(): void {
     this.router.navigate(['/pharmacy-list']);
+  }
+
+   private createFavorite(pharmacyId: number): void {
+    this.favoriteService.create(this.favoriteUserId!, { pharmacyId }).subscribe({
+      next: () => {
+        this.favoriteMessage.set('Added to favorites!');
+        this.favoriteError.set(false);
+        this.addingFavorite.set(false);
+      },
+      error: (error) => {
+        this.favoriteMessage.set(
+          error?.error?.detail || error?.error?.message || 'Failed to add favorite.'
+        );
+        this.favoriteError.set(true);
+        this.addingFavorite.set(false);
+      },
+    });
+  }
+
+   addToFavorites(pharmacyId: number): void {
+    if (!this.favoriteUserId) {
+      this.favoriteMessage.set('Enter your user ID first.');
+      this.favoriteError.set(true);
+      return;
+    }
+
+    this.addingFavorite.set(true);
+    this.favoriteMessage.set('');
+    this.favoriteError.set(false);
+
+    this.favoriteService.check(this.favoriteUserId, pharmacyId).subscribe({
+      next: (already) => {
+        if (already) {
+          this.favoriteMessage.set('Already in your favorites.');
+          this.favoriteError.set(true);
+          this.addingFavorite.set(false);
+          return;
+        }
+        this.createFavorite(pharmacyId);
+      },
+      error: () => this.createFavorite(pharmacyId),
+    });
   }
 }
