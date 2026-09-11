@@ -1,15 +1,19 @@
 import { DecimalPipe } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, effect, inject, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { ReviewService } from '../../services/review.service';
 import { ReviewResponse } from '../../model/review.model';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-review',
   standalone: true,
-  imports: [FormsModule, RouterLink, DecimalPipe],
+  imports: [FormsModule, RouterLink, DecimalPipe,MatPaginator,MatSortModule],
   templateUrl: './review.component.html',
   styleUrl: './review.component.scss',
 })
@@ -20,9 +24,15 @@ export class ReviewComponent implements OnInit {
   pharmacyId!: number;
 
   reviews = signal<ReviewResponse[]>([]);
-  totalCount = signal(0);
-  page = signal(1);
-  readonly pageSize = 10;
+  readonly reviewsDataSource = new MatTableDataSource<ReviewResponse>([]);
+
+  readonly paginator = viewChild.required(MatPaginator);
+  readonly sort = viewChild.required(MatSort);
+
+  readonly pagedReviews = toSignal(this.reviewsDataSource.connect(), {
+    initialValue: [] as ReviewResponse[],
+  });
+
 
   averageRating = signal<number | null>(null);
 
@@ -36,8 +46,28 @@ export class ReviewComponent implements OnInit {
   submitting = signal(false);
   submitError = signal('');
 
-  get totalPages(): number {
-    return Math.max(1, Math.ceil(this.totalCount() / this.pageSize));
+  constructor() {
+    this.reviewsDataSource.sortingDataAccessor = (item, property) => {
+      switch (property) {
+        case 'rating':
+          return item.rating ?? 0;
+        case 'userId':
+          return item.userId ?? 0;
+        case 'submittedAt':
+          return item.submittedAt ? new Date(item.submittedAt).getTime() : 0;
+        default:
+          return '';
+      }
+    };
+
+    effect(() => {
+      this.reviewsDataSource.data = this.reviews();
+    });
+
+    effect(() => {
+      this.reviewsDataSource.paginator = this.paginator();
+      this.reviewsDataSource.sort = this.sort();
+    });
   }
 
   ngOnInit(): void {
@@ -60,11 +90,10 @@ export class ReviewComponent implements OnInit {
     this.error.set('');
 
     this.reviewService
-      .getByPharmacy(this.pharmacyId, { page: this.page(), pageSize: this.pageSize })
+      .getByPharmacy(this.pharmacyId, { page: 1, pageSize: 1000 })
       .subscribe({
         next: (data) => {
           this.reviews.set(data.items ?? []);
-          this.totalCount.set(data.totalCount ?? 0);
           this.loading.set(false);
         },
 
@@ -87,24 +116,6 @@ export class ReviewComponent implements OnInit {
     });
   }
 
-  refresh(): void {
-    this.loadAverageRating();
-    this.loadReviews();
-  }
-
-  nextPage(): void {
-    if (this.page() < this.totalPages) {
-      this.page.update((p) => p + 1);
-      this.loadReviews();
-    }
-  }
-
-  previousPage(): void {
-    if (this.page() > 1) {
-      this.page.update((p) => p - 1);
-      this.loadReviews();
-    }
-  }
 
   submitReview(): void {
     if (!this.newUserId) {
@@ -132,7 +143,6 @@ export class ReviewComponent implements OnInit {
           this.newRating = 5;
           this.submitting.set(false);
 
-           this.page.set(1);
           this.loadAverageRating();
           this.loadReviews();
         },

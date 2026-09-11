@@ -211,58 +211,8 @@
     color: var(--pmafs-ink-muted);
   }
 }
-.medicine-toolbar {
-  display: flex;
-  align-items: center;
-  gap: var(--pmafs-space-2);
-  margin-bottom: var(--pmafs-space-3);
-  flex-wrap: wrap;
 
-  .sort-label {
-    color: var(--pmafs-ink-muted);
-    font-size: 0.85rem;
-    font-weight: 500;
-  }
-
-  button[mat-sort-header] {
-    border: 1px solid var(--pmafs-border);
-    background: var(--pmafs-surface);
-    border-radius: 999px;
-    padding: 4px 12px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-
-    &:hover {
-      background: var(--pmafs-teal-light);
-    }
-  }
-}
-
-.medicine-paginator {
-  margin-top: var(--pmafs-space-3);
-  background: transparent;
-  display: flex;
-  justify-content: center;
-}
-
-@media (max-width: 640px) {
-  .medicines-header {
-    flex-direction: column;
-  }
-
-  .medicine-card-header {
-    flex-direction: column;
-  }
-  .medicine-list {
-    grid-template-columns: 1fr;
-  }
-
-  .medicine-details {
-    grid-template-columns: 1fr;
-  }
-
-  a{
+a{
   text-decoration: none;
 }
 
@@ -319,6 +269,57 @@
   }
 }
 
+
+.medicine-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--pmafs-space-2);
+  margin-bottom: var(--pmafs-space-3);
+  flex-wrap: wrap;
+
+  .sort-label {
+    color: var(--pmafs-ink-muted);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  button[mat-sort-header] {
+    border: 1px solid var(--pmafs-border);
+    background: var(--pmafs-surface);
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--pmafs-teal-light);
+    }
+  }
+}
+
+.medicine-paginator {
+  margin-top: var(--pmafs-space-3);
+  background: transparent;
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .medicines-header {
+    flex-direction: column;
+  }
+
+  .medicine-card-header {
+    flex-direction: column;
+  }
+  .medicine-list {
+    grid-template-columns: 1fr;
+  }
+
+  .medicine-details {
+    grid-template-columns: 1fr;
+  }
 
   
 }

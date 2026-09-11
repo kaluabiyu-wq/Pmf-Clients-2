@@ -51,7 +51,7 @@
     </form>
   </div>
 
-  @if (loading()) {
+   @if (loading()) {
     <div class="state-card">
       <div class="spinner"></div>
       <p>Loading reviews...</p>
@@ -64,8 +64,7 @@
       <div>
         <h3>Unable to load reviews</h3>
         <p>{{ error() }}</p>
-        <button type="button" (click)="refresh()">Try Again</button>
-      </div>
+       </div>
     </div>
   }
 
@@ -78,37 +77,47 @@
   }
 
   @if (!loading() && !error() && reviews().length > 0) {
-    <div class="review-list">
-      @for (review of reviews(); track review.id) {
-        <div class="review-row">
-          <div class="review-row-header">
-            <span class="stars">
-              @for (star of [1, 2, 3, 4, 5]; track star) {
-                <span [class.filled]="star <= review.rating">★</span>
-              }
-            </span>
-            <span class="reviewer">User #{{ review.userId }}</span>
-            <span class="submitted-at">{{ formatDate(review.submittedAt) }}</span>
-          </div>
+    <div class="review-toolbar" matSort>
+      <span class="sort-label">Sort by:</span>
+      <button mat-sort-header="submittedAt">Date</button>
+      <button mat-sort-header="rating">Rating</button>
+      <button mat-sort-header="userId">User</button>
+    </div>
 
-          @if (review.comment) {
-            <p class="comment">{{ review.comment }}</p>
+    <div class="review-table-wrapper">
+      <table class="review-table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Comment</th>
+            <th>Rating</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (review of pagedReviews(); track review.id) {
+            <tr>
+              <td class="col-user">User #{{ review.userId }}</td>
+              <td class="col-comment">{{ review.comment || '—' }}</td>
+              <td class="col-rating">
+                <span class="stars">
+                  @for (star of [1, 2, 3, 4, 5]; track star) {
+                    <span [class.filled]="star <= review.rating">★</span>
+                  }
+                </span>
+              </td>
+              <td class="col-date">{{ formatDate(review.submittedAt) }}</td>
+            </tr>
           }
-        </div>
-      }
+        </tbody>
+      </table>
     </div>
 
-    <div class="pagination">
-      <button type="button" (click)="previousPage()" [disabled]="page() <= 1">
-        Previous
-      </button>
-
-      <span class="page-info">Page {{ page() }} of {{ totalPages }}</span>
-
-      <button type="button" (click)="nextPage()" [disabled]="page() >= totalPages">
-        Next
-      </button>
-    </div>
+    <mat-paginator
+      class="review-paginator"
+      [pageSizeOptions]="[5, 10, 25]"
+      showFirstLastButtons
+    ></mat-paginator>
   }
 
 </div>

@@ -257,6 +257,116 @@ a{
   color: var(--pmafs-ink-muted);
 }
 
+.review-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--pmafs-space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--pmafs-space-3);
+
+  .sort-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--pmafs-ink-muted);
+    margin-right: 4px;
+  }
+
+  button {
+    font-family: var(--pmafs-font-display);
+    border: 1px solid var(--pmafs-border);
+    border-radius: var(--pmafs-radius-sm);
+    padding: 6px var(--pmafs-space-3);
+    background: var(--pmafs-surface);
+    color: var(--pmafs-ink);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+
+    &:hover {
+      border-color: var(--pmafs-teal);
+    }
+
+    &.mat-sort-header-sorted {
+      background: var(--pmafs-teal);
+      border-color: var(--pmafs-teal);
+      color: var(--pmafs-surface);
+    }
+  }
+}
+
+.review-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--pmafs-border);
+  border-radius: var(--pmafs-radius-md);
+  background: var(--pmafs-surface);
+}
+
+.review-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  thead {
+    background: var(--pmafs-bg);
+
+    th {
+      text-align: left;
+      padding: var(--pmafs-space-3) var(--pmafs-space-4);
+      font-family: var(--pmafs-font-display);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--pmafs-ink-muted);
+      border-bottom: 1px solid var(--pmafs-border);
+      white-space: nowrap;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid var(--pmafs-border);
+      transition: background 0.15s ease;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &:hover {
+        background: var(--pmafs-bg);
+      }
+    }
+
+    td {
+      padding: var(--pmafs-space-3) var(--pmafs-space-4);
+      color: var(--pmafs-ink);
+      vertical-align: top;
+    }
+  }
+
+  .col-user {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .col-comment {
+    color: var(--pmafs-ink);
+    line-height: 1.5;
+    max-width: 420px;
+  }
+
+  .col-rating {
+    white-space: nowrap;
+  }
+
+  .col-date {
+    color: var(--pmafs-ink-muted);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+}
+
 .review-list {
   display: flex;
   flex-direction: column;
@@ -335,6 +445,14 @@ a{
     color: var(--pmafs-ink-muted);
     font-size: 13px;
   }
+}
+
+.review-paginator {
+  margin-top: var(--pmafs-space-4);
+  background: transparent;
+  border-top: 1px solid var(--pmafs-border);
+  display: flex;
+  justify-content: center;
 }
 
 @media (max-width: 700px) {
