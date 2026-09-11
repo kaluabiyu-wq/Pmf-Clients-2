@@ -1,0 +1,82 @@
+<div class="favorite-page">
+
+  <div class="page-header">
+    <div>
+      <h1>My Favorites</h1>
+     
+    </div>
+
+  </div>
+
+  <div class="card form-card">
+    <h2>Add a Pharmacy</h2>
+
+    @if (addError()) {
+      <p class="form-error">{{ addError() }}</p>
+    }
+
+    <form class="add-form" (ngSubmit)="addFavorite()">
+      <label>Pharmacy ID <input type="number" name="pharmacyId" [(ngModel)]="newPharmacyId" required min="1" />
+      </label>
+
+      <button type="submit" class="add-button" [disabled]="adding()">
+        {{ adding() ? 'Adding...' : 'Add to Favorites' }}
+      </button>
+    </form>
+  </div>
+
+  @if (loading()) {
+    <div class="state-card">
+      <div class="spinner"></div>
+      <p>Loading favorites...</p>
+    </div>
+  }
+
+  @if (error() && !loading()) {
+    <div class="error-card">
+      <div class="error-icon">!</div>
+      <div>
+        <h3>Unable to load favorites</h3>
+        <p>{{ error() }}</p>
+        <button type="button" (click)="refresh()">Try Again</button>
+      </div>
+    </div>
+  }
+
+  @if (!loading() && !error() && favorites().length === 0) {
+    <div class="empty-card">
+      <div class="empty-icon">⭐</div>
+      <h2>No favorites yet</h2>
+      <p>Pharmacies you favorite will show up here for quick access.</p>
+    </div>
+  }
+
+  @if (!loading() && !error() && favorites().length > 0) {
+    <div class="favorite-list">
+      @for (favorite of favorites(); track favorite.id) {
+        <div class="favorite-row">
+          <div class="favorite-row-main">
+            <span class="pharmacy-id">Pharmacy #{{ favorite.pharmacyId }}</span>
+            <span class="created-at">Added {{ favorite.createdAt | date: 'medium' }}</span>
+          </div>
+
+          <div class="favorite-row-actions">
+            <button type="button" class="view-button" (click)="viewPharmacy(favorite)">
+              View
+            </button>
+
+            <button
+              type="button"
+              class="remove-button"
+              [disabled]="removingId() === favorite.id"
+              (click)="removeFavorite(favorite)"
+            >
+              {{ removingId() === favorite.id ? 'Removing...' : 'Remove' }}
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+</div>

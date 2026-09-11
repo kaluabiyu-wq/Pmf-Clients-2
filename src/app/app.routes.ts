@@ -84,6 +84,22 @@ export const routes: Routes = [
       ),
        
   },
+  {
+    path: 'review/:pharmacyId',
+    loadComponent: () =>
+      import('./features/review/review.component').then(
+        (m) => m.ReviewComponent,
+      ),
+       
+  },
+  {
+    path: 'favourite/:userId',
+    loadComponent: () =>
+      import('./features/favorite/favorite.component').then(
+        (m) => m.FavoriteComponent,
+      ),
+       
+  },
  
   { path: '', redirectTo: 'pharmacy-dashboard', pathMatch: 'full' },
 
