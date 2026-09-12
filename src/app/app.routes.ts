@@ -77,6 +77,15 @@ export const routes: Routes = [
       import('./features/user-list/user-list.component').then((m) => m.UserListComponent),
   },
   {
+    path: 'users-feedback/:pharmacyId/:id',
+    loadComponent: () =>
+      import('./features/user-feedback/user-feedback.component').then(
+        (m) => m.UserFeedbackComponent),
+
+
+
+  },
+  {
     path: 'patient-dashboard',
     loadComponent: () =>
       import('./features/patient-dashboard/patient-dashboard.component').then(

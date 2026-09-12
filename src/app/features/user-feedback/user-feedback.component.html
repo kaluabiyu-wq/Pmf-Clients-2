@@ -1,0 +1,88 @@
+<div class="feedback-page">
+
+  <div class="page-header">
+    <div>
+      <a routerLink="/inventory" class="back-button">Back to Inventory</a>
+      <h1>Medicine Availability Feedback</h1>
+    </div>
+  </div>
+
+  @if (routeError()) {
+    <div class="error-card">
+      <div class="error-icon">!</div>
+      <div>
+        <h3>Unable to load this feedback form</h3>
+        <p>{{ routeError() }}</p>
+      </div>
+    </div>
+  } @else {
+
+    <div class="card form-card">
+      <h2>Check Your Existing Feedback</h2>
+
+      @if (checkError()) {
+        <p class="form-error">{{ checkError() }}</p>
+      }
+
+      <div class="form-row">
+        <label>Your User ID<input type="number" name="checkUserId" [(ngModel)]="newUserId" min="1" />
+        </label>
+      </div>
+
+      <button
+        type="button"
+        class="add-button"
+        [disabled]="checking()"
+        (click)="checkExistingFeedback()">
+        {{ checking() ? 'Checking...' : 'Check My Feedback' }}
+      </button>
+
+      @if (existingFeedback()) {
+        <div class="existing-feedback">
+          <p class="existing-label">You already reported this medicine was<strong>{{ existingFeedback()!.wasMedicineAvailable ? 'available' : 'unavailable' }}</strong>
+            at this pharmacy.
+          </p>
+
+          @if (existingFeedback()!.comments) {
+            <p class="existing-comment">"{{ existingFeedback()!.comments }}"</p>
+          }
+
+          <p class="submitted-at">Submitted {{ formatDate(existingFeedback()!.submittedAt) }}</p>
+        </div>
+      }
+    </div>
+
+    <div class="card form-card">
+      <h2>Submit Feedback</h2>
+
+      @if (submitError()) {
+        <p class="form-error">{{ submitError() }}</p>
+      }
+
+      <form (ngSubmit)="submitFeedback()">
+        <div class="form-row">
+          <label>Your User ID
+            <input type="number" name="userId" [(ngModel)]="newUserId" required min="1" />
+          </label>
+
+          <label>Was the medicine available?
+             <select name="wasMedicineAvailable" [(ngModel)]="wasMedicineAvailable" required>
+              <option [ngValue]="true">Yes, it was available</option>
+              <option [ngValue]="false">No, it was not available</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="comment-label"> Comments (optional)
+          <textarea name="comments" [(ngModel)]="newComments" maxlength="2000" rows="3"></textarea>
+        </label>
+
+        <button type="submit" class="add-button" [disabled]="submitting()">
+          {{ submitting() ? 'Submitting...' : 'Submit Feedback' }}
+        </button>
+      </form>
+    </div>
+
+  }
+
+</div>
