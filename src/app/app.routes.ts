@@ -85,6 +85,13 @@ export const routes: Routes = [
 
 
   },
+    {
+    path: 'users-feedback-list',
+    loadComponent: () =>
+      import('./features/user-feedback-list/user-feedback-list.component').then(
+        (m) => m.UserFeedbackListComponent,
+      ),
+  },
   {
     path: 'patient-dashboard',
     loadComponent: () =>

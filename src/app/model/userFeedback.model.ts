@@ -17,3 +17,20 @@ export interface UserFeedbackResponse {
   comments: string | null;
   submittedAt: string;
 }
+
+export interface PagedFeedbackQuery {
+  page?: number;
+  pageSize?: number;
+  orderBy?: 'SubmittedAt' | 'PharmacyId' | 'InventoryId';
+  descending?: boolean;
+}
+ 
+export interface PagedResponse<T> {
+  items: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  hasPrevious: boolean;
+  hasNext: boolean;
+}

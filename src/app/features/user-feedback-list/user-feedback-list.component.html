@@ -1,1 +1,80 @@
-<p>user-feedback-list works!</p>
+<div class="feedback-page">
+
+  <div class="page-header">
+    <div>
+      <h1>User Feedback</h1>
+     </div>
+  </div>
+
+  @if (loading()) {
+    <div class="state-card">
+      <div class="spinner"></div>
+      <p>Loading feedback...</p>
+    </div>
+  }
+
+  @if (error() && !loading()) {
+    <div class="error-card">
+      <div class="error-icon">!</div>
+      <div>
+        <h3>Unable to load feedback</h3>
+        <p>{{ error() }}</p>
+        <button type="button" (click)="refresh()">Try Again</button>
+      </div>
+    </div>
+  }
+
+  @if (!loading() && !error() && feedback().length === 0) {
+    <div class="empty-card">
+      <div class="empty-icon">💬</div>
+      <h2>No feedback yet</h2>
+      <p>No patient has reported on a medicine's availability yet.</p>
+    </div>
+  }
+
+  @if (!loading() && !error() && feedback().length > 0) {
+    <div class="feedback-toolbar" matSort>
+      <span class="sort-label">Sort by:</span>
+      <button mat-sort-header="medicineName">Inventory</button>
+      <button mat-sort-header="pharmacyName">Pharmacy</button>
+      <button mat-sort-header="wasMedicineAvailable">Medicine Available</button>
+      <button mat-sort-header="submittedAt">Date</button>
+    </div>
+
+    <div class="feedback-table-wrapper">
+      <table class="feedback-table">
+        <thead>
+          <tr>
+            <th>Inventory</th>
+            <th>Pharmacy</th>
+            <th>Medicine Available</th>
+            <th>Comments</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of pagedFeedback(); track row.id) {
+            <tr>
+              <td class="col-inventory">{{ row.medicineName }}</td>
+              <td class="col-pharmacy">{{ row.pharmacyName }}</td>
+              <td class="col-availability">
+                <span class="availability-badge" [class.unavailable]="!row.wasMedicineAvailable">
+                  {{ row.wasMedicineAvailable ? 'Available' : 'Unavailable' }}
+                </span>
+              </td>
+              <td class="col-comments">{{ row.comments || '—' }}</td>
+              <td class="col-date">{{ formatDate(row.submittedAt) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <mat-paginator
+      class="feedback-paginator"
+      [pageSizeOptions]="[5, 10, 25]"
+      showFirstLastButtons
+    ></mat-paginator>
+  }
+
+</div>

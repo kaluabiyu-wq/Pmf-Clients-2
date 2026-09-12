@@ -1,8 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { UserFeedbackRequest, UserFeedbackResponse } from '../model/userFeedback.model';
+import { PagedFeedbackQuery, UserFeedbackRequest, UserFeedbackResponse } from '../model/userFeedback.model';
+import { PagedResponse } from '../model/medicine.model';
 
 @Injectable({ providedIn: 'root' })
 export class UserFeedbackService {
@@ -20,5 +21,18 @@ export class UserFeedbackService {
 
   create(userId: number, request: UserFeedbackRequest): Observable<UserFeedbackResponse> {
     return this.http.post<UserFeedbackResponse>(this.feedbackUrl(userId), request);
+  }
+
+  getAll(query: PagedFeedbackQuery = {}): Observable<PagedResponse<UserFeedbackResponse>> {
+    let params = new HttpParams();
+ 
+    if (query.page) params = params.set('page', query.page);
+    if (query.pageSize) params = params.set('pageSize', query.pageSize);
+    if (query.orderBy) params = params.set('orderBy', query.orderBy);
+    if (query.descending !== undefined) params = params.set('descending', query.descending);
+ 
+    return this.http.get<PagedResponse<UserFeedbackResponse>>(`${this.baseUrl}/feedback`, {
+      params,
+    });
   }
 }
