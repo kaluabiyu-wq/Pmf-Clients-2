@@ -116,6 +116,14 @@ export const routes: Routes = [
       ),
        
   },
+  {
+    path: 'pharmacy-admin',
+    loadComponent: () =>
+      import('./features/pharmacy-admin-dashboard/pharmacy-admin-dashboard.component').then(
+        (m) => m.PharmacyAdminDashboardComponent,
+      ),
+       
+  },
  
   { path: '', redirectTo: 'pharmacy-dashboard', pathMatch: 'full' },
 
