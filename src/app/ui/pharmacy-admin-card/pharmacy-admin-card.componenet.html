@@ -1,0 +1,36 @@
+<article
+  class="card"
+  role="button"
+  tabindex="0"
+  (click)="onCardClick()"
+  (keyup.enter)="onCardClick()"
+>
+  <div class="card-header">
+    <h3>{{ pharmacy().name }}</h3>
+    <div class="badges">
+      <span class="status-badge" [class]="activeClass()">{{ activeLabel() }}</span>
+      <span class="status-badge" [class]="verifiedClass()">{{ verifiedLabel() }}</span>
+    </div>
+  </div>
+
+  <p class="license">Licence #{{ pharmacy().licenseNumber }}</p>
+
+  <div class="meta">
+    <span>{{ pharmacy().reliablityScore }} reliability</span>
+    <span class="freshness-badge" [class]="freshnessClass()">{{ pharmacy().freshnessStatus }}</span>
+  </div>
+
+  <div class="counts">
+    <span>{{ pharmacy().activeStaffCount }} active staff</span>
+    @if (pharmacy().pendingDocumentCount > 0) {
+      <span class="pending">{{ pharmacy().pendingDocumentCount }} document(s) pending review</span>
+    }
+  </div>
+
+  <hr class="divider" />
+
+  <footer class="card-footer">
+    <span class="updated">Inventory updated {{ pharmacy().lastInventoryUpdatedAt | date: 'short' }}</span>
+    <button type="button" class="btn btn-view-details" (click)="onCardClick()">Manage</button>
+  </footer>
+</article>

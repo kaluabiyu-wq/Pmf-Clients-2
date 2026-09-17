@@ -1,0 +1,148 @@
+<section class="pharmacy-admin-detail-page">
+  <button type="button" class="back-link" routerLink="/pharmacy-admin-manages">← Back to list</button>
+
+  @if (isLoading()) {
+    <div class="spinner">Loading pharmacy…</div>
+  }
+
+  @if (loadError()) {
+    <p class="error-banner">{{ loadError() }}</p>
+  }
+
+  @if (profile(); as p) {
+    <header class="profile-header">
+      <h1>{{ p.name }}</h1>
+      <div class="badges">
+        <span class="status-badge" [class.active]="p.isActive" [class.suspended]="!p.isActive">
+          {{ p.isActive ? 'Active' : 'Suspended' }}
+        </span>
+        <span class="status-badge" [class.verified]="p.isVerified" [class.unverified]="!p.isVerified">
+          {{ p.isVerified ? 'Verified' : 'Unverified' }}
+        </span>
+        <span class="freshness-badge" [class.fresh]="p.freshnessStatus === 'Fresh'" [class.stale]="p.freshnessStatus !== 'Fresh'">
+          {{ p.freshnessStatus }}
+        </span>
+      </div>
+    </header>
+
+    <section class="stat-grid">
+      <div class="stat"><span class="stat-value">{{ p.reliablityScore | number: '1.0-2' }}</span><span class="stat-label">Reliability score</span></div>
+      <div class="stat"><span class="stat-value">{{ p.totalStaffCount }}</span><span class="stat-label">Total staff ({{ p.activeStaffCount }} active)</span></div>
+      <div class="stat"><span class="stat-value">{{ p.inventoryItemCount }}</span><span class="stat-label">Inventory items</span></div>
+      <div class="stat"><span class="stat-value">{{ p.pendingDocumentCount }}</span><span class="stat-label">Documents pending</span></div>
+      <div class="stat"><span class="stat-value">{{ p.approvedDocumentCount }}</span><span class="stat-label">Documents approved</span></div>
+      <div class="stat"><span class="stat-value">{{ p.rejectedDocumentCount }}</span><span class="stat-label">Documents rejected</span></div>
+      <div class="stat">
+        <span class="stat-value">{{ p.averageRating !== null ? (p.averageRating | number: '1.1-1') : '—' }}</span>
+        <span class="stat-label">Avg. rating ({{ p.reviewCount }} review{{ p.reviewCount === 1 ? '' : 's' }})</span>
+      </div>
+      <div class="stat"><span class="stat-value">{{ p.lastInventoryUpdatedAt | date: 'short' }}</span><span class="stat-label">Inventory last updated</span></div>
+      <div class="stat"><span class="stat-value">{{ p.registeredAt | date: 'mediumDate' }}</span><span class="stat-label">Registered</span></div>
+    </section>
+
+    <div class="panels">
+      <section class="panel">
+        <h2>Edit profile</h2>
+        <form (ngSubmit)="saveProfile()">
+          <label>
+            Name
+            <input type="text" [ngModel]="editName()" (ngModelChange)="editName.set($event)" name="name" required maxlength="200" />
+          </label>
+
+          <label>
+            Licence number
+            <input type="text" [ngModel]="editLicenseNumber()" (ngModelChange)="editLicenseNumber.set($event)" name="licenseNumber" required maxlength="30" />
+          </label>
+
+          <label>
+            Location
+            <select [ngModel]="editLocationId()" (ngModelChange)="editLocationId.set($event)" name="locationId" required>
+              <option [ngValue]="null" disabled>Select a location…</option>
+              @for (loc of locations(); track loc.id) {
+                <option [ngValue]="loc.id">{{ loc.label }} · {{ loc.subcity }}</option>
+              }
+            </select>
+          </label>
+
+          <label>
+            Phone number
+            <input type="number" [ngModel]="editPhoneNumber()" (ngModelChange)="editPhoneNumber.set($event)" name="phoneNumber" min="100000000" max="999999999" />
+          </label>
+
+          <label>
+            Email
+            <input type="email" [ngModel]="editEmail()" (ngModelChange)="editEmail.set($event)" name="email" />
+          </label>
+
+          <label>
+            Freshness threshold (hours)
+            <input type="number" [ngModel]="editFreshnessThreshold()" (ngModelChange)="editFreshnessThreshold.set($event)" name="freshnessThreshold" min="0" max="100" />
+          </label>
+
+          @if (profileSaveError()) {
+            <p class="error-banner">{{ profileSaveError() }}</p>
+          }
+          @if (profileSaveMessage()) {
+            <p class="success-banner">{{ profileSaveMessage() }}</p>
+          }
+
+          <button type="submit" class="btn btn-primary" [disabled]="!canSubmitProfile() || isSavingProfile()">
+            {{ isSavingProfile() ? 'Saving…' : 'Save profile' }}
+          </button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Verification &amp; status</h2>
+        <form (ngSubmit)="saveStatus()">
+          <label class="checkbox-label">
+            <input type="checkbox" [ngModel]="statusIsVerified()" (ngModelChange)="statusIsVerified.set($event)" name="isVerified" />
+            Verified
+          </label>
+
+          <label class="checkbox-label">
+            <input type="checkbox" [ngModel]="statusIsActive()" (ngModelChange)="statusIsActive.set($event)" name="isActive" />
+            Active
+          </label>
+
+          <label>
+            Reason (audit log only, not shown to the pharmacy)
+            <textarea [ngModel]="statusReason()" (ngModelChange)="statusReason.set($event)" name="reason" maxlength="500" rows="2"></textarea>
+          </label>
+
+          @if (statusSaveError()) {
+            <p class="error-banner">{{ statusSaveError() }}</p>
+          }
+          @if (statusSaveMessage()) {
+            <p class="success-banner">{{ statusSaveMessage() }}</p>
+          }
+
+          <button type="submit" class="btn btn-primary" [disabled]="isSavingStatus()">
+            {{ isSavingStatus() ? 'Updating…' : 'Update status' }}
+          </button>
+        </form>
+      </section>
+
+      <section class="panel panel-danger">
+        <h2>Remove pharmacy</h2>
+        <p>This suspends the pharmacy (soft delete) — staff, documents, inventory, and review history are kept.</p>
+
+        @if (deleteError()) {
+          <p class="error-banner">{{ deleteError() }}</p>
+        }
+
+        @if (!confirmingDelete()) {
+          <button type="button" class="btn btn-danger" (click)="requestDelete()">Remove pharmacy</button>
+        } @else {
+          <div class="confirm-row">
+            <span>Are you sure? This will deactivate the pharmacy.</span>
+            <button type="button" class="btn btn-danger" [disabled]="isDeleting()" (click)="confirmDelete()">
+              {{ isDeleting() ? 'Removing…' : 'Yes, remove' }}
+            </button>
+            <button type="button" class="btn" (click)="cancelDelete()">Cancel</button>
+          </div>
+        }
+      </section>
+    </div>
+  }
+</section>

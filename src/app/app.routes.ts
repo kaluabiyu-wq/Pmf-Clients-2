@@ -125,6 +125,20 @@ export const routes: Routes = [
        
   },
   {
+  path: 'pharmacy-admin-manages',
+  loadComponent: () =>
+    import('./features/pharmacy-admin-manages/pharmacy-admin-manages.component').then(
+      (m) => m.PharmacyAdminManagesComponent,
+    ),
+},
+{
+  path: 'pharmacy-admin-manages/:id',
+  loadComponent: () =>
+    import('./features/pharmacy-admin-managesdetail/pharmacy-admin-managesdetail.componenet').then(
+      (m) => m.PharmacyAdminManagesdetailComponenet,
+    ),
+},
+  {
   path: 'pharmacy-staff/:pharmacyId',
   loadComponent: () =>
     import('./features/pharmacy-staff/pharmacy-staff.component').then(
