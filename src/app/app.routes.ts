@@ -101,6 +101,13 @@ export const routes: Routes = [
        
   },
   {
+  path: 'pharmacy-document/:pharmacyId',
+  loadComponent: () =>
+    import('./features/pharmacy-document/pharmacy-document.componenet').then(
+      (m) => m.PharmacyDocumentComponenet,
+    ),
+},
+  {
     path: 'review/:pharmacyId',
     loadComponent: () =>
       import('./features/review/review.component').then(
