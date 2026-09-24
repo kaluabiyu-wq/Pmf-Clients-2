@@ -68,7 +68,7 @@
 
             <div class="pharmacy-row-main">
               <span class="pharmacy-id">
-                Pharmacy {{ stock.pharmacyId }}
+                {{ stock.name || 'Pharmacy ' + stock.pharmacyId }}
               </span>
 
               <span

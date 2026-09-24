@@ -1,0 +1,77 @@
+<h2>Create account</h2>
+<p>Register a new PMF user.</p>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="row">
+    <div class="field">
+      <label for="fullName">Full name</label>
+      <input id="fullName" type="text" formControlName="fullName" placeholder="e.g. Kalu Abiyu" />
+      @if (form.controls.fullName.invalid && form.controls.fullName.touched) {
+        <span class="error">Enter a full name (at least 2 characters).</span>
+      }
+    </div>
+
+    <div class="field">
+      <label for="email">Email</label>
+      <input id="email" type="email" formControlName="email" placeholder="e.g. kalu@example.com" />
+      @if (form.controls.email.invalid && form.controls.email.touched) {
+        <span class="error">Enter a valid email address.</span>
+      }
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="password">Password</label>
+    <input id="password" type="password" formControlName="password" placeholder="At least 8 characters" />
+    @if (form.controls.password.invalid && form.controls.password.touched) {
+      <span class="error">Password must be at least 8 characters.</span>
+    }
+  </div>
+
+  <div class="row">
+    <div class="field">
+      <label for="locationId">Location</label>
+
+      @if (locationsResource.isLoading()) {
+        <select id="locationId" disabled>
+          <option>Loading locations…</option>
+        </select>
+      } @else if (locationsResource.error()) {
+        <select id="locationId" disabled>
+          <option>Could not load locations</option>
+        </select>
+      } @else {
+        <select id="locationId" formControlName="locationId">
+          <option [value]="null" disabled>Select a location</option>
+          @for (location of locationsResource.value()?.items ?? []; track location.id) {
+            <option [value]="location.id">{{ location.label }} ({{ location.subcity }})</option>
+          }
+        </select>
+      }
+
+      @if (form.controls.locationId.invalid && form.controls.locationId.touched) {
+        <span class="error">Select a location.</span>
+      }
+    </div>
+
+    <div class="field">
+      <label for="roleId">Role</label>
+      <select id="roleId" formControlName="roleId">
+        @for (role of roles; track role.id) {
+          <option [value]="role.id">{{ role.name }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  @if (submitError(); as error) {
+    <div class="error-banner" role="alert">{{ error }}</div>
+  }
+
+  <div class="actions">
+    <button type="submit" [disabled]="isSubmitting()">
+      {{ isSubmitting() ? 'Creating…' : 'Create account' }}
+    </button>
+    <button type="button" (click)="onCancel()">Cancel</button>
+  </div>
+</form>

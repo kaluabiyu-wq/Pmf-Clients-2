@@ -66,6 +66,16 @@ export const routes: Routes = [
         (m) => m.PharmacyListDetailComponent,
       ),
   },
+   {
+    path: 'register',
+    loadComponent: () =>
+      import('./features/user/user.component').then((m) => m.UserComponent),
+  },
+  {
+    path: 'users-list',
+    loadComponent: () =>
+      import('./features/user-list/user-list.component').then((m) => m.UserListComponent),
+  },
   {
     path: 'patient-dashboard',
     loadComponent: () =>

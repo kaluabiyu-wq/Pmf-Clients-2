@@ -79,10 +79,16 @@
 
  
   @if (!loading() && !error() && medicines().length > 0) {
+     <div class="inventory-toolbar" matSort>
+      <span class="sort-label">Sort by:</span>
+      <button mat-sort-header="genericName">Name</button>
+      <button mat-sort-header="category">Category</button>
+      <button mat-sort-header="availableCount">Availability</button>
+    </div>
 
     <div class="inventory-grid">
 
-      @for (medicine of medicines(); track medicine.medicineId) {
+      @for (medicine of pagedMedicines(); track medicine.medicineId) {
 
         <app-inventory-card [medicine]="medicine"
           (view)="viewInventory($event)"/>
@@ -90,6 +96,11 @@
       }
 
     </div>
+    <mat-paginator
+      class="inventory-paginator"
+      [pageSizeOptions]="[6, 12, 24]"
+      showFirstLastButtons
+    ></mat-paginator>
 
   }
 
