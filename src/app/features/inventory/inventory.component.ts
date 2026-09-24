@@ -69,9 +69,7 @@ export class InventoryComponent implements OnInit {
 
 
   addInventory(): void {
-    this.router.navigate([
-      '/inventory/create'
-    ]);
+    this.router.navigate(['/inventory/create']);
   }
 
 
@@ -86,8 +84,7 @@ export class InventoryComponent implements OnInit {
 
         next: (inventory) => {
 
-          this.router.navigate([
-            '/inventory',
+          this.router.navigate(['/inventory',
             selection.pharmacyId,
             inventory.id
           ]);

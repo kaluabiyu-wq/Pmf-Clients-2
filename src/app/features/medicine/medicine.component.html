@@ -1,5 +1,11 @@
 <h2>Medicine Catalog</h2>
 
+<div class="toolbar" matSort>
+  <span class="sort-label">Sort by:</span>
+ <button mat-sort-header="genericName">Name</button>
+  <button mat-sort-header="strength">Strength</button>
+</div>
+
 @if (medicinesResource.isLoading()) {
   <div class="spinner">Fetching medicines from the server...</div>
 } @else if (medicinesResource.error(); as err) {
@@ -8,13 +14,15 @@
   </div>
 } @else {
   <div class="grid">
-    @for (medicine of medicinesResource.value()!; track medicine.id) {
-      <app-medicine-card
-        [medicine]="medicine"
-        (favoriteToggled)="onFavoriteToggle($event)" />
+    @for (medicine of pagedMedicines(); track medicine.id) {
+      <app-medicine-card [medicine]="medicine"/>
     }
     @empty {
       <p>No medicines are available for this search.</p>
     }
   </div>
 }
+
+<mat-paginator 
+[pageSizeOptions]="[6, 12, 30]" 
+showFirstLastButtons></mat-paginator>

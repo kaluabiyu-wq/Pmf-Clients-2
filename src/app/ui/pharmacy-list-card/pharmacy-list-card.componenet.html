@@ -23,7 +23,11 @@
   <hr class="divider" />
 
   <footer class="card-footer">
+    <div class="footer-info">
     <span class="phone">{{ pharmacy().phoneNumber }}</span>
     <span class="updated">Updated {{ pharmacy().lastInventoryUpdateAt | date: 'short' }}</span>
+  </div>
+
+     <button type="button" class="btn btn-view-details" (click)="onCardClick()">View Detail</button>
   </footer>
 </article>

@@ -1,0 +1,23 @@
+<div class="dashboard">
+  <section class="search-card">
+    <h2 class="search-card__title">Find a medicine near you</h2>
+    <p class="search-card__subtitle">Search by generic or brand name</p>
+
+    <form class="search-form" (ngSubmit)="onSearch()">
+      <div class="search-input-wrap">
+        <svg class="search-input-wrap__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8" />
+          <path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+        <input
+          type="search"
+          class="search-input-wrap__input"
+          name="dashboardSearch"
+          placeholder="e.g. Amoxicillin"
+          [(ngModel)]="searchTerm"
+        />
+      </div>
+      <button type="submit" class="search-form__submit">Search</button>
+    </form>
+  </section>
+</div>

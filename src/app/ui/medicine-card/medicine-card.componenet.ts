@@ -13,9 +13,4 @@ export class MedicineCardComponent {
   @Input({ required: true }) medicine!: Medicine;
   @Output() favoriteToggled = new EventEmitter<Medicine>();
 
-  onFavoriteClick(event: Event) {
-     event.stopPropagation();
-    event.preventDefault();
-    this.favoriteToggled.emit(this.medicine);
-  }
 }

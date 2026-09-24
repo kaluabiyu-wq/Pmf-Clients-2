@@ -128,9 +128,52 @@
   justify-content: space-between;
   margin-top: var(--pmafs-space-2);
 }
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--pmafs-space-1);
+}
+.btn {
+  font-family: var(--pmafs-font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: var(--pmafs-radius-sm, 6px);
+  padding: 6px 14px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-directions {
+  background: var(--pmafs-teal);
+  color: var(--pmafs-surface);
+  border-color: var(--pmafs-teal);
+
+  &:hover {
+    background: var(--pmafs-teal-dark);
+    border-color: var(--pmafs-teal-dark);
+  }
+}
+
+
+
+
+.btn-view-details {
+  background: var(--pmafs-teal);
+  color: var(--pmafs-surface);
+  border-color: var(--pmafs-teal);
+
+  &:hover {
+    background: var(--pmafs-teal-dark);
+    border-color: var(--pmafs-teal-dark);
+  }
+}
 
 .divider {
   border: none;
   border-top: 1px solid var(--pmafs-border);
   margin: var(--pmafs-space-2) 0 0;
 }
+
+
