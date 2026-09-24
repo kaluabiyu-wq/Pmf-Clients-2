@@ -4,8 +4,7 @@
 
   <div class="page-header">
     <div>
-     <a routerLink="/inventory" class="back-button">
-         ← Back to Inventory
+     <a routerLink="/inventory" class="back-button"> Back to Inventory
        </a>
 
       <h1>Inventory Details</h1>
@@ -39,7 +38,7 @@
     </div>
   }
 
-  <!-- Inventory -->
+ 
   @if (inventory(); as inventory) {
     @if (!loading()) {
 
@@ -124,9 +123,6 @@
           </div>
 
           <div class="medicine-placeholder">
-            <div class="medicine-icon">
-              💊
-            </div>
 
             <div>
               <h3>Medicine #{{ inventory.medicineId }}</h3>
@@ -137,12 +133,11 @@
           </div>
         </div>
 
-        <!-- Summary -->
+       
         <div class="summary-grid">
 
           <div class="summary-card">
-            <span class="summary-icon">💊</span>
-
+          
             <div>
               <span class="summary-label">Medicine</span>
               <strong>#{{ inventory.medicineId }}</strong>
@@ -150,8 +145,7 @@
           </div>
 
           <div class="summary-card">
-            <span class="summary-icon">💰</span>
-
+        
             <div>
               <span class="summary-label">Price</span>
               <strong>
@@ -161,7 +155,6 @@
           </div>
 
           <div class="summary-card">
-            <span class="summary-icon">📋</span>
 
             <div>
               <span class="summary-label">Status</span>

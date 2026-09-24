@@ -2,26 +2,31 @@
   <p class="user-greeting">Hi, {{ currentUserName() }}</p>
 
   <div class="search-bar">
-    <input
+     <input
       type="search"
       class="search-input"
       placeholder="Search medicine (e.g. Amoxicillin 500mg)"
       [(ngModel)]="searchTerm"
       (keyup.enter)="onSearch()"
     />
+    @if (searchTerm()) {
+      <button type="button" class="clear-btn" (click)="onClear()" aria-label="Clear search">✕</button>
+    }
   </div>
 
   <div class="location-row">
-    <span class="location-label"> {{ locationLabel() }}</span>
+    <span class="location-label">{{ locationLabel() }}</span>
     <button type="button" class="change-link">Change</button>
   </div>
 
   @if (isSearching()) {
     <p class="status-text">Searching nearby pharmacies…</p>
+    <div class="spinner">Searching nearby pharmacies…</div>
   }
 
   @if (searchError()) {
     <p class="status-text status-error">{{ searchError() }}</p>
+    <p class="error-banner">{{ searchError() }}</p>
   }
 
   @if (hasSearched() && !isSearching() && !searchError()) {
@@ -29,11 +34,20 @@
       NEARBY RESULTS · {{ results().length }} {{ results().length === 1 ? 'PHARMACY' : 'PHARMACIES' }}
     </h2>
 
+    <div class="results-meta">
+      <span>
+        NEARBY RESULTS · {{ results().length }} {{ results().length === 1 ? 'PHARMACY' : 'PHARMACIES' }}
+      </span>
+    </div>
+
     @if (results().length === 0) {
       <p class="status-text">No pharmacies currently list this medicine near you.</p>
+      <div class="empty-state">
+        <p>No pharmacies currently list this medicine near you.</p>
+      </div>
     }
 
-    <div class="results-list">
+    <div class="results-list grid">
       @for (item of results(); track item.pharmacyId + '-' + item.medicineId) {
         <app-medicine-search-card
           [result]="item"

@@ -51,6 +51,10 @@ export class MedicineSearchComponent {
       });
   }
 
+  onClear(): void {
+    this.searchTerm.set('');
+  }
+
   onDirections(item: SearchResultItem): void {
     console.log('Directions requested for pharmacy', item.pharmacyId);
   }

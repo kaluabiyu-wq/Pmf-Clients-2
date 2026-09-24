@@ -1,0 +1,39 @@
+<section class="pharmacy-list-page">
+ 
+
+  <div class="search-bar">
+    <span class="search-icon">🔍</span>
+    <input
+      type="search"
+      class="search-input"
+      placeholder="Search pharmacy name…"
+      [(ngModel)]="searchTerm"
+      (keyup.enter)="onSearch()"
+    />
+    @if (searchTerm()) {
+      <button type="button" class="clear-btn" (click)="onClear()" aria-label="Clear search">✕</button>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="spinner">Loading pharmacies…</div>
+  }
+
+  @if (loadError()) {
+    <p class="error-banner">{{ loadError() }}</p>
+  }
+
+  @if (!isLoading() && !loadError()) {
+    @if (pharmacies().length === 0) {
+      <div class="empty-state">
+        <p>No pharmacies found.</p>
+      </div>
+    }
+
+    <div class="grid">
+      @for (item of pharmacies(); track item.id) {
+        <app-pharmacy-list-card [pharmacy]="item" (viewDetails)="onViewDetails($event)" />
+      }
+    </div>
+  }
+</section>

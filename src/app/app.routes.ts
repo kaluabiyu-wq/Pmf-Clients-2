@@ -52,6 +52,20 @@ export const routes: Routes = [
         (m) => m.MedicineSearchDetailComponent,
       ),
   },
+  {
+    path: 'pharmacy-list',
+    loadComponent: () =>
+      import('./features/pharmacy-list/pharmacy-list.component').then(
+        (m) => m.PharmacyListComponent,
+      ),
+  },
+  {
+    path: 'pharmacy-list/:id',
+    loadComponent: () =>
+      import('./features/pharmacy-list-detail/pharmacy-list-detail.component').then(
+        (m) => m.PharmacyListDetailComponent,
+      ),
+  },
  
   { path: '', redirectTo: 'pharmacy-dashboard', pathMatch: 'full' },
 

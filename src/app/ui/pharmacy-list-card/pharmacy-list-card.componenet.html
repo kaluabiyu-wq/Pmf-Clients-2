@@ -1,0 +1,29 @@
+<article class="card" role="button" tabindex="0"
+  (click)="onCardClick()"
+  (keyup.enter)="onCardClick()"
+>
+  <div class="card-header">
+    <h3>{{ pharmacy().name }}</h3>
+    <span class="status-badge" [class]="statusClass()">{{ statusLabel() }}</span>
+  </div>
+
+  @if (pharmacy().location; as loc) {
+    <p class="pharmacy-location">{{ loc.label }} · {{ loc.subcity }}</p>
+  } @else {
+    <p class="pharmacy-location">Location unavailable</p>
+  }
+
+  <div class="meta">
+    @if (pharmacy().isVerified) {
+      <span>✓ Verified</span>
+    }
+    <span>{{ pharmacy().reliabilityScore }} reliability</span>
+  </div>
+
+  <hr class="divider" />
+
+  <footer class="card-footer">
+    <span class="phone">{{ pharmacy().phoneNumber }}</span>
+    <span class="updated">Updated {{ pharmacy().lastInventoryUpdateAt | date: 'short' }}</span>
+  </footer>
+</article>

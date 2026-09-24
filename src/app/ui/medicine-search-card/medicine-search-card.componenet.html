@@ -1,4 +1,7 @@
-<article class="pharmacy-card">
+<article class="pharmacy-card card" role="button" tabindex="0"
+  (click)="onViewDetailsClick()"
+  (keyup.enter)="onViewDetailsClick()"
+>
   <header class="card-header" role="button"
     tabindex="0" (click)="onViewDetailsClick()"
     (keyup.enter)="onViewDetailsClick()"
@@ -7,18 +10,25 @@
       <h3 class="pharmacy-name">{{ result().pharmacyName }}</h3>
       <p class="pharmacy-location"> {{ result().distanceKm.toFixed(1) }} km · {{ result().locationLabel }}</p>
     </div>
-    <span class="status-badge" [class]="statusClass()">{{ statusLabel() }}</span>
+    <span class="distance">{{ result().distanceKm.toFixed(1) }} km</span>
   </header>
+
+  <p class="pharmacy-name">{{ result().locationLabel }}</p>
+
+  <span class="status-badge" [class]="statusClass()">{{ statusLabel() }}</span>
 
   <hr class="divider" />
 
   <footer class="card-footer">
-    <span class="price">{{ result().price | currency: 'ETB ' }}</span>
+    <span class="price">
+      {{ result().price | currency: 'ETB ' }}
+      <span class="unit">/ unit</span>
+    </span>
 
     @if (isOutOfStock()) {
-      <button type="button" class="btn btn-notify" (click)="onNotifyClick()">Notify me</button>
+      <button type="button" class="btn btn-notify" (click)="onNotifyClick($event)">Notify me</button>
     } @else {
-      <button type="button" class="btn btn-directions" (click)="onDirectionsClick()">Directions</button>
+      <button type="button" class="btn btn-directions" (click)="onDirectionsClick($event)">Directions</button>
     }
   </footer>
 </article>
