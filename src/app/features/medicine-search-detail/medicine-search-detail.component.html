@@ -1,0 +1,49 @@
+<section class="detail-page">
+  @if (result(); as item) {
+    <a routerLink="/search" class="back-button">
+        Back to Search
+       </a>
+    <article class="detail-card">
+      <header class="detail-header">
+        <div class="pharmacy-info">
+          <h1 class="pharmacy-name">{{ item.pharmacyName }}</h1>
+          <p class="pharmacy-location">{{ item.distanceKm.toFixed(1) }} km · {{ item.locationLabel }}</p>
+        </div>
+        <span class="status-badge" [class]="statusClass()">{{ statusLabel() }}</span>
+      </header>
+
+      <hr class="divider" />
+
+      <dl class="detail-list">
+        <div class="detail-row">
+          <dt>Medicine</dt>
+          <dd>{{ item.genericName }}{{ item.brandName ? ' (' + item.brandName + ')' : '' }}</dd>
+        </div>
+        <div class="detail-row">
+          <dt>Price</dt>
+          <dd>{{ item.price | currency: 'ETB ' }}</dd>
+        </div>
+        <div class="detail-row">
+          <dt>Last updated</dt>
+          <dd>{{ item.lastUpdatedAt | date: 'medium' }}</dd>
+        </div>
+      </dl>
+
+      <footer class="detail-footer">
+        @if (isOutOfStock()) {
+          <button type="button" class="btn btn-notify" (click)="onNotifyMe()">Notify me</button>
+        } @else {
+          <button type="button" class="btn btn-directions" (click)="onDirections()">Directions</button>
+        }
+      </footer>
+    </article>
+  } @else if (isMissingData()) {
+    <p class="status-text status-error">
+      This listing's details aren't available after a refresh yet. Please search again and tap the result.
+    </p>
+    <button type="button" class="back-link" (click)="onBack()">← Back to search</button>
+  } @else {
+    <p class="status-text">No pharmacy selected yet. Go back and pick a result to see its details.</p>
+    <button type="button" class="back-link" (click)="onBack()">← Back to search</button>
+  }
+</section>

@@ -1,0 +1,168 @@
+:host {
+  display: block;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: var(--pmafs-space-5) var(--pmafs-space-4);
+}
+
+.spinner {
+  color: var(--pmafs-ink-muted);
+  padding: var(--pmafs-space-4);
+  border: 1px dashed var(--pmafs-border);
+  border-radius: var(--pmafs-radius-md);
+  text-align: center;
+}
+
+.error-banner {
+  background: var(--pmafs-red-light);
+  border: 1px solid var(--pmafs-red);
+  color: var(--pmafs-red);
+  padding: var(--pmafs-space-3) var(--pmafs-space-4);
+  border-radius: var(--pmafs-radius-sm);
+  font-weight: 500;
+}
+
+.back-link {
+  display: inline-block;
+  font-size: 0.9rem;
+  color: var(--pmafs-teal-dark);
+  text-decoration: none;
+  margin-bottom: var(--pmafs-space-3);
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.detail-card {
+  background: var(--pmafs-surface);
+  border: 1px solid var(--pmafs-border);
+  border-left: 4px solid var(--pmafs-teal);
+  border-radius: var(--pmafs-radius-md);
+  padding: var(--pmafs-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--pmafs-space-1);
+
+  h2 {
+    margin-bottom: 2px;
+  }
+
+  .pharmacy-name {
+    color: var(--pmafs-ink-muted);
+    margin-bottom: var(--pmafs-space-3);
+  }
+}
+
+.status-badge {
+  align-self: flex-start;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 3px 10px;
+  margin-bottom: var(--pmafs-space-2);
+
+  &.in-stock {
+    color: var(--pmafs-teal-dark);
+    background: var(--pmafs-teal-light);
+  }
+
+  &.low-stock {
+    color: var(--pmafs-amber-dark);
+    background: var(--pmafs-amber-light);
+  }
+
+  &.out-of-stock {
+    color: var(--pmafs-red);
+    background: var(--pmafs-red-light);
+  }
+}
+
+.price-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--pmafs-space-1);
+  padding: var(--pmafs-space-2) 0;
+  border-bottom: 1px solid var(--pmafs-border);
+
+  .price {
+    font-family: var(--pmafs-font-display);
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: var(--pmafs-ink);
+  }
+
+  .unit {
+    font-size: 0.85rem;
+    color: var(--pmafs-ink-muted);
+  }
+}
+
+p {
+  margin: 0;
+  padding: var(--pmafs-space-1) 0;
+  border-bottom: 1px solid var(--pmafs-border);
+  color: var(--pmafs-ink);
+
+  &:last-of-type {
+    border-bottom: none;
+  }
+}
+
+strong {
+  color: var(--pmafs-ink-muted);
+  font-weight: 600;
+  margin-right: var(--pmafs-space-1);
+}
+
+.map-placeholder {
+  margin-top: var(--pmafs-space-3);
+  height: 160px;
+  border-radius: var(--pmafs-radius-sm);
+  background: var(--pmafs-bg);
+  border: 1px dashed var(--pmafs-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pmafs-ink-faint);
+  font-size: 0.85rem;
+}
+
+.actions {
+  display: flex;
+  gap: var(--pmafs-space-2);
+  margin-top: var(--pmafs-space-3);
+
+  button,
+  a.btn {
+    text-decoration: none;
+    text-align: center;
+    border-radius: var(--pmafs-radius-sm);
+    padding: var(--pmafs-space-1) var(--pmafs-space-3);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .btn-primary {
+    background: var(--pmafs-teal);
+    border: 1px solid var(--pmafs-teal);
+    color: #fff;
+
+    &:hover {
+      background: var(--pmafs-teal-dark);
+      border-color: var(--pmafs-teal-dark);
+    }
+  }
+
+  .btn-favorite {
+    background: var(--pmafs-amber-light);
+    color: var(--pmafs-amber-dark);
+    border: 1px solid var(--pmafs-amber);
+
+    &:hover {
+      background: var(--pmafs-amber);
+      color: #fff;
+    }
+  }
+}
