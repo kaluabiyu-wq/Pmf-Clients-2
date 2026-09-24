@@ -7,6 +7,10 @@ import { Location as PmfLocation, PagedResponse } from '../model/location.model'
 import { PagedPharmacyQuery, Pharmacy, PharmacyListItem } from '../model/pharmacy.model';
 import { LocationService } from './location.service';
 
+import { PharmacyMedicine } from '../model/pharmacy.model';
+
+
+
 @Injectable({ providedIn: 'root' })
 export class PharmacyListService {
   private readonly http = inject(HttpClient);
@@ -50,6 +54,14 @@ export class PharmacyListService {
       ),
     );
   }
+ 
+  getMedicinesByPharmacy(id: number): Observable<PharmacyMedicine[]> {
+    return this.http.get<PharmacyMedicine[]>(
+      `${this.baseUrl}/${id}/inventory/medicines`,
+    );
+  }
+
+
 
   private joinLocations(
     response: PagedResponse<Pharmacy>,

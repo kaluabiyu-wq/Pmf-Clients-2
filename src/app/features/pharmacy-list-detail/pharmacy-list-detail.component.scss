@@ -81,3 +81,146 @@
     text-align: right;
   }
 }
+.medicines-section {
+  margin-top: var(--pmafs-space-4);
+  background: var(--pmafs-surface);
+  border: 1px solid var(--pmafs-border);
+  border-radius: var(--pmafs-radius-md);
+  padding: var(--pmafs-space-4);
+}
+
+.medicines-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--pmafs-space-3);
+  margin-bottom: var(--pmafs-space-3);
+
+  h2 {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+
+  p {
+    margin: 4px 0 0;
+    color: var(--pmafs-ink-muted);
+    font-size: 0.9rem;
+  }
+}
+
+.medicine-count {
+  color: var(--pmafs-ink-muted);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.medicine-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pmafs-space-3);
+}
+
+.medicine-card {
+  border: 1px solid var(--pmafs-border);
+  border-radius: var(--pmafs-radius-md);
+  padding: var(--pmafs-space-3);
+  background: var(--pmafs-surface);
+}
+
+.medicine-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--pmafs-space-3);
+
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+  }
+}
+
+.medicine-brand {
+  margin: 4px 0 0;
+  color: var(--pmafs-ink-muted);
+  font-size: 0.9rem;
+}
+
+.medicine-status {
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.medicine-status.available {
+  color: var(--pmafs-teal-dark);
+  background: var(--pmafs-teal-light);
+}
+
+.medicine-status.unavailable {
+  color: var(--pmafs-red);
+  background: var(--pmafs-red-light);
+}
+
+.medicine-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--pmafs-space-2);
+  margin-top: var(--pmafs-space-3);
+  padding-top: var(--pmafs-space-3);
+  border-top: 1px solid var(--pmafs-border);
+}
+
+.medicine-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  span {
+    color: var(--pmafs-ink-muted);
+    font-size: 0.78rem;
+  }
+
+  strong {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+}
+
+.medicine-loading {
+  padding: var(--pmafs-space-4);
+  text-align: center;
+  color: var(--pmafs-ink-muted);
+}
+
+.empty-medicines {
+  padding: var(--pmafs-space-4);
+  text-align: center;
+  border: 1px dashed var(--pmafs-border);
+  border-radius: var(--pmafs-radius-md);
+
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  p {
+    margin: var(--pmafs-space-1) 0 0;
+    color: var(--pmafs-ink-muted);
+  }
+}
+
+@media (max-width: 640px) {
+  .medicines-header {
+    flex-direction: column;
+  }
+
+  .medicine-card-header {
+    flex-direction: column;
+  }
+
+  .medicine-details {
+    grid-template-columns: 1fr;
+  }
+}

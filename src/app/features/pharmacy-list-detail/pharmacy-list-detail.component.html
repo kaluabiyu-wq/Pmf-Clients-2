@@ -57,3 +57,125 @@
     </article>
   }
 </section>
+
+<section class="medicines-section">
+  <header class="medicines-header">
+    <div>
+      <h2>Medicines Available</h2>
+      <p>Medicines currently available at this pharmacy.</p>
+    </div>
+
+    @if (!medicinesLoading()) {
+      <span class="medicine-count">
+        {{ medicines().length }}
+        medicine{{ medicines().length === 1 ? '' : 's' }}
+      </span>
+    }
+  </header>
+
+  @if (medicinesLoading()) {
+    <div class="medicine-loading">
+      Loading medicines…
+    </div>
+  }
+
+  @if (medicinesError()) {
+    <p class="error-banner">
+      {{ medicinesError() }}
+    </p>
+  }
+
+  @if (
+    !medicinesLoading() &&
+    !medicinesError() &&
+    medicines().length === 0
+  ) {
+    <div class="empty-medicines">
+      <h3>No medicines available</h3>
+      <p>
+        This pharmacy currently has no medicine inventory records.
+      </p>
+    </div>
+  }
+
+  @if (!medicinesLoading() && medicines().length > 0) {
+    <div class="medicine-list">
+      @for (medicine of medicines(); track medicine.medicineId) {
+        <article class="medicine-card">
+          <div class="medicine-card-header">
+            <div>
+              <h3>{{ medicine.genericName }}</h3>
+
+              @if (medicine.brandName) {
+                <p class="medicine-brand">
+                  {{ medicine.brandName }}
+                </p>
+              }
+            </div>
+
+            <span
+              class="medicine-status"
+              [class.available]="
+                medicine.status.toLowerCase() === 'available'
+              "
+              [class.unavailable]="
+                medicine.status.toLowerCase() !== 'available'
+              "
+            >
+              {{ medicine.status }}
+            </span>
+          </div>
+
+          <div class="medicine-details">
+            @if (medicine.category) {
+              <div class="medicine-detail">
+                <span>Category</span>
+                <strong>{{ medicine.category }}</strong>
+              </div>
+            }
+
+            @if (medicine.dosageForm) {
+              <div class="medicine-detail">
+                <span>Dosage form</span>
+                <strong>{{ medicine.dosageForm }}</strong>
+              </div>
+            }
+
+            @if (medicine.strength) {
+              <div class="medicine-detail">
+                <span>Strength</span>
+                <strong>{{ medicine.strength }}</strong>
+              </div>
+            }
+
+            <div class="medicine-detail">
+              <span>Prescription</span>
+              <strong>
+                {{
+                  medicine.requiresPrescription
+                    ? 'Required'
+                    : 'Not required'
+                }}
+              </strong>
+            </div>
+
+            <div class="medicine-detail">
+              <span>Price</span>
+              <strong>
+                {{ medicine.price | number: '1.2-2' }}
+              </strong>
+            </div>
+
+            <div class="medicine-detail">
+              <span>Last updated</span>
+              <strong>
+                {{ medicine.lastUpdatedAt | date: 'medium' }}
+              </strong>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>
+
