@@ -1,0 +1,181 @@
+
+<div class="inventory-detail">
+
+
+  <div class="page-header">
+    <div>
+     <a routerLink="/inventory" class="back-button">
+         ← Back to Inventory
+       </a>
+
+      <h1>Inventory Details</h1>
+      <p>View the details of this inventory record.</p>
+    </div>
+
+    
+  </div>
+
+ 
+  @if (loading()) {
+    <div class="state-card">
+      <div class="spinner"></div>
+      <p>Loading inventory details...</p>
+    </div>
+  }
+
+  
+  @if (error() && !loading()) {
+    <div class="error-card">
+      <div class="error-icon">!</div>
+
+      <div>
+        <h3>Something went wrong</h3>
+        <p>{{ error() }}</p>
+
+        <button type="button" (click)="loadInventory()">
+          Try Again
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Inventory -->
+  @if (inventory(); as inventory) {
+    @if (!loading()) {
+
+      <div class="content">
+
+         <div class="card main-card">
+
+          <div class="card-header">
+            <div>
+              <span class="label">Inventory #{{ inventory.id }}</span>
+              <h2>Medicine Inventory</h2>
+            </div>
+
+            <span
+              class="status"
+              [class]="getStatusClass(inventory.status)"
+            >
+              {{ inventory.status }}
+            </span>
+          </div>
+
+          <div class="details-grid">
+
+            <div class="detail-item">
+              <span class="detail-label">Inventory ID</span>
+              <span class="detail-value">
+                {{ inventory.id }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <span class="detail-label">Medicine ID</span>
+              <span class="detail-value">
+                {{ inventory.medicineId }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <span class="detail-label">Pharmacy ID</span>
+              <span class="detail-value">
+                {{ inventory.pharmacyId }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <span class="detail-label">Updated By User</span>
+              <span class="detail-value">
+                {{ inventory.updateUserId }}
+              </span>
+            </div>
+
+            <div class="detail-item price-item">
+              <span class="detail-label">Price</span>
+              <span class="price">
+                {{ inventory.price | number:'1.2-2' }}
+              </span>
+            </div>
+
+            <div class="detail-item">
+              <span class="detail-label">Status</span>
+              <span class="detail-value">
+                {{ inventory.status }}
+              </span>
+            </div>
+
+            <div class="detail-item full-width">
+              <span class="detail-label">Last Updated</span>
+              <span class="detail-value">
+                {{ formatDate(inventory.lastUpdatedAt) }}
+              </span>
+            </div>
+
+          </div>
+        </div>
+
+          <div class="card">
+          <div class="card-header simple">
+            <div>
+              <span class="label">Medicine</span>
+              <h2>Medicine Information</h2>
+            </div>
+          </div>
+
+          <div class="medicine-placeholder">
+            <div class="medicine-icon">
+              💊
+            </div>
+
+            <div>
+              <h3>Medicine #{{ inventory.medicineId }}</h3>
+              <p>
+                Medicine information is associated with this inventory record.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary-grid">
+
+          <div class="summary-card">
+            <span class="summary-icon">💊</span>
+
+            <div>
+              <span class="summary-label">Medicine</span>
+              <strong>#{{ inventory.medicineId }}</strong>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <span class="summary-icon">💰</span>
+
+            <div>
+              <span class="summary-label">Price</span>
+              <strong>
+                {{ inventory.price | number:'1.2-2' }}
+              </strong>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <span class="summary-icon">📋</span>
+
+            <div>
+              <span class="summary-label">Status</span>
+              <strong>
+                {{ inventory.status }}
+              </strong>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    }
+  }
+
+</div>

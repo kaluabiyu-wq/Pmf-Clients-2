@@ -14,8 +14,7 @@ export class MedicineCardComponent {
   @Output() favoriteToggled = new EventEmitter<Medicine>();
 
   onFavoriteClick(event: Event) {
-    // stop the click from bubbling to the routerLink and navigating away
-    event.stopPropagation();
+     event.stopPropagation();
     event.preventDefault();
     this.favoriteToggled.emit(this.medicine);
   }
