@@ -1,0 +1,123 @@
+<div class="review-page">
+
+  <div class="page-header">
+    <div>
+      <a routerLink="/pharmacy-list" class="back-button">Back to Pharmacies</a>
+      <h1>Pharmacy Reviews</h1>
+     </div>
+
+  </div>
+
+  @if (averageRating() !== null) {
+    <div class="rating-summary">
+      <span class="rating-value">{{ averageRating() | number: '1.1-1' }}</span>
+      <span class="rating-label">average service rating out of 5</span>
+    </div>
+  }
+
+  <div class="card form-card">
+    <h2>Leave a Review</h2>
+
+    @if (submitError()) {
+      <p class="form-error">{{ submitError() }}</p>
+    }
+
+    <form (ngSubmit)="submitReview()">
+      <div class="form-row">
+        <label>
+          Your User ID
+          <input type="number" name="userId" [(ngModel)]="newUserId" required min="1" />
+        </label>
+
+        <label>
+          Rating
+          <select name="rating" [(ngModel)]="newRating" required>
+            <option [value]="5">5 - Excellent</option>
+            <option [value]="4">4 - Good</option>
+            <option [value]="3">3 - Average</option>
+            <option [value]="2">2 - Poor</option>
+            <option [value]="1">1 - Very Poor</option>
+          </select>
+        </label>
+      </div>
+
+      <label class="comment-label"> Comment (optional)
+        <textarea name="comment" [(ngModel)]="newComment" maxlength="2000" rows="3"></textarea>
+      </label>
+
+      <button type="submit" class="add-button" [disabled]="submitting()">
+        {{ submitting() ? 'Submitting...' : 'Submit Review' }}
+      </button>
+    </form>
+  </div>
+
+   @if (loading()) {
+    <div class="state-card">
+      <div class="spinner"></div>
+      <p>Loading reviews...</p>
+    </div>
+  }
+
+  @if (error() && !loading()) {
+    <div class="error-card">
+      <div class="error-icon">!</div>
+      <div>
+        <h3>Unable to load reviews</h3>
+        <p>{{ error() }}</p>
+       </div>
+    </div>
+  }
+
+  @if (!loading() && !error() && reviews().length === 0) {
+    <div class="empty-card">
+      <div class="empty-icon">📝</div>
+      <h2>No reviews yet</h2>
+      <p>Be the first to share how this pharmacy handled your visit.</p>
+    </div>
+  }
+
+  @if (!loading() && !error() && reviews().length > 0) {
+    <div class="review-toolbar" matSort>
+      <span class="sort-label">Sort by:</span>
+      <button mat-sort-header="submittedAt">Date</button>
+      <button mat-sort-header="rating">Rating</button>
+      <button mat-sort-header="userId">User</button>
+    </div>
+
+    <div class="review-table-wrapper">
+      <table class="review-table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Comment</th>
+            <th>Rating</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (review of pagedReviews(); track review.id) {
+            <tr>
+              <td class="col-user">User #{{ review.userId }}</td>
+              <td class="col-comment">{{ review.comment || '—' }}</td>
+              <td class="col-rating">
+                <span class="stars">
+                  @for (star of [1, 2, 3, 4, 5]; track star) {
+                    <span [class.filled]="star <= review.rating">★</span>
+                  }
+                </span>
+              </td>
+              <td class="col-date">{{ formatDate(review.submittedAt) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <mat-paginator
+      class="review-paginator"
+      [pageSizeOptions]="[5, 10, 25]"
+      showFirstLastButtons
+    ></mat-paginator>
+  }
+
+</div>

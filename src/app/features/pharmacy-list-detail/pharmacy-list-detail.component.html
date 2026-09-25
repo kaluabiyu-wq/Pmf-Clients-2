@@ -1,6 +1,8 @@
 <section class="detail-page">
   <button type="button" class="back-link" (click)="onBack()">← Back to pharmacies</button>
 
+   
+
   @if (isLoading()) {
     <div class="spinner">Loading pharmacy…</div>
   }
@@ -17,6 +19,13 @@
           {{ item.isActive ? 'Active' : 'Inactive' }}
         </span>
       </header>
+     <div class="detail-actions">
+     <a class="btn-primary" [routerLink]="['/review', item.id]">
+      Add and See Reviews</a>
+     <a class="btn-primary" [routerLink]="['/favourite', item.id]">
+       Add and See favourite</a>
+     </div>
+     
 
       <hr class="divider" />
 
