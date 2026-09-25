@@ -124,6 +124,13 @@ export const routes: Routes = [
       ),
        
   },
+  {
+  path: 'pharmacy-staff/:pharmacyId',
+  loadComponent: () =>
+    import('./features/pharmacy-staff/pharmacy-staff.component').then(
+      (m) => m.PharmacyStaffComponent,
+    ),
+},
  
   { path: '', redirectTo: 'pharmacy-dashboard', pathMatch: 'full' },
 

@@ -1,0 +1,131 @@
+<div class="pharmacy-staff">
+
+  <div class="page-header">
+    <div>
+      <h1>Pharmacy Staff</h1>
+      <p>Manage who is authorized to update inventory for pharmacy #{{ pharmacyId }}.</p>
+    </div>
+
+    <button type="button" class="back-button" (click)="goBack()">Back to Dashboard</button>
+  </div>
+
+  @if (error()) {
+    <div class="banner error-banner">{{ error() }}</div>
+  }
+
+  <section class="add-staff-card">
+
+    <h2>Authorize a Staff Member</h2>
+
+    <form [formGroup]="lookupForm" (ngSubmit)="lookupUser()" class="lookup-form">
+
+      <label class="field">
+        <span class="label">User Email</span>
+        <input type="email" formControlName="email" placeholder="staff@pharmacy.com" />
+      </label>
+
+      <button type="submit" class="secondary-button" [disabled]="lookupLoading()">
+        @if (lookupLoading()) { Searching... } @else { Find User }
+      </button>
+
+    </form>
+
+    @if (lookupError()) {
+      <p class="field-error">{{ lookupError() }}</p>
+    }
+
+    @if (foundUser(); as user) {
+
+      <div class="found-user">
+
+        <div class="found-user-info">
+          <span class="name">{{ user.fullName }}</span>
+          <span class="email">{{ user.email }}</span>
+        </div>
+
+        <button type="button" class="link-button" (click)="clearLookup()">Change</button>
+
+      </div>
+
+      <form [formGroup]="staffForm" (ngSubmit)="addStaff()" class="staff-form">
+
+        <label class="field">
+          <span class="label">Position</span>
+
+          <select formControlName="position">
+            @for (position of positions; track position) {
+              <option [value]="position">{{ position }}</option>
+            }
+          </select>
+
+        </label>
+
+        <label class="checkbox-field">
+          <input type="checkbox" formControlName="isActive" />
+          <span>Active immediately</span>
+        </label>
+
+        @if (submitError()) {
+          <p class="field-error">{{ submitError() }}</p>
+        }
+
+        <button type="submit" class="primary-button" [disabled]="isSubmitting()">
+          @if (isSubmitting()) { Authorizing... } @else { Authorize Staff Member }
+        </button>
+
+      </form>
+
+    }
+
+  </section>
+
+  <section class="staff-list-section">
+
+    <h2>Current Staff</h2>
+
+    @if (loading()) {
+
+      <p class="status-text">Loading staff...</p>
+
+    } @else if (staff().length === 0) {
+
+      <p class="status-text">No staff have been authorized for this pharmacy yet.</p>
+
+    } @else {
+
+      <div class="staff-list">
+
+        @for (member of staff(); track member.id) {
+
+          <div class="staff-row" [class.inactive]="!member.isActive">
+
+            <div class="staff-row-main">
+              <span class="position">{{ member.position }}</span>
+
+              <span class="status-badge" [class.active]="member.isActive">
+                {{ member.isActive ? 'Active' : 'Revoked' }}
+              </span>
+            </div>
+
+            <div class="staff-row-details">
+              <span class="user-id">User #{{ member.userId }}</span>
+              <span class="assigned-at">Assigned {{ formatDate(member.assignedAt) }}</span>
+            </div>
+
+            @if (member.isActive) {
+              <button type="button" class="revoke-button" (click)="deactivate(member)">
+                Revoke Access
+              </button>
+            }
+
+          </div>
+
+        }
+
+      </div>
+
+    }
+
+  </section>
+
+</div>
