@@ -1,0 +1,159 @@
+<div class="document-page">
+
+  <div class="page-header">
+    <div>
+      <a routerLink="/pharmacy-list" class="back-button">Back to Pharmacies</a>
+      <h1>Verification Documents</h1>
+      <p>Licenses, business registration, and pharmacist credentials on file for this pharmacy.</p>
+    </div>
+  </div>
+
+  <div class="card form-card">
+    <h2>Upload a Document</h2>
+
+    @if (submitError()) {
+      <p class="form-error">{{ submitError() }}</p>
+    }
+
+    <form (ngSubmit)="submitDocument()">
+      <div class="form-row">
+        <label>
+          Document Type
+          <select name="documentType" [(ngModel)]="newDocumentType" required>
+            @for (type of documentTypes; track type) {
+              <option [value]="type">{{ type }}</option>
+            }
+          </select>
+        </label>
+
+        <label>
+          Expires At (optional)
+          <input type="date" name="expiresAt" [(ngModel)]="newExpiresAt" />
+        </label>
+      </div>
+
+      <label class="file-url-label">
+        File URL
+        <input type="text" name="fileUrl" [(ngModel)]="newFileUrl" required
+          placeholder="https://..." />
+      </label>
+
+      <button type="submit" class="add-button" [disabled]="submitting()">
+        {{ submitting() ? 'Uploading...' : 'Upload Document' }}
+      </button>
+    </form>
+  </div>
+
+  @if (loading()) {
+    <div class="state-card">
+      <div class="spinner"></div>
+      <p>Loading documents...</p>
+    </div>
+  }
+
+  @if (error() && !loading()) {
+    <div class="error-card">
+      <div class="error-icon">!</div>
+      <div>
+        <h3>Unable to load documents</h3>
+        <p>{{ error() }}</p>
+      </div>
+    </div>
+  }
+
+  @if (!loading() && !error() && documents().length === 0) {
+    <div class="empty-card">
+      <div class="empty-icon">📄</div>
+      <h2>No documents yet</h2>
+      <p>Upload a license, business registration, or pharmacist credential to get started.</p>
+    </div>
+  }
+
+  @if (!loading() && !error() && documents().length > 0) {
+    <div class="document-toolbar" matSort>
+      <span class="sort-label">Sort by:</span>
+      <button mat-sort-header="documentType">Type</button>
+      <button mat-sort-header="reviewStatus">Status</button>
+      <button mat-sort-header="uploadedAt">Uploaded</button>
+      <button mat-sort-header="expiresAt">Expires</button>
+    </div>
+
+    <div class="document-table-wrapper">
+      <table class="document-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>File</th>
+            <th>Status</th>
+            <th>Uploaded</th>
+            <th>Expires</th>
+            <th>Reviewed By</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (document of pagedDocuments(); track document.id) {
+            <tr>
+              <td class="col-type">{{ document.documentType }}</td>
+
+              <td class="col-file">
+                <a [href]="document.fileUrl" target="_blank" rel="noopener">View file</a>
+              </td>
+
+              <td class="col-status">
+                <span class="status" [class]="getStatusClass(document.reviewStatus)">
+                  {{ document.reviewStatus }}
+                </span>
+                @if (isExpired(document.expiresAt)) {
+                  <span class="status status-expired">Expired</span>
+                }
+              </td>
+
+              <td class="col-date">{{ document.uploadedAt | date: 'short' }}</td>
+
+              <td class="col-date">
+                {{ document.expiresAt ? (document.expiresAt | date: 'short') : '—' }}
+              </td>
+
+              <td class="col-reviewer">
+                {{ document.reviewedByUserId ? 'User #' + document.reviewedByUserId : '—' }}
+              </td>
+
+              <td class="col-actions">
+                @if (reviewingId() === document.id) {
+                  <div class="review-form">
+                    @if (reviewError()) {
+                      <p class="form-error">{{ reviewError() }}</p>
+                    }
+
+                    <input type="number" min="1" placeholder="Admin user ID"
+                      [(ngModel)]="reviewerUserId" name="reviewerUserId-{{ document.id }}" />
+
+                    <div class="review-buttons">
+                      <button type="button" class="approve-button"
+                        (click)="submitReview(document.id, 'Approved')">Approve</button>
+                      <button type="button" class="reject-button"
+                        (click)="submitReview(document.id, 'Rejected')">Reject</button>
+                      <button type="button" class="cancel-button"
+                        (click)="cancelReview()">Cancel</button>
+                    </div>
+                  </div>
+                } @else {
+                  <button type="button" class="review-button"
+                    (click)="startReview(document.id)">Review</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <mat-paginator
+      class="document-paginator"
+      [pageSizeOptions]="[5, 10, 25]"
+      showFirstLastButtons
+    ></mat-paginator>
+  }
+
+</div>
