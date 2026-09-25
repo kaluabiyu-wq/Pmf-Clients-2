@@ -8,7 +8,6 @@ import { PharmacyMedicine } from '../../model/pharmacy.model';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { FavoriteService } from '../../services/favorite.service';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -20,8 +19,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class PharmacyListDetailComponent {
   private readonly pharmacyListService = inject(PharmacyListService);
-  private readonly favoriteService = inject(FavoriteService);
-  private readonly router = inject(Router);
+   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   
   readonly medicines = signal<PharmacyMedicine[]>([]); 
@@ -101,45 +99,5 @@ export class PharmacyListDetailComponent {
     this.router.navigate(['/pharmacy-list']);
   }
 
-   private createFavorite(pharmacyId: number): void {
-    this.favoriteService.create(this.favoriteUserId!, { pharmacyId }).subscribe({
-      next: () => {
-        this.favoriteMessage.set('Added to favorites!');
-        this.favoriteError.set(false);
-        this.addingFavorite.set(false);
-      },
-      error: (error) => {
-        this.favoriteMessage.set(
-          error?.error?.detail || error?.error?.message || 'Failed to add favorite.'
-        );
-        this.favoriteError.set(true);
-        this.addingFavorite.set(false);
-      },
-    });
-  }
-
-   addToFavorites(pharmacyId: number): void {
-    if (!this.favoriteUserId) {
-      this.favoriteMessage.set('Enter your user ID first.');
-      this.favoriteError.set(true);
-      return;
-    }
-
-    this.addingFavorite.set(true);
-    this.favoriteMessage.set('');
-    this.favoriteError.set(false);
-
-    this.favoriteService.check(this.favoriteUserId, pharmacyId).subscribe({
-      next: (already) => {
-        if (already) {
-          this.favoriteMessage.set('Already in your favorites.');
-          this.favoriteError.set(true);
-          this.addingFavorite.set(false);
-          return;
-        }
-        this.createFavorite(pharmacyId);
-      },
-      error: () => this.createFavorite(pharmacyId),
-    });
-  }
+  
 }
