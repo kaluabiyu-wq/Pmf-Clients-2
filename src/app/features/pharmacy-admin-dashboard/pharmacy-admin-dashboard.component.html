@@ -1,0 +1,207 @@
+<div class="admin-dashboard">
+
+  <div class="page-header">
+    <div>
+      <h1>Admin Dashboard</h1>
+    </div>
+    </div>
+
+  @if (loading()) {
+    <div class="state-card">
+      <div class="spinner"></div>
+      <p>Loading dashboard...</p>
+    </div>
+  }
+
+  @if (error() && !loading()) {
+    <div class="error-card">
+      <div class="error-icon">!</div>
+      <div>
+        <h3>Unable to load the dashboard</h3>
+        <p>{{ error() }}</p>
+        <button type="button" (click)="refresh()">Try Again</button>
+      </div>
+    </div>
+  }
+
+  @if (!loading() && !error() && summary(); as stats) {
+    <section class="stat-grid">
+      <div class="stat-card">
+        <p class="stat-card__label">Verified &amp; Active</p>
+        <p class="stat-card__value">{{ stats.verifiedPharmacyCount }}</p>
+        <p class="stat-card__helper">of {{ stats.totalPharmacyCount }} registered pharmacies</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-card__label">Pending Verification</p>
+        <p class="stat-card__value">{{ verificationQueue().length }}</p>
+        <p class="stat-card__helper">awaiting document review</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-card__label">Priced Medicines</p>
+        <p class="stat-card__value">{{ stats.pricedMedicineCount }}</p>
+        <p class="stat-card__helper">carried by at least one pharmacy</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-card__label">Uncovered Medicines</p>
+        <p class="stat-card__value">{{ stats.uncoveredMedicineCount }}</p>
+        <p class="stat-card__helper">in the catalogue, stocked nowhere</p>
+      </div>
+    </section>
+
+    <section class="panel-row">
+      <div class="panel">
+        <h2 class="panel__title">Top Pharmacies by Inventory</h2>
+        <p class="panel__subtitle">Ranked by number of medicines carried.</p>
+
+        @if (rankedPharmacies().length === 0) {
+          <p class="panel__empty">No inventory data yet.</p>
+        } @else {
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Pharmacy</th>
+                <th>Items</th>
+                <th>Reliability</th>
+                <th>Lowest Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of rankedPharmacies(); track row.pharmacyId) {
+                <tr>
+                  <td class="col-name">{{ row.name }}</td>
+                  <td>{{ row.itemCount }}</td>
+                  <td>{{ row.reliablityScore.toFixed(1) }}</td>
+                  <td>{{ formatPrice(row.lowestPrice) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+
+      <div class="panel">
+        <h2 class="panel__title">Highest-Priced Medicines</h2>
+        <p class="panel__subtitle">Average price across every pharmacy that carries it.</p>
+
+        @if (topPricedMedicines().length === 0) {
+          <p class="panel__empty">No priced inventory yet.</p>
+        } @else {
+          <table class="mini-table">
+            <thead>
+              <tr>
+                <th>Medicine</th>
+                <th>Average Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of topPricedMedicines(); track row.medicine) {
+                <tr>
+                  <td class="col-name">{{ row.medicine }}</td>
+                  <td>{{ formatPrice(row.averagePrice) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </section>
+
+    @if (uncoveredMedicines().length > 0) {
+      <section class="panel">
+        <h2 class="panel__title">Catalogue Gaps</h2>
+        <p class="panel__subtitle">
+          medicines exist in the catalogue but no pharmacy currently stocks them.
+        </p>
+        <div class="chip-list">
+          @for (name of uncoveredMedicines(); track name) {
+            <span class="chip">{{ name }}</span>
+          }
+        </div>
+      </section>
+    }
+
+    @if (verificationQueue().length > 0) {
+      <section class="panel">
+        <h2 class="panel__title">Verification Queue</h2>
+        <p class="panel__subtitle">
+          Registered but not yet verified. Approving a pharmacy requires reviewing its uploaded
+          documents, which isn't wired into this dashboard yet.
+        </p>
+        <table class="mini-table">
+          <thead>
+            <tr>
+              <th>Pharmacy</th>
+              <th>License</th>
+              <th>Registered</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (pharmacy of verificationQueue(); track pharmacy.id) {
+              <tr>
+                <td class="col-name">{{ pharmacy.name }}</td>
+                <td>{{ pharmacy.licenseNumber }}</td>
+                <td>{{ formatDate(pharmacy.registeredAt) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </section>
+    }
+
+    @if (pharmacies().length === 0) {
+      <div class="empty-card">
+        <h2>No pharmacies registered yet</h2>
+        <p>Once pharmacies register, they'll show up here for oversight.</p>
+      </div>
+    } @else {
+      <section class="panel">
+        <h2 class="panel__title">All Pharmacies</h2>
+
+        <div class="directory-toolbar" matSort>
+          <span class="sort-label">Sort by:</span>
+          <button mat-sort-header="name">Name</button>
+          <button mat-sort-header="licenseNumber">License</button>
+          <button mat-sort-header="isVerified">Verified</button>
+          <button mat-sort-header="reliablityScore">Reliability</button>
+          <button mat-sort-header="registeredAt">Registered</button>
+        </div>
+
+        <div class="directory-table-wrapper">
+          <table class="directory-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>License</th>
+                <th>Verified</th>
+                <th>Reliability</th>
+                <th>Registered</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (pharmacy of pagedPharmacies(); track pharmacy.id) {
+                <tr>
+                  <td class="col-name">{{ pharmacy.name }}</td>
+                  <td>{{ pharmacy.licenseNumber }}</td>
+                  <td>
+                    <span class="verified-badge" [class.is-unverified]="!pharmacy.isVerified">
+                      {{ pharmacy.isVerified ? 'Verified' : 'Unverified' }}
+                    </span>
+                  </td>
+                  <td>{{ pharmacy.reliablityScore.toFixed(1) }}</td>
+                  <td class="col-date">{{ formatDate(pharmacy.registeredAt) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <mat-paginator
+          class="directory-paginator"
+          [pageSizeOptions]="[10, 25, 50]"
+          showFirstLastButtons
+        ></mat-paginator>
+      </section>
+    }
+  }
+
+</div>
