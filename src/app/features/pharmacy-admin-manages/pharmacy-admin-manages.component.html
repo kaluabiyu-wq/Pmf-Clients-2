@@ -1,0 +1,82 @@
+<section class="pharmacy-admin-manages-page">
+  <h1>Pharmacy Administration</h1>
+
+  <div class="search-bar">
+    <input
+      type="search"  class="search-input"
+      placeholder="Search pharmacy name or licence number…"
+      [(ngModel)]="searchTerm"
+      (keyup.enter)="onSearch()"
+    />
+    @if (searchTerm()) {
+      <button type="button" class="clear-btn" (click)="onClear()" aria-label="Clear search">✕</button>
+    }
+  </div>
+
+  <div class="filters">
+    <label>
+      Verification
+      <select [(ngModel)]="verifiedFilter" (ngModelChange)="onFilterChange()">
+        <option value="all">All</option>
+        <option value="verified">Verified</option>
+        <option value="unverified">Unverified</option>
+      </select>
+    </label>
+
+    <label>
+      Status
+      <select [(ngModel)]="activeFilter" (ngModelChange)="onFilterChange()">
+        <option value="all">All</option>
+        <option value="active">Active</option>
+        <option value="suspended">Suspended</option>
+      </select>
+    </label>
+
+    <label>
+      Freshness
+      <select [(ngModel)]="freshnessFilter" (ngModelChange)="onFilterChange()">
+        <option value="all">All</option>
+        <option value="Fresh">Fresh</option>
+        <option value="Stale">Stale</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="toolbar" matSort (matSortChange)="onSortChange($event)">
+    <span class="sort-label">Sort by:</span>
+    <button type="button" mat-sort-header="Name">Name</button>
+    <button type="button" mat-sort-header="LicenceNumber">Licence #</button>
+    <button type="button" mat-sort-header="ReliabilityScore">Reliability</button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="spinner">Loading pharmacies…</div>
+  }
+
+  @if (loadError()) {
+    <p class="error-banner">{{ loadError() }}</p>
+  }
+
+  @if (!isLoading() && !loadError()) {
+    @if (pharmacies().length === 0) {
+      <div class="empty-state">
+        <p>No pharmacies match these filters.</p>
+      </div>
+    }
+
+    <div class="grid">
+      @for (item of pharmacies(); track item.id) {
+        <app-pharmacy-admin-card [pharmacy]="item" (viewDetails)="onManage($event)" />
+      }
+    </div>
+
+    <mat-paginator
+      [length]="totalCount()"
+      [pageIndex]="pageIndex"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[10, 20, 50]"
+      showFirstLastButtons
+      (page)="onPageChange($event)">
+    </mat-paginator>
+  }
+</section>
