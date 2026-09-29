@@ -152,8 +152,15 @@ export const routes: Routes = [
       (m) => m.PharmacyStaffComponent,
     ),
 },
+{
+  path: 'unauthorized',
+  loadComponent: () =>
+    import('./features/unauthorized/unauthorized.componenet').then(
+      (m) => m.UnauthorizedComponent),
+},
  
-  { path: '', redirectTo: 'pharmacy-dashboard', pathMatch: 'full' },
+  { 
+    path: '', redirectTo: 'pharmacy-dashboard', pathMatch: 'full' },
 
   { path: '**', redirectTo: 'pharmacy-dashboard' },
 ];
