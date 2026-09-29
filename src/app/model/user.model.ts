@@ -49,3 +49,21 @@ export const USER_ROLES: readonly RoleOption[] = [
   { id: 3, name: 'PharmacyStaff' },
   { id: 4, name: 'Admin' },
 ];
+
+export type RoleName = 'Patient' | 'Pharmacy' | 'PharmacyStaff' | 'Admin';
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  token: string;
+}
+
+
+export interface AuthUser {
+  id: number | null;
+  email: string | null;
+  role: RoleName | null;
+}
