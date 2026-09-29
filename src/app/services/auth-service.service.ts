@@ -1,0 +1,78 @@
+import { computed, inject, Injectable, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
+import { AuthUser, LoginRequest, LoginResponse, RoleName } from '../model/user.model';
+
+const DOTNET_ROLE_CLAIM = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
+const DOTNET_NAME_ID_CLAIM = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier';
+const DOTNET_EMAIL_CLAIM = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress';
+
+@Injectable({ providedIn: 'root' })
+export class AuthService {
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = `${environment.apiBaseUrl}/api/auth`;
+
+  
+  private readonly _token = signal<string | null>(null);
+  private readonly _currentUser = signal<AuthUser | null>(null);
+
+  readonly token = this._token.asReadonly();
+  readonly currentUser = this._currentUser.asReadonly();
+  readonly role = computed<RoleName | null>(() => this._currentUser()?.role ?? null);
+  readonly isAuthenticated = computed(() => this._token() !== null);
+
+  login(request: LoginRequest): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(`${this.apiUrl}/login`, request)
+      .pipe(
+        tap((response) => {
+          this._token.set(response.token);
+          this._currentUser.set(this.decodeUser(response.token));
+        })
+      );
+  }
+
+  logout(): void {
+    this._token.set(null);
+    this._currentUser.set(null);
+  }
+
+  hasRole(...roles: RoleName[]): boolean {
+    const current = this.role();
+    return current !== null && roles.includes(current);
+  }
+
+  private decodeUser(token: string): AuthUser | null {
+    const payload = this.decodePayload(token);
+    if (!payload) return null;
+
+    const rawRole = payload[DOTNET_ROLE_CLAIM] ?? payload['role'];
+    const role = Array.isArray(rawRole) ? rawRole[0] : rawRole;
+
+    const rawId = payload[DOTNET_NAME_ID_CLAIM] ?? payload['sub'];
+    const id = rawId !== undefined && !isNaN(Number(rawId)) ? Number(rawId) : null;
+
+    return {
+      id,
+      email: payload[DOTNET_EMAIL_CLAIM] ?? payload['email'] ?? null,
+      role: (role as RoleName) ?? null,
+    };
+  }
+
+  private decodePayload(token: string): Record<string, any> | null {
+    try {
+      const part = token.split('.')[1];
+      const base64 = part.replace(/-/g, '+').replace(/_/g, '/');
+      const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
+      const json = decodeURIComponent(atob(padded)
+          .split('')
+          .map((c) => '%' + c.charCodeAt(0).toString(16).padStart(2, '0'))
+          .join('')
+      );
+      return JSON.parse(json);
+    } catch {
+      return null;
+    }
+  }
+}
