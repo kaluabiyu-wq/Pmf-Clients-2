@@ -22,7 +22,11 @@ export const guestGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  return auth.isAuthenticated() ? router.createUrlTree([homeFor(auth.role())]) : true;
+   if (!auth.isAuthenticated()) return true;
+
+  const home = homeFor(auth.role());
+  // Authenticated but no recognised role: stay on the guest page (prevents a redirect loop).
+  return home === '/login' ? true : router.createUrlTree([home]);
 };
 
 /** For '/' and unknown URLs: send people to login or their role's home. */

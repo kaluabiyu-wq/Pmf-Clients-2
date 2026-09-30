@@ -10,6 +10,10 @@ const DOTNET_ROLE_CLAIM = 'http://schemas.microsoft.com/ws/2008/06/identity/clai
 const DOTNET_NAME_ID_CLAIM = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier';
 const DOTNET_EMAIL_CLAIM = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress';
 
+const TOKEN_STORAGE_KEY = 'pmf_auth_token';
+
+const VALID_ROLES: readonly RoleName[] = ['Patient', 'Pharmacy', 'PharmacyStaff', 'Admin'];
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
@@ -22,7 +26,12 @@ export class AuthService {
   readonly token = this._token.asReadonly();
   readonly currentUser = this._currentUser.asReadonly();
   readonly role = computed<RoleName | null>(() => this._currentUser()?.role ?? null);
-  readonly isAuthenticated = computed(() => this._token() !== null);
+  readonly isAuthenticated = computed(() => this._token() !== null 
+           && this._currentUser() !=null,);
+
+  constructor() {
+    this.restoreSession();
+  }
 
   login(request: LoginRequest): Observable<LoginResponse> {
     return this.http
@@ -92,5 +101,36 @@ export class AuthService {
     } catch {
       return null;
     }
+  }
+  private restoreSession(): void {
+    const stored = this.readToken();
+    if (!stored) return;
+
+    const user = this.decodeUser(stored);
+    if (!user) {
+      this.clearToken();
+      return;
+    }
+    this._token.set(stored);
+    this._currentUser.set(user);
+  }
+  private saveToken(token: string): void {
+    try {
+      sessionStorage.setItem(TOKEN_STORAGE_KEY, token);
+    } catch {}
+  }
+
+  private readToken(): string | null {
+    try {
+      return sessionStorage.getItem(TOKEN_STORAGE_KEY);
+    } catch {
+      return null;
+    }
+  }
+
+  private clearToken(): void {
+    try {
+      sessionStorage.removeItem(TOKEN_STORAGE_KEY);
+    } catch {}
   }
 }

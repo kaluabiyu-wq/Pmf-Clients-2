@@ -212,6 +212,6 @@ export const routes: Routes = [
       ),
   },
 
-   { path: '', pathMatch: 'full', canActivate: [homeRedirectGuard], children: [] },
+  { path: '', pathMatch: 'full', canActivate: [homeRedirectGuard], children: [] },
   { path: '**', canActivate: [homeRedirectGuard], children: [] },
 ];
