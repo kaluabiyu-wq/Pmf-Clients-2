@@ -14,7 +14,11 @@ export const roleGuard: CanActivateFn = (route) => {
   }
 
   const allowed = route.data['roles'] as readonly RoleName[] | undefined;
-  return !allowed || auth.hasRole(...allowed) ? true : router.createUrlTree(['/unauthorized']);
+  if (!allowed || auth.hasRole(...allowed)) return true;
+
+  // Wrong role: send them to their own home, or /unauthorized if they have none.
+  const home = homeFor(auth.role());
+  return router.createUrlTree([home === '/login' ? '/unauthorized' : home]);
 };
 
 /** For login/signup pages: logged-in users are sent to their own home instead. */

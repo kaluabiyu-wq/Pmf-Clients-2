@@ -12,7 +12,7 @@ const DOTNET_EMAIL_CLAIM = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claim
 
 const TOKEN_STORAGE_KEY = 'pmf_auth_token';
 
-const VALID_ROLES: readonly RoleName[] = ['Patient', 'Pharmacy', 'PharmacyStaff', 'Admin'];
+const VALID_ROLES: readonly RoleName[] = ['Patient', 'Pharmacy', 'PharmacyAdmin', 'SysAdmin'];
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {

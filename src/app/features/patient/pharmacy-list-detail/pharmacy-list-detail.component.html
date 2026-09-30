@@ -1,0 +1,206 @@
+<section class="detail-page">
+  <button type="button" class="back-link" (click)="onBack()">← Back to pharmacies</button>
+
+   
+
+  @if (isLoading()) {
+    <div class="spinner">Loading pharmacy…</div>
+  }
+
+  @if (loadError()) {
+    <p class="error-banner">{{ loadError() }}</p>
+  }
+
+  @if (pharmacy(); as item) {
+    <article class="detail-card">
+      <header class="detail-header">
+        <h1>{{ item.name }}</h1>
+        <span class="status-badge" [class]="item.isActive ? 'active' : 'inactive'">
+          {{ item.isActive ? 'Active' : 'Inactive' }}
+        </span>
+      </header>
+     <div class="detail-actions">
+     <a class="btn-primary" [routerLink]="['/patient/review', item.id]">
+      Add and See Reviews</a>
+     <a class="btn-primary" [routerLink]="['/patient/favourite', item.id]">
+       Add and See favourite</a>
+       <a class="btn-primary" [routerLink]="['/pharmacy-admin/staff', item.id]">
+       pharmacy-staff</a>
+        <a class="btn-primary" [routerLink]="['/pharmacy/pharmacy-document', item.id]">
+       pharmacy-document</a>
+     </div>
+     
+
+      <hr class="divider" />
+
+      <dl class="detail-list">
+        <div class="detail-row">
+          <dt>License number</dt>
+          <dd>{{ item.licenseNumber }}</dd>
+        </div>
+        <div class="detail-row">
+          <dt>Phone</dt>
+          <dd>{{ item.phoneNumber }}</dd>
+        </div>
+        @if (item.email) {
+          <div class="detail-row">
+            <dt>Email</dt>
+            <dd>{{ item.email }}</dd>
+          </div>
+        }
+        <div class="detail-row">
+          <dt>Verified</dt>
+          <dd>{{ item.isVerified ? 'Yes' : 'No' }}</dd>
+        </div>
+        <div class="detail-row">
+          <dt>Reliability score</dt>
+          <dd>{{ item.reliabilityScore }}</dd>
+        </div>
+        @if (item.location; as loc) {
+          <div class="detail-row">
+            <dt>Location</dt>
+            <dd>{{ loc.label }} · {{ loc.subcity }}, {{ loc.woreda }}</dd>
+          </div>
+        }
+        <div class="detail-row">
+          <dt>Last inventory update</dt>
+          <dd>{{ item.lastInventoryUpdateAt | date: 'medium' }}</dd>
+        </div>
+      </dl>
+    </article>
+  }
+</section>
+
+<section class="medicines-section">
+  <header class="medicines-header">
+    <div>
+      <h2>Medicines Available</h2>
+      <p>Medicines currently available at this pharmacy.</p>
+    </div>
+
+    @if (!medicinesLoading()) {
+      <span class="medicine-count">
+        {{ medicines().length }}
+        medicine{{ medicines().length === 1 ? '' : 's' }}
+      </span>
+    }
+  </header>
+
+  @if (medicinesLoading()) {
+    <div class="medicine-loading">
+      Loading medicines…
+    </div>
+  }
+
+  @if (medicinesError()) {
+    <p class="error-banner">
+      {{ medicinesError() }}
+    </p>
+  }
+
+  @if (
+    !medicinesLoading() &&
+    !medicinesError() &&
+    medicines().length === 0
+  ) {
+    <div class="empty-medicines">
+      <h3>No medicines available</h3>
+      <p>
+        This pharmacy currently has no medicine inventory records.
+      </p>
+    </div>
+  }
+
+  @if (!medicinesLoading() && medicines().length > 0) {
+    <div class="medicine-toolbar" matSort>
+      <span class="sort-label">Sort by:</span>
+      <button mat-sort-header="genericName">Name</button>
+      <button mat-sort-header="price">Price</button>
+      <button mat-sort-header="lastUpdatedAt">Last updated</button>
+    </div>
+
+    <div class="medicine-list">
+      @for (medicine of pagedMedicines(); track medicine.medicineId) {
+        <article class="medicine-card">
+          <div class="medicine-card-header">
+            <div>
+              <h3>{{ medicine.genericName }}</h3>
+
+              @if (medicine.brandName) {
+                <p class="medicine-brand">
+                  {{ medicine.brandName }}
+                </p>
+              }
+            </div>
+
+            <span
+              class="medicine-status"
+              [class.available]="
+                medicine.status.toLowerCase() === 'available'
+              "
+              [class.unavailable]="
+                medicine.status.toLowerCase() !== 'available'
+              "
+            >
+              {{ medicine.status }}
+            </span>
+          </div>
+
+          <div class="medicine-details">
+            @if (medicine.category) {
+              <div class="medicine-detail">
+                <span>Category</span>
+                <strong>{{ medicine.category }}</strong>
+              </div>
+            }
+
+            @if (medicine.dosageForm) {
+              <div class="medicine-detail">
+                <span>Dosage form</span>
+                <strong>{{ medicine.dosageForm }}</strong>
+              </div>
+            }
+
+            @if (medicine.strength) {
+              <div class="medicine-detail">
+                <span>Strength</span>
+                <strong>{{ medicine.strength }}</strong>
+              </div>
+            }
+
+            <div class="medicine-detail">
+              <span>Prescription</span>
+              <strong>
+                {{
+                  medicine.requiresPrescription
+                    ? 'Required'
+                    : 'Not required'
+                }}
+              </strong>
+            </div>
+
+            <div class="medicine-detail">
+              <span>Price</span>
+              <strong>
+                {{ medicine.price | number: '1.2-2' }}
+              </strong>
+            </div>
+
+            <div class="medicine-detail">
+              <span>Last updated</span>
+              <strong>
+                {{ medicine.lastUpdatedAt | date: 'medium' }}
+              </strong>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+     <mat-paginator
+      class="medicine-paginator"
+      [pageSizeOptions]="[2, 6, 10]"
+      showFirstLastButtons
+    ></mat-paginator>
+  }
+</section>
+

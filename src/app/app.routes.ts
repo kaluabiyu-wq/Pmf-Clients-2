@@ -1,16 +1,14 @@
-import { Route, Routes } from '@angular/router';
-import { guestGuard, homeRedirectGuard, roleGuard } from '../app/guards/role-guard';
-import { ADMIN_AREA, PATIENT_AREA, PHARMACY_AREA } from '../app/features/auth/role-access';
-
-//   patient  -> search, patient dashboard, inventory   (+ the detail pages they lead to)
-//   pharmacy -> dashboard, medicine, add medicine      (+ medicine detail)
-//   admin    -> everything
-const patientArea: Route = { canActivate: [roleGuard], data: { roles: PATIENT_AREA } };
-const pharmacyArea: Route = { canActivate: [roleGuard], data: { roles: PHARMACY_AREA } };
-const adminArea: Route = { canActivate: [roleGuard], data: { roles: ADMIN_AREA } };
+import { Routes } from '@angular/router';
+import { guestGuard, homeRedirectGuard, roleGuard } from './guards/role-guard';
+import {
+  PATIENT_AREA,
+  PHARMACY_AREA,
+  PHARMACY_ADMIN_AREA,
+  SYSADMIN_AREA,
+} from './features/auth/role-access';
 
 export const routes: Routes = [
-  
+  // ---------- Public (guests only) ----------
   {
     path: 'login',
     canActivate: [guestGuard],
@@ -41,177 +39,47 @@ export const routes: Routes = [
       ),
   },
 
-  
+  // ---------- Role areas ----------
   {
-    path: 'search',
-    ...patientArea,
-    loadComponent: () =>
-      import('./features/medicine-search/medicine-search.component').then(
-        (m) => m.MedicineSearchComponent,
-      ),
-  },
-  {
-    path: 'search/:pharmacyId/:medicineId',
-    ...patientArea,
-    loadComponent: () =>
-      import('./features/medicine-search-detail/medicine-search-detail.component').then(
-        (m) => m.MedicineSearchDetailComponent,
-      ),
-  },
-  {
-    path: 'patient-dashboard',
-    ...patientArea,
-    loadComponent: () =>
-      import('./features/patient-dashboard/patient-dashboard.component').then(
-        (m) => m.PatientDashboardComponent,
-      ),
-  },
-  {
-    path: 'inventory',
-    ...patientArea,
-    loadComponent: () =>
-      import('./features/inventory/inventory.component').then((m) => m.InventoryComponent),
-  },
-  {
-    path: 'inventory/:pharmacyId/:id',
-    ...patientArea,
-    loadComponent: () =>
-      import('./features/inventory-detail/inventory-detail.component').then(
-        (m) => m.InventoryDetailComponent,
-      ),
-  },
-  {
-    
-    path: 'users-feedback/:pharmacyId/:id',
-    ...patientArea,
-    loadComponent: () =>
-      import('./features/user-feedback/user-feedback.component').then(
-        (m) => m.UserFeedbackComponent,
-      ),
-  },
-
-  
-  {
-    path: 'pharmacy-dashboard',
-    ...pharmacyArea,
-    loadComponent: () =>
-      import('./features/pharmacy-dashboard/pharmacy-dashboard.component').then(
-        (m) => m.PharmacyDashboardComponent,
-      ),
-  },
-  {
-    path: 'medicine',
-    ...pharmacyArea,
-    loadComponent: () =>
-      import('./features/medicine/medicine.component').then((m) => m.MedicineComponent),
-  },
-  {
-    path: 'medicine/:id',
-    ...pharmacyArea,
-    loadComponent: () =>
-      import('./features/medicine-detail/medicine-detail.component').then(
-        (m) => m.MedicineDetailComponent,
-      ),
-  },
-  {
-    path: 'add-medicine',
-    ...pharmacyArea,
-    loadComponent: () =>
-      import('./features/add-medicine/add-medicine.component').then(
-        (m) => m.AddMedicineComponent,
-      ),
-  },
-
-  
-  {
-    path: 'pharmacy-list',
-    ...adminArea,
-    loadComponent: () =>
-      import('./features/pharmacy-list/pharmacy-list.component').then(
-        (m) => m.PharmacyListComponent,
-      ),
-  },
-  {
-    path: 'pharmacy-list/:id',
-    ...adminArea,
-    loadComponent: () =>
-      import('./features/pharmacy-list-detail/pharmacy-list-detail.component').then(
-        (m) => m.PharmacyListDetailComponent,
-      ),
-  },
-  {
+    // Was unguarded before; restricted to SysAdmin. Use guestGuard instead if it's a public signup.
     path: 'register',
-    ...adminArea,
+    canActivate: [roleGuard],
+    data: { roles: SYSADMIN_AREA },
     loadComponent: () =>
-      import('./features/user/user.component').then((m) => m.UserComponent),
+      import('./features/public/user/user.component').then((m) => m.UserComponent),
   },
   {
-    path: 'users-list',
-    ...adminArea,
-    loadComponent: () =>
-      import('./features/user-list/user-list.component').then((m) => m.UserListComponent),
+    path: 'patient',
+    canActivate: [roleGuard],
+    data: { roles: PATIENT_AREA },
+    loadChildren: () =>
+      import('./features/patient/patient.routes').then((m) => m.PATIENT_ROUTES),
   },
   {
-    path: 'users-feedback-list',
-    ...adminArea,
-    loadComponent: () =>
-      import('./features/user-feedback-list/user-feedback-list.component').then(
-        (m) => m.UserFeedbackListComponent,
-      ),
-  },
-  {
-    path: 'pharmacy-document/:pharmacyId',
-    ...adminArea,
-    loadComponent: () =>
-      import('./features/pharmacy-document/pharmacy-document.componenet').then(
-        (m) => m.PharmacyDocumentComponenet,
-      ),
-  },
-  {
-    path: 'review/:pharmacyId',
-    ...adminArea,
-    loadComponent: () =>
-      import('./features/review/review.component').then((m) => m.ReviewComponent),
-  },
-  {
-    path: 'favourite/:userId',
-    ...adminArea,
-    loadComponent: () =>
-      import('./features/favorite/favorite.component').then((m) => m.FavoriteComponent),
+    path: 'pharmacy',
+    canActivate: [roleGuard],
+    data: { roles: PHARMACY_AREA },
+    loadChildren: () =>
+      import('./features/pharmacy/pharmacy.routes').then((m) => m.PHARMACY_ROUTES),
   },
   {
     path: 'pharmacy-admin',
-    ...adminArea,
-    loadComponent: () =>
-      import('./features/pharmacy-admin-dashboard/pharmacy-admin-dashboard.component').then(
-        (m) => m.PharmacyAdminDashboardComponent,
+    canActivate: [roleGuard],
+    data: { roles: PHARMACY_ADMIN_AREA },
+    loadChildren: () =>
+      import('./features/pharmacy-admin/pharmacy-admin.routes').then(
+        (m) => m.PHARMACY_ADMIN_ROUTES,
       ),
   },
   {
-    path: 'pharmacy-admin-manages',
-    ...adminArea,
-    loadComponent: () =>
-      import('./features/pharmacy-admin-manages/pharmacy-admin-manages.component').then(
-        (m) => m.PharmacyAdminManagesComponent,
-      ),
-  },
-  {
-    path: 'pharmacy-admin-manages/:id',
-    ...adminArea,
-    loadComponent: () =>
-      import(
-        './features/pharmacy-admin-managesdetail/pharmacy-admin-managesdetail.componenet'
-      ).then((m) => m.PharmacyAdminManagesdetailComponenet),
-  },
-  {
-    path: 'pharmacy-staff/:pharmacyId',
-    ...adminArea,
-    loadComponent: () =>
-      import('./features/pharmacy-staff/pharmacy-staff.component').then(
-        (m) => m.PharmacyStaffComponent,
-      ),
+    path: 'sysadmin',
+    canActivate: [roleGuard],
+    data: { roles: SYSADMIN_AREA },
+    loadChildren: () =>
+      import('./features/sysadmin/sysadmin.routes').then((m) => m.SYSADMIN_ROUTES),
   },
 
+  // ---------- Fallbacks ----------
   { path: '', pathMatch: 'full', canActivate: [homeRedirectGuard], children: [] },
   { path: '**', canActivate: [homeRedirectGuard], children: [] },
 ];
