@@ -83,7 +83,7 @@ export interface RegisterPharmacyForm {
   password: string;
   locationId: number;
   pharmacyName: string;
-  address: string;
+  licenseNumber: string;
   phoneNumber: string;
   license: File;
   businessRegistration: File;

@@ -77,18 +77,19 @@
 
       <div class="row">
         <div class="field">
-          <label for="address">Address</label>
-          <input id="address" type="text" formControlName="address" autocomplete="street-address" />
-          @if (form.controls.address.invalid && form.controls.address.touched) {
-            <span class="error">Address is required.</span>
+          <label for="licenseNumber">License number</label>
+          <input id="licenseNumber" type="text" formControlName="licenseNumber" />
+          @if (form.controls.licenseNumber.invalid && form.controls.licenseNumber.touched) {
+            <span class="error">License number is required.</span>
           }
         </div>
 
         <div class="field">
           <label for="phoneNumber">Phone number</label>
-          <input id="phoneNumber" type="tel" formControlName="phoneNumber" autocomplete="tel" />
+          <input id="phoneNumber" type="tel" formControlName="phoneNumber" autocomplete="tel"
+                 placeholder="911223344" />
           @if (form.controls.phoneNumber.invalid && form.controls.phoneNumber.touched) {
-            <span class="error">Phone number is required.</span>
+            <span class="error">Enter a valid phone number (9 digits, e.g. 911223344).</span>
           }
         </div>
       </div>

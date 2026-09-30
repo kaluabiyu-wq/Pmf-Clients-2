@@ -35,23 +35,21 @@ export class AuthService {
       );
   }
 
-  // One multipart request: the backend creates user, pharmacy, owner link and documents atomically.
-  registerPharmacy(form: RegisterPharmacyForm): Observable<{ pharmacyId: number }> {
-    const data = new FormData();
-    data.append('fullName', form.fullName);
-    data.append('email', form.email);
-    data.append('password', form.password);
-    data.append('locationId', String(form.locationId));
-    data.append('pharmacyName', form.pharmacyName);
-    data.append('address', form.address);
-    data.append('phoneNumber', form.phoneNumber);
-    data.append('license', form.license);
-    data.append('businessRegistration', form.businessRegistration);
-    data.append('pharmacistCredential', form.pharmacistCredential);
+  registerPharmacy(form: RegisterPharmacyForm): Observable<{ pharmacyId: number; userId: number }> {
+  const data = new FormData();
+  data.append('FullName', form.fullName);
+  data.append('Email', form.email);
+  data.append('Password', form.password);
+  data.append('LocationId', String(form.locationId));
+  data.append('PharmacyName', form.pharmacyName);
+  data.append('LicenseNumber', form.licenseNumber);
+  data.append('PhoneNumber', form.phoneNumber.replace(/\D/g, '').slice(-9)); // 9 digits only
+  data.append('License', form.license, form.license.name);
+  data.append('BusinessRegistration', form.businessRegistration, form.businessRegistration.name);
+  data.append('PharmacistCredential', form.pharmacistCredential, form.pharmacistCredential.name);
 
-    // Do not set Content-Type: the browser adds the multipart boundary.
-    return this.http.post<{ pharmacyId: number }>(`${this.apiUrl}/register-pharmacy`, data);
-  }
+   return this.http.post<{ pharmacyId: number; userId: number }>(`${this.apiUrl}/register-pharmacy`, data);
+}
 
   logout(): void {
     this._token.set(null);
