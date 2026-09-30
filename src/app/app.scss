@@ -17,6 +17,8 @@
   max-width: 960px;
   margin: 0 auto;
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: var(--pmafs-space-1);
 }
 
@@ -36,8 +38,23 @@
     color: var(--pmafs-teal-dark);
   }
 
+  &.is-active {
+    color: var(--pmafs-teal-dark);
+    border-bottom-color: var(--pmafs-teal);
+  }
+
   &:focus-visible {
     outline: 2px solid var(--pmafs-teal);
     outline-offset: 2px;
   }
+}
+
+.nav-spacer {
+  flex: 1;
+}
+
+.nav-user {
+  font-size: 0.85rem;
+  color: var(--pmafs-ink-faint);
+  padding: 0 var(--pmafs-space-1);
 }

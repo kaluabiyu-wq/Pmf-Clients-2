@@ -2,7 +2,9 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { AuthUser, LoginRequest, LoginResponse, RoleName } from '../model/user.model';
+import {AuthUser,LoginRequest,LoginResponse,
+   RegisterPharmacyForm,RoleName,
+      } from '../model/user.model';
 
 const DOTNET_ROLE_CLAIM = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
 const DOTNET_NAME_ID_CLAIM = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier';
@@ -11,7 +13,7 @@ const DOTNET_EMAIL_CLAIM = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claim
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiBaseUrl}/api/auth`;
+  private readonly apiUrl = `${environment.apiBaseUrl}/auth`;
 
   
   private readonly _token = signal<string | null>(null);
@@ -31,6 +33,24 @@ export class AuthService {
           this._currentUser.set(this.decodeUser(response.token));
         })
       );
+  }
+
+  // One multipart request: the backend creates user, pharmacy, owner link and documents atomically.
+  registerPharmacy(form: RegisterPharmacyForm): Observable<{ pharmacyId: number }> {
+    const data = new FormData();
+    data.append('fullName', form.fullName);
+    data.append('email', form.email);
+    data.append('password', form.password);
+    data.append('locationId', String(form.locationId));
+    data.append('pharmacyName', form.pharmacyName);
+    data.append('address', form.address);
+    data.append('phoneNumber', form.phoneNumber);
+    data.append('license', form.license);
+    data.append('businessRegistration', form.businessRegistration);
+    data.append('pharmacistCredential', form.pharmacistCredential);
+
+    // Do not set Content-Type: the browser adds the multipart boundary.
+    return this.http.post<{ pharmacyId: number }>(`${this.apiUrl}/register-pharmacy`, data);
   }
 
   logout(): void {

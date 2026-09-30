@@ -1,0 +1,5 @@
+@use '../auth-form';
+
+:host {
+  --auth-card-width: 520px;
+}

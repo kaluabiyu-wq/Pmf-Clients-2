@@ -67,3 +67,25 @@ export interface AuthUser {
   email: string | null;
   role: RoleName | null;
 }
+
+export interface RegisterPatientRequest {
+  fullName: string;
+  email: string;
+  password: string;
+  locationId: number;
+}
+
+export type PharmacyDocumentType = 'License' | 'BusinessRegistration' | 'PharmacistCredential';
+
+export interface RegisterPharmacyForm {
+  fullName: string;
+  email: string;
+  password: string;
+  locationId: number;
+  pharmacyName: string;
+  address: string;
+  phoneNumber: string;
+  license: File;
+  businessRegistration: File;
+  pharmacistCredential: File;
+}

@@ -1,0 +1,76 @@
+<section class="auth-card">
+  <header class="auth-header">
+    <span class="auth-brand">PMF</span>
+    <h2>Patient sign up</h2>
+    <p>Create an account to search medicine availability near you.</p>
+  </header>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+    <div class="field">
+      <label for="fullName">Full name</label>
+      <input id="fullName" type="text" formControlName="fullName" autocomplete="name"
+             placeholder="e.g. Kalu Abiyu" />
+      @if (form.controls.fullName.invalid && form.controls.fullName.touched) {
+        <span class="error">Enter a full name (at least 2 characters).</span>
+      }
+    </div>
+
+    <div class="field">
+      <label for="email">Email</label>
+      <input id="email" type="email" formControlName="email" autocomplete="email"
+             placeholder="e.g. kalu@example.com" />
+      @if (form.controls.email.invalid && form.controls.email.touched) {
+        <span class="error">Enter a valid email address.</span>
+      }
+    </div>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <input id="password" type="password" formControlName="password"
+             autocomplete="new-password" placeholder="At least 8 characters" />
+      @if (form.controls.password.invalid && form.controls.password.touched) {
+        <span class="error">Password must be at least 8 characters.</span>
+      }
+    </div>
+
+    <div class="field">
+      <label for="locationId">Location</label>
+
+      @if (locationsResource.isLoading()) {
+        <select id="locationId" disabled>
+          <option>Loading locations…</option>
+        </select>
+      } @else if (locationsResource.error()) {
+        <select id="locationId" disabled>
+          <option>Could not load locations</option>
+        </select>
+      } @else {
+        <select id="locationId" formControlName="locationId">
+          <option [ngValue]="null" disabled>Select a location</option>
+          @for (location of locationsResource.value()?.items ?? []; track location.id) {
+            <option [ngValue]="location.id">{{ location.label }} ({{ location.subcity }})</option>
+          }
+        </select>
+      }
+
+      @if (form.controls.locationId.invalid && form.controls.locationId.touched) {
+        <span class="error">Select a location.</span>
+      }
+    </div>
+
+    @if (submitError(); as error) {
+      <div class="error-banner" role="alert">{{ error }}</div>
+    }
+
+    <div class="actions">
+      <button type="submit" class="btn-primary" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Creating account…' : 'Sign up' }}
+      </button>
+    </div>
+  </form>
+
+  <p class="alt-links">
+    Already registered? <a routerLink="/login">Log in</a><br />
+    Own a pharmacy? <a routerLink="/signup/pharmacy">Register it here</a>
+  </p>
+</section>
