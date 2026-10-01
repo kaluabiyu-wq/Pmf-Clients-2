@@ -7,6 +7,7 @@ import {
   InventoryRecord,
   MedicinePharmacyInventoryResponse,
   PharmacyMedicineDetail,
+  UpdateInventoryRequest,
 } from '../model/inventory.model';
 
 
@@ -59,6 +60,12 @@ export class InventoryService {
   
   create(pharmacyId: number, payload: CreateInventoryRequest): Observable<InventoryRecord> {
     return this.http.post<InventoryRecord>(this.inventoryUrl(pharmacyId), payload);
+  }
+  update(pharmacyId: number, id: number, payload:UpdateInventoryRequest): Observable<InventoryRecord> {
+    return this.http.put<InventoryRecord>(`${this.inventoryUrl(pharmacyId)}/${id}`,payload);    
+  }
+  delete(pharmacyId:number, id:number): Observable<void> {
+    return this.http.delete<void>(`${this.inventoryUrl(pharmacyId)}/${id}`);
   }
 
  }

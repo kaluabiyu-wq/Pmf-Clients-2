@@ -52,7 +52,7 @@ export interface InventoryRecord {
   id: number;
   medicineId: number;
   pharmacyId: number;
-  updateUserId: number;
+  updatebyUserId: number;
   price: number;
   status: InventoryStatus;
   lastUpdatedAt: string;
@@ -64,6 +64,10 @@ export interface CreateInventoryRequest {
   updatebyUserId: number;
   price: number;
   status: InventoryStatus;
+}
+export interface UpdateInventoryRequest {
+  price?:number;
+  status?: InventoryStatus;
 }
 
 export interface PagedResponse<T> {
