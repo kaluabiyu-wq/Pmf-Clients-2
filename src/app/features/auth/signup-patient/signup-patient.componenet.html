@@ -33,30 +33,11 @@
       }
     </div>
 
-    <div class="field">
-      <label for="locationId">Location</label>
-
-      @if (locationsResource.isLoading()) {
-        <select id="locationId" disabled>
-          <option>Loading locations…</option>
-        </select>
-      } @else if (locationsResource.error()) {
-        <select id="locationId" disabled>
-          <option>Could not load locations</option>
-        </select>
-      } @else {
-        <select id="locationId" formControlName="locationId">
-          <option [ngValue]="null" disabled>Select a location</option>
-          @for (location of locationsResource.value()?.items ?? []; track location.id) {
-            <option [ngValue]="location.id">{{ location.label }} ({{ location.subcity }})</option>
-          }
-        </select>
-      }
-
-      @if (form.controls.locationId.invalid && form.controls.locationId.touched) {
-        <span class="error">Select a location.</span>
-      }
-    </div>
+    <fieldset>
+          <legend>Location</legend>
+       <p class="hint">Click the map to pin your location, then fill in the details.</p>
+      <app-location-fields [group]="locationGroup" />
+</fieldset>
 
     @if (submitError(); as error) {
       <div class="error-banner" role="alert">{{ error }}</div>

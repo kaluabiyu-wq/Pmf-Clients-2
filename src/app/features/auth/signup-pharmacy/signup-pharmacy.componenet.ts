@@ -5,6 +5,8 @@ import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../../services/auth-service.service';
 import { LocationService } from '../../../services/location.service';
+import { LocationFieldsComponent } from '../../../ui/location-fields/location-fields.componenet';
+import { switchMap } from 'rxjs';
 
 type DocumentControl = 'license' | 'businessRegistration' | 'pharmacistCredential';
 
@@ -14,7 +16,7 @@ const ALLOWED_EXTENSIONS = ['.pdf', '.jpg', '.jpeg', '.png'];
 @Component({
   selector: 'app-signup-pharmacy',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+ imports: [ReactiveFormsModule, RouterLink, LocationFieldsComponent],
   templateUrl: './signup-pharmacy.componenet.html',
   styleUrl: './signup-pharmacy.componenet.scss',
 })
@@ -28,9 +30,13 @@ export class SignupPharmacyComponent {
   readonly submitError = signal<string | null>(null);
   readonly fileErrors = signal<Partial<Record<DocumentControl, string>>>({});
 
-  readonly locationsResource = rxResource({
-    stream: () => this.locationService.getAll({ pageSize: 200 }),
-  });
+  readonly locationGroup = this.fb.group({
+  label: this.fb.nonNullable.control('', Validators.required),
+  subcity: this.fb.nonNullable.control('', Validators.required),
+  woreda: this.fb.nonNullable.control('', Validators.required),
+  latitude: new FormControl<number | null>(null, Validators.required),
+  longitude: new FormControl<number | null>(null, Validators.required),
+});
 
   readonly form = this.fb.group({
     fullName: this.fb.nonNullable.control('', [
@@ -44,7 +50,7 @@ export class SignupPharmacyComponent {
       Validators.maxLength(200),
     ]),
     password: this.fb.nonNullable.control('', [Validators.required, Validators.minLength(8)]),
-    locationId: new FormControl<number | null>(null, Validators.required),
+    location: this.locationGroup,
     pharmacyName: this.fb.nonNullable.control('', [
       Validators.required,
       Validators.maxLength(200),
@@ -84,44 +90,55 @@ export class SignupPharmacyComponent {
     ctrl.markAsTouched();
   }
 
-  onSubmit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-
-    const v = this.form.getRawValue();
-    this.isSubmitting.set(true);
-    this.submitError.set(null);
-
-    this.auth
-      .registerPharmacy({
-        fullName: v.fullName.trim(),
-        email: v.email.trim(),
-        password: v.password,
-        locationId: v.locationId!,
-        pharmacyName: v.pharmacyName.trim(),
-        licenseNumber: v.licenseNumber.trim(),
-        phoneNumber: v.phoneNumber,
-        license: v.license!,
-        businessRegistration: v.businessRegistration!,
-        pharmacistCredential: v.pharmacistCredential!,
-      })
-      .subscribe({
-        // No auto-login: the pharmacy is unverified until an admin approves it.
-        next: () => this.router.navigate(['/login'], { queryParams: { registered: 'pharmacy' } }),
-        error: (err: HttpErrorResponse) => {
-          this.isSubmitting.set(false);
-          const fieldErrors = err.error?.errors
-            ? (Object.values(err.error.errors).flat() as string[])
-            : [];
-          this.submitError.set(
-            fieldErrors.join(' ') ||
-              err.error?.detail ||
-              err.error?.title ||
-              'Registration failed. Nothing was created, so you can try again.',
-          );
-        },
-      });
+ onSubmit(): void {
+  if (this.form.invalid) {
+    this.form.markAllAsTouched();
+    return;
   }
+
+  const v = this.form.getRawValue();
+  const loc = v.location;
+  this.isSubmitting.set(true);
+  this.submitError.set(null);
+
+  this.locationService
+    .create({
+      label: loc.label,
+      subcity: loc.subcity,
+      woreda: loc.woreda,
+      coordinate: { latitude: loc.latitude!, longitude: loc.longitude! },
+    })
+    .pipe(
+      switchMap((created) =>
+        this.auth.registerPharmacy({
+          fullName: v.fullName.trim(),
+          email: v.email.trim(),
+          password: v.password,
+          locationId: created.id,
+          pharmacyName: v.pharmacyName.trim(),
+          licenseNumber: v.licenseNumber.trim(),
+          phoneNumber: v.phoneNumber,
+          license: v.license!,
+          businessRegistration: v.businessRegistration!,
+          pharmacistCredential: v.pharmacistCredential!,
+        }),
+      ),
+    )
+    .subscribe({
+      // No auto-login: the pharmacy is unverified until an admin approves it.
+      next: () => this.router.navigate(['/login'], { queryParams: { registered: 'pharmacy' } }),
+      error: (err: HttpErrorResponse) => {
+        this.isSubmitting.set(false);
+        const fieldErrors = err.error?.errors
+          ? (Object.values(err.error.errors).flat() as string[])
+          : [];
+        this.submitError.set(
+          fieldErrors.join(' ') ||
+            err.error?.detail ||
+            err.error?.title ||
+            'Registration failed. Please try again.',
+        );
+      },
+    });
+}
 }

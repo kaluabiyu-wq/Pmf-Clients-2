@@ -237,3 +237,14 @@ legend {
     }
   }
 }
+
+app-location-fields {
+  display: block;
+  width: 100%;
+  min-width: 0; // lets the map shrink inside the flex fieldset on small screens
+}
+
+// Keeps the hint close to the map inside a fieldset
+fieldset > .hint {
+  margin-top: calc(var(--pmafs-space-1) * -0.5);
+}

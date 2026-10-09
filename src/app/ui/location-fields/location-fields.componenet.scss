@@ -1,0 +1,126 @@
+// Styles for the map + location fields.
+// Uses only the --pmafs-* tokens from src/styles.scss, same as auth-form.scss.
+
+:host {
+  display: block;
+}
+
+.location-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pmafs-space-3);
+}
+
+// Map
+.map {
+  height: 320px;
+  width: 100%;
+  border: 1px solid var(--pmafs-border);
+  border-radius: var(--pmafs-radius-md);
+  overflow: hidden;
+  background: var(--pmafs-bg);
+  cursor: crosshair;
+
+  // Leaflet panes use z-index up to 1000; this keeps the map from
+  // floating above the navbar or dropdowns.
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+
+  &:focus-within {
+    border-color: var(--pmafs-teal);
+    box-shadow: 0 0 0 3px var(--pmafs-teal-light);
+  }
+
+  @media (max-width: 560px) {
+    height: 260px;
+  }
+}
+
+// "Use my current location" button (secondary style)
+.btn-secondary {
+  align-self: flex-start;
+  font-family: var(--pmafs-font-display);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--pmafs-teal-dark);
+  background: var(--pmafs-teal-light);
+  border: 1px solid var(--pmafs-teal);
+  border-radius: var(--pmafs-radius-sm);
+  padding: 6px var(--pmafs-space-2);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: var(--pmafs-teal);
+    color: #fff;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pmafs-teal);
+    outline-offset: 2px;
+  }
+}
+
+// Fields (same look as the auth forms)
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--pmafs-space-3);
+
+  @media (max-width: 560px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+label {
+  font-family: var(--pmafs-font-display);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--pmafs-ink-muted);
+}
+
+input,
+select {
+  font-family: var(--pmafs-font-body);
+  font-size: 0.95rem;
+  color: var(--pmafs-ink);
+  background: var(--pmafs-bg);
+  border: 1px solid var(--pmafs-border);
+  border-radius: var(--pmafs-radius-sm);
+  padding: var(--pmafs-space-2);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+
+  &::placeholder {
+    color: var(--pmafs-ink-faint);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--pmafs-teal);
+    box-shadow: 0 0 0 3px var(--pmafs-teal-light);
+    background: var(--pmafs-surface);
+  }
+
+  &.ng-invalid.ng-touched {
+    border-color: var(--pmafs-red);
+  }
+}
+
+.error {
+  font-size: 0.8rem;
+  color: var(--pmafs-red);
+}
+
+// Shown after a point is picked
+.coords {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--pmafs-ink-faint);
+}

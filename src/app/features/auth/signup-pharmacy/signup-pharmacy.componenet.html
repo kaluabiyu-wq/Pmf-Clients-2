@@ -6,7 +6,7 @@
   </header>
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
-    <fieldset>
+       <fieldset>
       <legend>Owner account</legend>
 
       <div class="row">
@@ -27,42 +27,21 @@
         </div>
       </div>
 
-      <div class="row">
-        <div class="field">
-          <label for="password">Password</label>
-          <input id="password" type="password" formControlName="password"
-                 autocomplete="new-password" placeholder="At least 8 characters" />
-          @if (form.controls.password.invalid && form.controls.password.touched) {
-            <span class="error">Password must be at least 8 characters.</span>
-          }
-        </div>
-
-        <div class="field">
-          <label for="locationId">Location</label>
-
-          @if (locationsResource.isLoading()) {
-            <select id="locationId" disabled>
-              <option>Loading locations…</option>
-            </select>
-          } @else if (locationsResource.error()) {
-            <select id="locationId" disabled>
-              <option>Could not load locations</option>
-            </select>
-          } @else {
-            <select id="locationId" formControlName="locationId">
-              <option [ngValue]="null" disabled>Select a location</option>
-              @for (location of locationsResource.value()?.items ?? []; track location.id) {
-                <option [ngValue]="location.id">{{ location.label }} ({{ location.subcity }})</option>
-              }
-            </select>
-          }
-
-          @if (form.controls.locationId.invalid && form.controls.locationId.touched) {
-            <span class="error">Select a location.</span>
-          }
-        </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" formControlName="password"
+               autocomplete="new-password" placeholder="At least 8 characters" />
+        @if (form.controls.password.invalid && form.controls.password.touched) {
+          <span class="error">Password must be at least 8 characters.</span>
+        }
       </div>
     </fieldset>
+
+    <fieldset>
+         <legend>Location</legend>
+        <p class="hint">Click the map to pin your location, then fill in the details.</p>
+  <app-location-fields [group]="locationGroup" />
+</fieldset>
 
     <fieldset>
       <legend>Pharmacy</legend>
