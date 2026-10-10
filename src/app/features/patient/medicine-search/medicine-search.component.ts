@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router,ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { MedicineSearchCardComponent } from '../../../ui/medicine-search-card/medicine-search-card.componenet';
 import { SearchResultItem } from '../../../model/search.model';
 import { SearchService } from '../../../services/search.service';
+import { AuthService } from '../../../services/auth-service.service';
 
 @Component({
   selector: 'app-medicine-search',
@@ -16,14 +17,15 @@ export class MedicineSearchComponent {
   private readonly searchService = inject(SearchService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly auth = inject(AuthService);
 
-  // Signed-in for Yonas Tesfaye (Patient), seeded as the 4th user -> id 4. 
-  private readonly userId = signal(4);
-
-  // Yonas Tesfaye seeded location: Locations[3] "Arada Branch Area" -> the 4th location seeded -> id 4.
-  readonly locationId = signal(4);
-  readonly locationLabel = signal('Arada, Addis Ababa');
-  readonly currentUserName = signal('Yonas Tesfaye');
+  // Derived from the logged-in user (JWT + /auth/me profile).
+  private readonly userId = computed(() => this.auth.currentUser()?.id ?? null);
+  readonly locationId = computed(() => this.auth.currentUser()?.locationId ?? null);
+  readonly locationLabel = computed(
+    () => this.auth.currentUser()?.locationLabel ?? 'Select location',
+  );
+  readonly currentUserName = computed(() => this.auth.currentUser()?.fullName ?? '');
 
   readonly searchTerm = signal('');
   readonly hasSearched = signal(false);
@@ -42,14 +44,17 @@ export class MedicineSearchComponent {
 
   onSearch(): void {
     const term = this.searchTerm().trim();
-    if (!term) {
+    const userId = this.userId();
+    const locationId = this.locationId();
+
+    if (!term || userId === null || locationId === null) {
       return;
     }
 
     this.searchService
-      .search(this.userId(), {
+      .search(userId, {
         medicineSearch: term,
-        locationId: this.locationId(),
+        locationId,
       })
       .subscribe({
         next: (response) => {

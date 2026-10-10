@@ -89,3 +89,18 @@ export interface RegisterPharmacyForm {
   businessRegistration: File;
   pharmacistCredential: File;
 }
+
+export interface UserProfile {
+  fullName: string;
+  locationId: number | null;
+  locationLabel: string | null;
+}
+
+export interface AuthUser {
+  id: number | null;
+  email: string | null;
+  role: RoleName | null;
+  fullName: string | null;
+  locationId: number | null;
+  locationLabel: string | null;
+}
