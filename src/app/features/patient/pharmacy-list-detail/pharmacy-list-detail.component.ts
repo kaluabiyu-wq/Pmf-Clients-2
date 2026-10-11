@@ -9,6 +9,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../../services/auth-service.service';
 
 @Component({
   selector: 'app-pharmacy-list-detail',
@@ -21,7 +22,8 @@ export class PharmacyListDetailComponent {
   private readonly pharmacyListService = inject(PharmacyListService);
    private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  
+
+  readonly auth = inject(AuthService);
   readonly medicines = signal<PharmacyMedicine[]>([]); 
   readonly medicinesLoading = signal(false);
   readonly medicinesError = signal<string | null>(null);

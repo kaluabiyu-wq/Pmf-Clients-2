@@ -9,4 +9,8 @@ export interface PharmacyDashboard {
   feedbackCount: number;
   unavailableReports: number;
   lastInventoryUpdateAt: string;
+  averageRating: number | null;
+  reviewCount: number;
+  favouritCount: number;
+
 }

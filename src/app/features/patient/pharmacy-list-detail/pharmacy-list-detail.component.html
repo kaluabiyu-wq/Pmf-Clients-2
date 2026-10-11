@@ -19,16 +19,22 @@
           {{ item.isActive ? 'Active' : 'Inactive' }}
         </span>
       </header>
-     <div class="detail-actions">
-     <a class="btn-primary" [routerLink]="['/patient/review', item.id]">
-      Add and See Reviews</a>
-     <a class="btn-primary" [routerLink]="['/patient/favourite', item.id]">
-       Add and See favourite</a>
-       <a class="btn-primary" [routerLink]="['/pharmacy-admin/staff', item.id]">
-       pharmacy-staff</a>
-        <a class="btn-primary" [routerLink]="['/pharmacy/pharmacy-document', item.id]">
-       pharmacy-document</a>
-     </div>
+    <div class="detail-actions">
+  <a class="btn-primary" [routerLink]="['/patient/review', item.id]">
+    Add and See Reviews</a>
+
+  @if (auth.currentUser()?.id; as userId) {
+    <a class="btn-primary" [routerLink]="['/patient/favourite', userId]">
+      Add and See Favourites</a>
+  }
+
+  @if (auth.hasRole('PharmacyAdmin')) {
+    <a class="btn-primary" [routerLink]="['/pharmacy-admin/staff', item.id]">
+      Pharmacy Staff</a>
+    <a class="btn-primary" [routerLink]="['/pharmacy/pharmacy-document', item.id]">
+      Pharmacy Documents</a>
+  }
+</div>
      
 
       <hr class="divider" />

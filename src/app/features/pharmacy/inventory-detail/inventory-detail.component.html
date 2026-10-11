@@ -5,8 +5,12 @@
   <div class="page-header">
     <div>
      <a routerLink="/pharmacy/inventory" class="back-button"> Back to Inventory
-       </a>
+       </a><br>
 
+         @if (inventory()) {
+        <a [routerLink]="['/pharmacy/inventory', pharmacyId, inventoryId, 'edit']"
+           class="back-button">Edit</a>
+      }
       <h1>Inventory Details</h1>
       <p>View the details of this inventory record.</p>
     </div>
@@ -28,7 +32,10 @@
       <div class="error-icon">!</div>
 
       <div>
-        <h3>Something went wrong</h3>
+ @if (inventory()) {
+        <a [routerLink]="['/pharmacy/inventory', pharmacyId, inventoryId, 'edit']"
+           class="back-button">Edit</a>
+      }        <h3>Something went wrong</h3>
         <p>{{ error() }}</p>
 
         <button type="button" (click)="loadInventory()">

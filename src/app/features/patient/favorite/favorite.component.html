@@ -2,29 +2,30 @@
 
   <div class="page-header">
     <div>
-     <a routerLink="/patient/pharmacy-list" class="back-button">Back to Pharmacies</a>
+      <a routerLink="/patient/pharmacy-list" class="back-button">Back to Pharmacies</a>
       <h1>My Favorites</h1>
-     
     </div>
-
   </div>
 
-  <div class="card form-card">
-    <h2>Add a Pharmacy</h2>
+  @if (userId) {
+    <div class="card form-card">
+      <h2>Add a Pharmacy</h2>
 
-    @if (addError()) {
-      <p class="form-error">{{ addError() }}</p>
-    }
+      @if (addError()) {
+        <p class="form-error">{{ addError() }}</p>
+      }
 
-    <form class="add-form" (ngSubmit)="addFavorite()">
-      <label>Pharmacy ID <input type="number" name="pharmacyId" [(ngModel)]="newPharmacyId" required min="1" />
-      </label>
+      <form class="add-form" (ngSubmit)="addFavorite()">
+        <label>Pharmacy ID
+          <input type="number" name="pharmacyId" [(ngModel)]="newPharmacyId" required min="1" />
+        </label>
 
-      <button type="submit" class="add-button" [disabled]="adding()">
-        {{ adding() ? 'Adding...' : 'Add to Favorites' }}
-      </button>
-    </form>
-  </div>
+        <button type="submit" class="add-button" [disabled]="adding()">
+          {{ adding() ? 'Adding...' : 'Add to Favorites' }}
+        </button>
+      </form>
+    </div>
+  }
 
   @if (loading()) {
     <div class="state-card">
@@ -39,12 +40,14 @@
       <div>
         <h3>Unable to load favorites</h3>
         <p>{{ error() }}</p>
-        <button type="button" (click)="refresh()">Try Again</button>
+        @if (userId) {
+          <button type="button" (click)="refresh()">Try Again</button>
+        }
       </div>
     </div>
   }
 
-  @if (!loading() && !error() && favorites().length === 0) {
+  @if (userId && !loading() && !error() && favorites().length === 0) {
     <div class="empty-card">
       <div class="empty-icon">⭐</div>
       <h2>No favorites yet</h2>

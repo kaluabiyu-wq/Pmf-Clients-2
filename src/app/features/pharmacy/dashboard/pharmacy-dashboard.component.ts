@@ -50,15 +50,28 @@ export class PharmacyDashboardComponent {
   });
 
   readonly stats = computed<DashboardStat[]>(() => {
-    const d = this.dashboard.value();
-    if (!d) return [];
-    return [
-      { label: 'Reliability score', value: d.reliabilityScore.toString(), unit: '/100', helper: 'Recalculated nightly' },
-      { label: 'Freshness threshold', value: String(d.freshnessThreshold), unit: ' min', helper: 'Stock flags stale after' },
-      { label: 'Items listed', value: String(d.itemsListed), helper: `${d.outOfStockCount} out of stock` },
-      { label: 'Patient reports', value: String(d.feedbackCount), helper: `${d.unavailableReports} said unavailable` },
-    ];
-  });
+  const d = this.dashboard.value();
+  if (!d) return [];
+  return [
+    { label: 'Reliability score', value: d.reliabilityScore.toString(), unit: '/100', helper: 'Recalculated nightly' },
+    {
+      label: 'Average rating',
+      value: d.averageRating === null ? '—' : d.averageRating.toFixed(1),
+      unit: d.averageRating === null ? undefined : '/5',
+      helper: d.reviewCount === 0
+        ? 'No patient reviews yet'
+        : `From ${d.reviewCount} patient ${d.reviewCount === 1 ? 'review' : 'reviews'}`,
+    },
+    { label: 'Freshness threshold', value: String(d.freshnessThreshold), unit: ' min', helper: 'Stock flags stale after' },
+    { label: 'Items listed', value: String(d.itemsListed), helper: `${d.outOfStockCount} out of stock` },
+    { label: 'Patient reports', value: String(d.feedbackCount), helper: `${d.unavailableReports} said unavailable` },
+    {
+  label: 'Favourites',
+  value: String(d.favouritCount),
+  helper: d.favouritCount === 1 ? 'Patient has saved you' : 'Patients have saved you',
+},
+  ];
+});
 
   readonly days: { key: DayKey; label: string }[] = [
     { key: 'monFri', label: 'Mon–Fri' },

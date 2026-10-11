@@ -157,9 +157,16 @@ export class AuthService {
     }
   }
 
-  private restoreSession(): void {
+   private restoreSession(): void {
     const stored = this.readToken();
     if (!stored) return;
+
+    // A token that has already expired would make the app look signed in while the API
+    // rejects every request with 401, so discard it and start signed out.
+    if (this.isExpired(stored)) {
+      this.clearToken();
+      return;
+    }
 
     const user = this.decodeUser(stored);
     if (!user) {
@@ -174,6 +181,15 @@ export class AuthService {
       if (raw) this.applyProfile(JSON.parse(raw) as UserProfile);
     } catch {}
   }
+
+  private isExpired(token: string): boolean {
+    const exp = this.decodePayload(token)?.['exp'];
+    return typeof exp === 'number' && exp * 1000 <= Date.now();
+  }
+
+ 
+
+
 
   private saveToken(token: string): void {
     try {

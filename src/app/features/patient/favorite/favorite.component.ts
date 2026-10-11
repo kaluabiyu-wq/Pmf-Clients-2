@@ -1,23 +1,25 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
+import { AuthService } from '../../../services/auth-service.service';
 import { FavoriteService } from '../../../services/favorite.service';
 import { FavoriteResponse } from '../../../model/favorite.model';
 
 @Component({
   selector: 'app-favorite',
-  standalone: true,
-  imports: [FormsModule, DatePipe,RouterLink],
+  imports: [FormsModule, DatePipe, RouterLink],
   templateUrl: './favorite.component.html',
   styleUrl: './favorite.component.scss',
 })
 export class FavoriteComponent implements OnInit {
   private readonly favoriteService = inject(FavoriteService);
-  private readonly route = inject(ActivatedRoute);
+  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
+  // The signed-in user's own id. It is no longer read from the URL, so nobody can open
+  // /patient/favourite/<someone else's id> to view or remove another person's favourites.
   userId!: number;
 
   favorites = signal<FavoriteResponse[]>([]);
@@ -31,17 +33,15 @@ export class FavoriteComponent implements OnInit {
   removingId = signal<number | null>(null);
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe((params) => {
-      const userId = Number(params.get('userId'));
+    const userId = this.auth.currentUser()?.id;
 
-      if (!userId) {
-        this.error.set('Invalid user ID.');
-        return;
-      }
+    if (!userId) {
+      this.error.set('Please log in to see your favorites.');
+      return;
+    }
 
-      this.userId = userId;
-      this.loadFavorites();
-    });
+    this.userId = userId;
+    this.loadFavorites();
   }
 
   loadFavorites(): void {
@@ -58,7 +58,9 @@ export class FavoriteComponent implements OnInit {
         console.error('Failed to load favorites:', error);
 
         this.error.set(
-          error?.error?.detail || error?.error?.message || 'Failed to load favorites.'
+          error?.status === 403
+            ? "You don't have access to these favorites."
+            : error?.error?.detail || error?.error?.message || 'Failed to load favorites.',
         );
 
         this.loading.set(false);
@@ -113,7 +115,7 @@ export class FavoriteComponent implements OnInit {
           this.addError.set(
             error?.error?.detail ||
               error?.error?.message ||
-              'Failed to add that pharmacy to favorites.'
+              'Failed to add that pharmacy to favorites.',
           );
 
           this.adding.set(false);
@@ -134,7 +136,7 @@ export class FavoriteComponent implements OnInit {
         console.error('Failed to remove favorite:', error);
 
         this.error.set(
-          error?.error?.detail || error?.error?.message || 'Failed to remove that favorite.'
+          error?.error?.detail || error?.error?.message || 'Failed to remove that favorite.',
         );
 
         this.removingId.set(null);
@@ -143,6 +145,7 @@ export class FavoriteComponent implements OnInit {
   }
 
   viewPharmacy(favorite: FavoriteResponse): void {
-    this.router.navigate(['../patient/pharmacy-list', favorite.pharmacyId]);
+    // Absolute path: the old relative '../patient/pharmacy-list' depended on the current URL.
+    this.router.navigate(['/patient/pharmacy-list', favorite.pharmacyId]);
   }
 }

@@ -1,129 +1,123 @@
 import { DecimalPipe } from '@angular/common';
-import { Component, OnInit, effect, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, inject, linkedSignal, signal } from '@angular/core';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatSortModule, Sort } from '@angular/material/sort';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Observable } from 'rxjs';
 
+import { AuthService } from '../../../services/auth-service.service';
 import { ReviewService } from '../../../services/review.service';
-import { ReviewResponse } from '../../../model/review.model';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort, MatSortModule } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { toSignal } from '@angular/core/rxjs-interop';
+
+type ReviewPage = ReturnType<ReviewService['getByPharmacy']> extends Observable<infer T>
+  ? T
+  : never;
 
 @Component({
   selector: 'app-review',
-  standalone: true,
-  imports: [FormsModule, RouterLink, DecimalPipe,MatPaginator,MatSortModule],
+  imports: [FormsModule, RouterLink, DecimalPipe, MatPaginatorModule, MatSortModule],
   templateUrl: './review.component.html',
   styleUrl: './review.component.scss',
 })
-export class ReviewComponent implements OnInit {
+export class ReviewComponent {
   private readonly reviewService = inject(ReviewService);
+  private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
 
-  pharmacyId!: number;
-
-  reviews = signal<ReviewResponse[]>([]);
-  readonly reviewsDataSource = new MatTableDataSource<ReviewResponse>([]);
-
-  readonly paginator = viewChild.required(MatPaginator);
-  readonly sort = viewChild.required(MatSort);
-
-  readonly pagedReviews = toSignal(this.reviewsDataSource.connect(), {
-    initialValue: [] as ReviewResponse[],
+  private readonly routeParams = toSignal(this.route.paramMap, {
+    initialValue: this.route.snapshot.paramMap,
   });
 
+  readonly pharmacyId = computed(() => {
+    const id = Number(this.routeParams().get('pharmacyId'));
+    return id > 0 ? id : null;
+  });
 
-  averageRating = signal<number | null>(null);
+  // The reviewer is whoever is signed in. The user id is no longer typed into the form.
+  readonly userId = computed(() => this.auth.currentUser()?.id ?? null);
 
-  loading = signal(false);
-  error = signal('');
+  // Paging and sorting state. Changing any of these re-runs the reviews request.
+  readonly pageIndex = signal(0);
+  readonly pageSize = signal(10);
+  readonly orderBy = signal<'SubmittedAt' | 'Rating'>('SubmittedAt');
+  readonly descending = signal(true);
 
-  
-  newUserId: number | null = null;
+  private readonly averageRatingResource = rxResource({
+    params: () => this.pharmacyId() ?? undefined,
+    stream: ({ params: pharmacyId }) => this.reviewService.getAverageRating(pharmacyId),
+  });
+
+  readonly averageRating = computed(() => this.averageRatingResource.value() ?? null);
+
+  readonly reviewsResource = rxResource({
+    params: () => {
+      const pharmacyId = this.pharmacyId();
+      if (pharmacyId === null) return undefined;
+      return {
+        pharmacyId,
+        page: this.pageIndex() + 1,
+        pageSize: this.pageSize(),
+        orderBy: this.orderBy(),
+        descending: this.descending(),
+      };
+    },
+    stream: ({ params }) =>
+      this.reviewService.getByPharmacy(params.pharmacyId, {
+        page: params.page,
+        pageSize: params.pageSize,
+        orderBy: params.orderBy,
+        descending: params.descending,
+      }),
+  });
+
+  // Keeps the previous page on screen while the next one loads, so the sort toolbar and
+  // paginator are not destroyed and rebuilt on every click.
+  readonly page = linkedSignal<ReviewPage | undefined, ReviewPage | undefined>({
+    source: () => this.reviewsResource.value(),
+    computation: (current, previous) => current ?? previous?.value,
+  });
+
+  readonly reviews = computed(() => this.page()?.items ?? []);
+  readonly total = computed(() => this.page()?.totalCount ?? 0);
+
+  readonly loading = computed(() => this.reviewsResource.isLoading() && !this.page());
+
+  readonly error = computed(() => {
+    if (this.pharmacyId() === null) return 'Invalid pharmacy ID.';
+    const raw: any = this.reviewsResource.error();
+    if (!raw) return '';
+    const e = raw.cause ?? raw; // rxResource wraps non-Error throwables such as HttpErrorResponse
+    return e?.error?.detail || e?.error?.message || 'Failed to load reviews.';
+  });
+
   newRating = 5;
   newComment = '';
   submitting = signal(false);
   submitError = signal('');
 
-  constructor() {
-    this.reviewsDataSource.sortingDataAccessor = (item, property) => {
-      switch (property) {
-        case 'rating':
-          return item.rating ?? 0;
-        case 'userId':
-          return item.userId ?? 0;
-        case 'submittedAt':
-          return item.submittedAt ? new Date(item.submittedAt).getTime() : 0;
-        default:
-          return '';
-      }
-    };
-
-    effect(() => {
-      this.reviewsDataSource.data = this.reviews();
-    });
-
-    effect(() => {
-      this.reviewsDataSource.paginator = this.paginator();
-      this.reviewsDataSource.sort = this.sort();
-    });
+  onPage(event: PageEvent): void {
+    this.pageIndex.set(event.pageIndex);
+    this.pageSize.set(event.pageSize);
   }
 
-  ngOnInit(): void {
-    this.route.paramMap.subscribe((params) => {
-      const pharmacyId = Number(params.get('pharmacyId'));
-
-      if (!pharmacyId) {
-        this.error.set('Invalid pharmacy ID.');
-        return;
-      }
-
-      this.pharmacyId = pharmacyId;
-      this.loadAverageRating();
-      this.loadReviews();
-    });
+  onSort(sort: Sort): void {
+    this.orderBy.set(sort.active === 'rating' ? 'Rating' : 'SubmittedAt');
+    this.descending.set(sort.direction !== 'asc');
+    this.pageIndex.set(0);
   }
-
-  loadReviews(): void {
-    this.loading.set(true);
-    this.error.set('');
-
-    this.reviewService
-      .getByPharmacy(this.pharmacyId, { page: 1, pageSize: 1000 })
-      .subscribe({
-        next: (data) => {
-          this.reviews.set(data.items ?? []);
-          this.loading.set(false);
-        },
-
-        error: (error) => {
-          console.error('Failed to load reviews:', error);
-
-          this.error.set(
-            error?.error?.detail || error?.error?.message || 'Failed to load reviews.'
-          );
-
-          this.loading.set(false);
-        },
-      });
-  }
-
-  loadAverageRating(): void {
-    this.reviewService.getAverageRating(this.pharmacyId).subscribe({
-      next: (average) => this.averageRating.set(average),
-      error: (error) => console.error('Failed to load average rating:', error),
-    });
-  }
-
 
   submitReview(): void {
-    if (!this.newUserId) {
-      this.submitError.set('Enter your user ID first.');
+    const userId = this.userId();
+    const pharmacyId = this.pharmacyId();
+
+    if (!userId || pharmacyId === null) {
+      this.submitError.set('Please log in to leave a review.');
       return;
     }
 
-    if (this.newRating < 1 || this.newRating > 5) {
+    const rating = Number(this.newRating);
+    if (rating < 1 || rating > 5) {
       this.submitError.set('Rating must be between 1 and 5.');
       return;
     }
@@ -132,9 +126,9 @@ export class ReviewComponent implements OnInit {
     this.submitError.set('');
 
     this.reviewService
-      .create(this.pharmacyId, {
-        userId: this.newUserId,
-        rating: this.newRating,
+      .create(pharmacyId, {
+        userId,
+        rating,
         comment: this.newComment.trim() || null,
       })
       .subscribe({
@@ -143,17 +137,21 @@ export class ReviewComponent implements OnInit {
           this.newRating = 5;
           this.submitting.set(false);
 
-          this.loadAverageRating();
-          this.loadReviews();
+          // Back to the first page; the sort the reader chose is left alone.
+          this.pageIndex.set(0);
+          this.reviewsResource.reload();
+          this.averageRatingResource.reload();
         },
 
         error: (error) => {
           console.error('Failed to submit review:', error);
 
           this.submitError.set(
-            error?.error?.detail ||
-              error?.error?.message ||
-              'Failed to submit your review.'
+            error?.status === 401
+              ? 'Your session has expired. Please log in again.'
+              : error?.error?.detail ||
+                  error?.error?.message ||
+                  'Failed to submit your review.',
           );
 
           this.submitting.set(false);
