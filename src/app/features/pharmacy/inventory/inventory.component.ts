@@ -1,148 +1,108 @@
-import { Component, OnInit, effect, inject, signal, viewChild } from '@angular/core';
-import { Router } from '@angular/router';
-
-import { InventoryService } from '../../../services/inventory.service';
-import { InventoryCardComponent, PharmacyStockSelection } from '../../../ui/inventory-card/inventory-card.componenet';
-import { MedicinePharmacyInventoryResponse } from '../../../model/inventory.model';
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { Component, computed, effect, inject, viewChild } from '@angular/core';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { MatTableDataSource } from '@angular/material/table';
+import { Router } from '@angular/router';
+
+import { AuthService } from '../../../services/auth-service.service';
+import { InventoryService } from '../../../services/inventory.service';
+import { PharmacyMedicineDetail } from '../../../model/inventory.model';
 
 @Component({
   selector: 'app-inventory',
-  standalone: true,
-  imports: [
-    InventoryCardComponent,MatPaginator, MatSortModule
-  ],
+  imports: [DecimalPipe, DatePipe, MatPaginator, MatSortModule],
   templateUrl: './inventory.component.html',
   styleUrl: './inventory.component.scss',
 })
-export class InventoryComponent implements OnInit {
-
+export class InventoryComponent {
+  private readonly auth = inject(AuthService);
   private readonly inventoryService = inject(InventoryService);
   private readonly router = inject(Router);
 
- 
-  medicines = signal<MedicinePharmacyInventoryResponse[]>([]);
+  // Loads only the signed-in pharmacy's stock. Stays idle while pharmacyId is null,
+  // and re-fetches automatically if a different pharmacy logs in.
+  readonly stock = rxResource({
+    params: () => this.auth.pharmacyId() ?? undefined,
+    stream: ({ params: pharmacyId }) => this.inventoryService.getMedicinesByPharmacy(pharmacyId),
+  });
 
-  loading = signal(false);
-  error = signal('');
+  readonly errorMessage = computed(() => {
+    const raw: any = this.stock.error();
+    if (!raw) return '';
+    const e = raw.cause ?? raw; // rxResource wraps non-Error throwables such as HttpErrorResponse
+    return e?.error?.detail || e?.error?.message || 'Failed to load inventory.';
+  });
 
-  readonly medicinesDataSource = new MatTableDataSource<MedicinePharmacyInventoryResponse>([]);
+  readonly medicinesDataSource = new MatTableDataSource<PharmacyMedicineDetail>([]);
 
-  readonly paginator = viewChild.required(MatPaginator);
-  readonly sort = viewChild.required(MatSort);
+  // Not .required(): the paginator and sort live inside an @if block and do not exist
+  // until the data has loaded, so the first read must be allowed to return undefined.
+  readonly paginator = viewChild(MatPaginator);
+  readonly sort = viewChild(MatSort);
 
   readonly pagedMedicines = toSignal(this.medicinesDataSource.connect(), {
-    initialValue: [] as MedicinePharmacyInventoryResponse[],
+    initialValue: [] as PharmacyMedicineDetail[],
   });
 
   constructor() {
-  this.medicinesDataSource.sortingDataAccessor = (item, property) => {
-     switch (property) {
-       case 'availableCount':
-          return item.pharmacies?.length ?? 0;
-       case 'genericName':
+    this.medicinesDataSource.sortingDataAccessor = (item, property) => {
+      switch (property) {
+        case 'genericName':
           return item.genericName ?? '';
-       case 'category':
-         return item.category ?? '';
-       default:
-         return '';
-  }
-};
+        case 'category':
+          return item.category ?? '';
+        case 'price':
+          return item.price ?? 0;
+        case 'status':
+          return item.status ?? '';
+        case 'lastUpdatedAt':
+          return new Date(item.lastUpdatedAt).getTime();
+        default:
+          return '';
+      }
+    };
 
     effect(() => {
-      this.medicinesDataSource.data = this.medicines();
+      this.medicinesDataSource.data = this.stock.value() ?? [];
     });
 
     effect(() => {
-      this.medicinesDataSource.paginator = this.paginator();
-      this.medicinesDataSource.sort = this.sort();
-       });
+      this.medicinesDataSource.paginator = this.paginator() ?? null;
+      this.medicinesDataSource.sort = this.sort() ?? null;
+    });
   }
-
-  ngOnInit(): void {
-    this.loadInventory();
-  }
-
-  loadInventory(): void {
-
-    this.loading.set(true);
-    this.error.set('');
-
-    this.inventoryService
-      .getAllMedicinesWithPharmacies()
-      .subscribe({
-
-        next: (data) => {
-          this.medicines.set(data ?? []);
-          this.loading.set(false);
-        },
-
-        error: (error) => {
-
-          console.error(
-            'Failed to load inventory:',
-            error
-          );
-
-          this.error.set(
-            error?.error?.detail ||
-            error?.error?.message ||
-            'Failed to load inventory.'
-          );
-
-          this.loading.set(false);
-        },
-
-      });
-  }
-
 
   refresh(): void {
-    this.loadInventory();
+    this.stock.reload();
   }
-
 
   addInventory(): void {
     this.router.navigate(['/inventory/create']);
   }
 
+  // The row already carries its inventoryId, so no extra lookup request is needed.
+  viewInventory(row: PharmacyMedicineDetail): void {
+    const pharmacyId = this.auth.pharmacyId();
+    if (pharmacyId === null) return;
+    this.router.navigate(['/pharmacy/inventory', pharmacyId, row.inventoryId]);
+  }
 
-   viewInventory(selection: PharmacyStockSelection): void {
-
-    this.inventoryService
-      .getByMedicine(
-        selection.pharmacyId,
-        selection.medicineId
-      )
-      .subscribe({
-
-        next: (inventory) => {
-
-          this.router.navigate(['../pharmacy/inventory',
-            selection.pharmacyId,
-            inventory.id
-          ]);
-
-        },
-
-        error: (error) => {
-
-          console.error(
-            'Failed to find inventory:',
-            error
-          );
-
-          this.error.set(
-            error?.error?.detail ||
-            error?.error?.message ||
-            'Failed to open that inventory record.'
-          );
-
-        },
-
-      });
+  statusClass(status: string): string {
+    switch ((status ?? '').toLowerCase()) {
+      case 'available':
+      case 'fresh':
+        return 'status-available';
+      case 'low':
+        return 'status-low';
+      case 'outofstock':
+      case 'out of stock':
+        return 'status-out';
+      case 'expired':
+        return 'status-expired';
+      default:
+        return 'status-default';
+    }
   }
 }

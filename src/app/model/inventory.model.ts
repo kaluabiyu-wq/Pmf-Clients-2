@@ -10,6 +10,7 @@ export type InventoryStatus =
 
 /** pharmacy's own stock list **/
 export interface PharmacyMedicineDetail {
+  inventoryId:number;
   medicineId: number;
   genericName: string;
   brandName: string;

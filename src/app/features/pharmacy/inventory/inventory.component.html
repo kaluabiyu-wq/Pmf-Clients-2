@@ -1,107 +1,95 @@
 <div class="inventory-page">
 
-  
   <div class="page-header">
-
     <div>
       <h1>Inventory</h1>
-    <p>Browse every medicine and the pharmacies currently stocking it. </p>
+      <p>The medicines your pharmacy currently stocks.</p>
     </div>
 
     <div class="header-actions">
-
-      <button type="button" class="refresh-button"
-        (click)="refresh()">Refresh</button>
-
-      <button type="button"  class="add-button"
-        (click)="addInventory()">Add Inventory
-      </button>
-
+      <button type="button" class="refresh-button" (click)="refresh()">Refresh</button>
+      <button type="button" class="add-button" (click)="addInventory()">Add Inventory</button>
     </div>
-
   </div>
 
-
- 
-  @if (loading()) {
-
+  @if (stock.isLoading()) {
     <div class="state-card">
-    <div class="spinner"></div>
-
-      <p> Loading inventory... </p>
-
+      <div class="spinner"></div>
+      <p>Loading inventory...</p>
     </div>
-
   }
 
-
- 
-  @if (error() && !loading()) {
-
+  @if (stock.error() && !stock.isLoading()) {
     <div class="error-card">
-
       <div class="error-icon">!</div>
-
       <div>
-        <h3> Unable to load inventory </h3>
-
-        <p> {{ error() }}</p>
-
-        <button type="button" (click)="refresh()">
-          Try Again</button>
-
+        <h3>Unable to load inventory</h3>
+        <p>{{ errorMessage() }}</p>
+        <button type="button" (click)="refresh()">Try Again</button>
       </div>
-
     </div>
-
   }
 
-
- 
-  @if (!loading() && !error() && medicines().length === 0) {
-
+  @if (stock.hasValue() && !stock.isLoading() && (stock.value() ?? []).length === 0) {
     <div class="empty-card">
-
-      <div class="empty-icon"> 💊  </div>
-
-      <h2>
-        No inventory found
-      </h2>
-
-      <p>There are currently no medicines in inventory anywhere.</p>
-
-      <button type="button" class="add-button" (click)="addInventory()">
-         Add Inventory </button>
-        </div>
-
+      <div class="empty-icon">💊</div>
+      <h2>No inventory found</h2>
+      <p>You haven't listed any medicines yet.</p>
+      <button type="button" class="add-button" (click)="addInventory()">Add Inventory</button>
+    </div>
   }
 
-
- 
-  @if (!loading() && !error() && medicines().length > 0) {
-     <div class="inventory-toolbar" matSort>
+  @if (stock.hasValue() && !stock.isLoading() && (stock.value() ?? []).length > 0) {
+    <div class="inventory-toolbar" matSort>
       <span class="sort-label">Sort by:</span>
       <button mat-sort-header="genericName">Name</button>
       <button mat-sort-header="category">Category</button>
-      <button mat-sort-header="availableCount">Availability</button>
+      <button mat-sort-header="price">Price</button>
+      <button mat-sort-header="status">Status</button>
+      <button mat-sort-header="lastUpdatedAt">Updated</button>
     </div>
 
-    <div class="inventory-grid">
-
-      @for (medicine of pagedMedicines(); track medicine.medicineId) {
-
-        <app-inventory-card [medicine]="medicine"
-          (view)="viewInventory($event)"/>
-
-      }
-
+    <div class="inventory-table-wrap">
+      <table class="inventory-table">
+        <thead>
+          <tr>
+            <th>Medicine</th>
+            <th>Form</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Updated</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of pagedMedicines(); track row.inventoryId) {
+            <tr>
+              <td>
+                {{ row.genericName }}
+                @if (row.brandName) {
+                  <small>{{ row.brandName }}</small>
+                }
+              </td>
+              <td>{{ row.dosageForm }} {{ row.strength }}</td>
+              <td>{{ row.price | number: '1.2-2' }}</td>
+              <td>
+                <span class="status" [class]="statusClass(row.status)">{{ row.status }}</span>
+              </td>
+              <td>{{ row.lastUpdatedAt | date: 'short' }}</td>
+              <td>
+                <button type="button" class="view-button" (click)="viewInventory(row)">View</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
     </div>
+
     <mat-paginator
       class="inventory-paginator"
       [pageSizeOptions]="[6, 12, 24]"
       showFirstLastButtons
     ></mat-paginator>
-
   }
 
 </div>

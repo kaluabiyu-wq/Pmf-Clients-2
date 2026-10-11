@@ -70,14 +70,110 @@
 }
 
 
-/* Inventory grid */
+/* Inventory table */
 
-.inventory-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-auto-rows: 1fr;
+.inventory-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--pmafs-border);
+  border-radius: var(--pmafs-radius-md);
+  background: var(--pmafs-surface);
+}
 
-  gap: var(--pmafs-space-4);
+.inventory-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 14px var(--pmafs-space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--pmafs-border);
+    font-size: 14px;
+    color: var(--pmafs-ink);
+    white-space: nowrap;
+  }
+
+  th {
+    font-family: var(--pmafs-font-display);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--pmafs-ink-muted);
+    background: var(--pmafs-bg);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  tbody tr:hover {
+    background: var(--pmafs-teal-light);
+  }
+
+  small {
+    display: block;
+    margin-top: 2px;
+    font-size: 12px;
+    color: var(--pmafs-ink-muted);
+  }
+}
+
+
+/* Status pills */
+
+.status {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-available {
+  background: var(--pmafs-teal-light);
+  color: var(--pmafs-teal-dark);
+}
+
+.status-low {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-out {
+  background: var(--pmafs-red-light);
+  color: var(--pmafs-red);
+}
+
+.status-expired {
+  background: var(--pmafs-bg);
+  color: var(--pmafs-ink-muted);
+  border: 1px solid var(--pmafs-border);
+}
+
+.status-default {
+  background: var(--pmafs-bg);
+  color: var(--pmafs-ink);
+  border: 1px solid var(--pmafs-border);
+}
+
+
+.view-button {
+  font-family: var(--pmafs-font-display);
+  border: 1px solid var(--pmafs-border);
+  border-radius: var(--pmafs-radius-sm);
+  padding: 6px var(--pmafs-space-3);
+  background: var(--pmafs-surface);
+  color: var(--pmafs-ink);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    background: var(--pmafs-teal-light);
+    border-color: var(--pmafs-teal);
+  }
 }
 
 
@@ -272,7 +368,9 @@
     flex: 1;
   }
 
-  .inventory-grid {
-    grid-template-columns: 1fr;
+  /* The table scrolls sideways inside .inventory-table-wrap on narrow screens. */
+  .inventory-table th,
+  .inventory-table td {
+    padding: 12px var(--pmafs-space-2);
   }
 }

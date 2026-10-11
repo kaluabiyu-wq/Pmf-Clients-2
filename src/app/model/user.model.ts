@@ -94,6 +94,7 @@ export interface UserProfile {
   fullName: string;
   locationId: number | null;
   locationLabel: string | null;
+  pharmacyId: number | null;
 }
 
 export interface AuthUser {
@@ -103,4 +104,5 @@ export interface AuthUser {
   fullName: string | null;
   locationId: number | null;
   locationLabel: string | null;
+  pharmacyId: number | null;
 }

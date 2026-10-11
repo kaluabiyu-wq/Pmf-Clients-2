@@ -31,6 +31,7 @@ export class AuthService {
   readonly token = this._token.asReadonly();
   readonly currentUser = this._currentUser.asReadonly();
   readonly role = computed<RoleName | null>(() => this._currentUser()?.role ?? null);
+  readonly pharmacyId = computed<number | null>(() => this._currentUser()?.pharmacyId ?? null);
   readonly isAuthenticated = computed(
     () => this._token() !== null && this._currentUser() !== null,
   );
@@ -94,6 +95,8 @@ export class AuthService {
       fullName: user.fullName ?? '',
       locationId,
       locationLabel,
+      // Keep the pharmacy so the stored profile does not lose it on the next refresh.
+      pharmacyId: user.pharmacyId,
     });
   }
 
@@ -106,6 +109,8 @@ export class AuthService {
       fullName: profile.fullName,
       locationId: profile.locationId,
       locationLabel: profile.locationLabel,
+      // Profiles saved before this field existed have no pharmacyId, so default to null.
+      pharmacyId: profile.pharmacyId ?? null,
     });
 
     try {
@@ -130,6 +135,8 @@ export class AuthService {
       fullName: null,
       locationId: null,
       locationLabel: null,
+      // Not in the JWT; filled in from /auth/me by applyProfile.
+      pharmacyId: null,
     };
   }
 

@@ -3,40 +3,49 @@
   <div class="page-header">
     <div>
       <h1>User Feedback</h1>
-     </div>
+      <p>Availability reports patients have left on your pharmacy's medicines.</p>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" class="refresh-button" (click)="refresh()">Refresh</button>
+    </div>
   </div>
 
-  @if (loading()) {
+  @if (feedback.isLoading() && !page()) {
     <div class="state-card">
       <div class="spinner"></div>
       <p>Loading feedback...</p>
     </div>
   }
 
-  @if (error() && !loading()) {
+  @if (feedback.error() && !feedback.isLoading()) {
     <div class="error-card">
       <div class="error-icon">!</div>
       <div>
         <h3>Unable to load feedback</h3>
-        <p>{{ error() }}</p>
+        <p>{{ errorMessage() }}</p>
         <button type="button" (click)="refresh()">Try Again</button>
       </div>
     </div>
   }
 
-  @if (!loading() && !error() && feedback().length === 0) {
+  @if (page() && !feedback.error() && total() === 0) {
     <div class="empty-card">
       <div class="empty-icon">💬</div>
       <h2>No feedback yet</h2>
-      <p>No patient has reported on a medicine's availability yet.</p>
+      <p>No patient has reported on your medicines' availability yet.</p>
     </div>
   }
 
-  @if (!loading() && !error() && feedback().length > 0) {
-    <div class="feedback-toolbar" matSort>
+  @if (page() && !feedback.error() && total() > 0) {
+    <div class="feedback-toolbar"
+         matSort
+         matSortActive="submittedAt"
+         matSortDirection="desc"
+         matSortDisableClear
+         (matSortChange)="onSort($event)">
       <span class="sort-label">Sort by:</span>
-      <button mat-sort-header="medicineName">Inventory</button>
-      <button mat-sort-header="pharmacyName">Pharmacy</button>
+      <button mat-sort-header="medicineName">Medicine</button>
       <button mat-sort-header="wasMedicineAvailable">Medicine Available</button>
       <button mat-sort-header="submittedAt">Date</button>
     </div>
@@ -45,18 +54,16 @@
       <table class="feedback-table">
         <thead>
           <tr>
-            <th>Inventory</th>
-            <th>Pharmacy</th>
+            <th>Medicine</th>
             <th>Medicine Available</th>
             <th>Comments</th>
             <th>Date</th>
           </tr>
         </thead>
         <tbody>
-          @for (row of pagedFeedback(); track row.id) {
+          @for (row of rows(); track row.id) {
             <tr>
               <td class="col-inventory">{{ row.medicineName }}</td>
-              <td class="col-pharmacy">{{ row.pharmacyName }}</td>
               <td class="col-availability">
                 <span class="availability-badge" [class.unavailable]="!row.wasMedicineAvailable">
                   {{ row.wasMedicineAvailable ? 'Available' : 'Unavailable' }}
@@ -72,7 +79,11 @@
 
     <mat-paginator
       class="feedback-paginator"
+      [length]="total()"
+      [pageIndex]="pageIndex()"
+      [pageSize]="pageSize()"
       [pageSizeOptions]="[5, 10, 25]"
+      (page)="onPage($event)"
       showFirstLastButtons
     ></mat-paginator>
   }

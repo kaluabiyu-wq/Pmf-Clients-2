@@ -1,20 +1,21 @@
 <div class="dashboard">
-  
+
   <section class="overview-card">
     <div class="overview-card__top">
       <div class="verification">
-        <span class="verification__dot" [class.is-approved]="verificationStatus === 'approved'"
-              [class.is-pending]="verificationStatus === 'pending'"
-              [class.is-rejected]="verificationStatus === 'rejected'"></span>
+        <span class="verification__dot"
+              [class.is-approved]="verificationStatus() === 'approved'"
+              [class.is-pending]="verificationStatus() === 'pending'"
+              [class.is-rejected]="verificationStatus() === 'rejected'"></span>
         <div>
-          <p class="verification__label">{{ verificationLabel }}</p>
-            </div>
+          <p class="verification__label">{{ verificationLabel() }}</p>
+        </div>
       </div>
       <span class="plan-pill">{{ planName }}</span>
     </div>
 
     <div class="stat-grid">
-      <div class="stat-card" *ngFor="let stat of stats">
+      <div class="stat-card" *ngFor="let stat of stats()">
         <p class="stat-card__label">{{ stat.label }}</p>
         <p class="stat-card__value">
           {{ stat.value }}<span *ngIf="stat.unit" class="stat-card__unit">{{ stat.unit }}</span>

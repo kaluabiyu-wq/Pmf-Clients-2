@@ -1,4 +1,3 @@
-
 export interface UserFeedbackRequest {
   userId: number;
   inventoryId: number;
@@ -6,7 +5,6 @@ export interface UserFeedbackRequest {
   wasMedicineAvailable: boolean;
   comments?: string | null;
 }
-
 
 export interface UserFeedbackResponse {
   id: number;
@@ -18,13 +16,22 @@ export interface UserFeedbackResponse {
   submittedAt: string;
 }
 
+export interface PharmacyFeedbackResponse {
+  id: number;
+  inventoryId: number;
+  medicineName: string;
+  wasMedicineAvailable: boolean;
+  comments: string | null;
+  submittedAt: string;
+}
+
 export interface PagedFeedbackQuery {
   page?: number;
   pageSize?: number;
-  orderBy?: 'SubmittedAt' | 'PharmacyId' | 'InventoryId';
+  orderBy?: 'SubmittedAt' | 'MedicineName' | 'WasMedicineAvailable' | 'PharmacyId' | 'InventoryId';
   descending?: boolean;
 }
- 
+
 export interface PagedResponse<T> {
   items: T[];
   totalCount: number;

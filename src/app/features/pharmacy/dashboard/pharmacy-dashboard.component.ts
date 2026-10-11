@@ -1,43 +1,65 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-
+import { AuthService } from '../../../services/auth-service.service';
+import { PharmacyDashboardService } from '../../../services/pharmacy-dashboard.service';
 
 interface DashboardStat {
-  label: string;value: string;
-  unit?: string;helper: string;
+  label: string;
+  value: string;
+  unit?: string;
+  helper: string;
 }
 
 type DayKey = 'monFri' | 'saturday' | 'sunday';
 
 @Component({
   selector: 'app-pharmacy-dashboard',
-  standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './pharmacy-dashboard.component.html',
   styleUrl: './pharmacy-dashboard.component.scss',
 })
 export class PharmacyDashboardComponent {
+  private readonly fb = inject(FormBuilder);
+  private readonly auth = inject(AuthService);
+  private readonly dashboardService = inject(PharmacyDashboardService);
 
-  verificationStatus: 'approved' | 'pending' | 'rejected' = 'approved';
-   planName = 'Standard plan';
+  // Re-runs whenever the session's pharmacyId changes; stays idle while it is null.
+  readonly dashboard = rxResource({
+    params: () => this.auth.pharmacyId() ?? undefined,
+    stream: ({ params: pharmacyId }) => this.dashboardService.get(pharmacyId),
+  });
 
-  get verificationLabel(): string {
-    switch (this.verificationStatus) {
+  // The API has no plan data yet, so this stays a display-only constant.
+  readonly planName = 'Standard plan';
+
+  readonly verificationStatus = computed(
+    () => this.dashboard.value()?.verificationStatus ?? 'pending',
+  );
+
+  readonly verificationLabel = computed(() => {
+    switch (this.verificationStatus()) {
       case 'approved':
         return 'Verification: Approved';
-      case 'pending':
-        return 'Verification: Pending';
-      default:
+      case 'rejected':
         return 'Verification: Rejected';
+      default:
+        return 'Verification: Pending';
     }
-  }
-  stats: DashboardStat[] = [
-    { label: 'Reliability score', value: '85', unit: '/100', helper: 'Recalculated nightly' },
-    { label: 'Freshness threshold', value: '1h', helper: 'Stock flags stale after' },
-    { label: 'Items listed', value: '30', helper: '1 out of stock' },
-    { label: 'Searches today', value: '5', helper: 'Where you appeared' },
-  ];
+  });
+
+  readonly stats = computed<DashboardStat[]>(() => {
+    const d = this.dashboard.value();
+    if (!d) return [];
+    return [
+      { label: 'Reliability score', value: d.reliabilityScore.toString(), unit: '/100', helper: 'Recalculated nightly' },
+      { label: 'Freshness threshold', value: String(d.freshnessThreshold), unit: ' min', helper: 'Stock flags stale after' },
+      { label: 'Items listed', value: String(d.itemsListed), helper: `${d.outOfStockCount} out of stock` },
+      { label: 'Patient reports', value: String(d.feedbackCount), helper: `${d.unavailableReports} said unavailable` },
+    ];
+  });
+
   readonly days: { key: DayKey; label: string }[] = [
     { key: 'monFri', label: 'Mon–Fri' },
     { key: 'saturday', label: 'Saturday' },
@@ -48,7 +70,7 @@ export class PharmacyDashboardComponent {
   savingSchedule = false;
   savedJustNow = false;
 
-  constructor(private fb: FormBuilder) {
+  constructor() {
     this.scheduleForm = this.fb.group({
       monFri: this.fb.group({
         open: ['08:00 AM', Validators.required],
@@ -78,13 +100,12 @@ export class PharmacyDashboardComponent {
     this.savingSchedule = true;
     this.savedJustNow = false;
 
-     setTimeout(() => {
+    setTimeout(() => {
       this.savingSchedule = false;
       this.savedJustNow = true;
       setTimeout(() => (this.savedJustNow = false), 2500);
     }, 500);
   }
 
-  markHolidayClosure(): void {
-   }
+  markHolidayClosure(): void {}
 }
