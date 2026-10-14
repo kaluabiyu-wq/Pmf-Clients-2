@@ -1,0 +1,68 @@
+<a class="back-link" routerLink="/patient/orders">← My orders</a>
+
+@if (loadError()) {
+  <p class="error-banner">{{ loadError() }}</p>
+} @else if (!order()) {
+  <p class="status-text">Loading order…</p>
+} @else {
+  @let o = order()!;
+
+  <article class="card">
+    <div class="card-head">
+      <h1>Order #{{ o.id }}</h1>
+      <span class="badge" [class]="'badge badge-' + (o.status | lowercase)">{{ o.status }}</span>
+    </div>
+    <p class="meta">Placed {{ o.createdAt | date: 'medium' }} · Updated {{ o.updatedAt | date: 'medium' }}</p>
+
+    @if (o.requiresPrescription) {
+      <p class="warn-banner">
+        This order contains prescription-only medicine. The pharmacy can only confirm it after your
+        prescription is approved.
+        @if (o.prescriptionStatus) {
+          Prescription: <span class="badge" [class]="'badge badge-' + (o.prescriptionStatus | lowercase)">{{ o.prescriptionStatus }}</span>
+        } @else {
+          No prescription submitted yet.
+        }
+      </p>
+    }
+
+    @if (actionError()) { <p class="error-banner">{{ actionError() }}</p> }
+
+    <table class="items">
+      <thead>
+        <tr><th>Medicine</th><th>Unit price</th><th>Qty</th><th class="num">Line total</th>@if (isPending()) { <th></th> }</tr>
+      </thead>
+      <tbody>
+        @for (item of o.items; track item.id) {
+          <tr>
+            <td>{{ item.genericName }}@if (item.brandName) { <span class="muted"> ({{ item.brandName }})</span> }</td>
+            <td>{{ item.unitPrice | currency: 'ETB ' }}</td>
+            <td>
+              @if (isPending()) {
+                <input class="qty" type="number" min="1" max="100" [value]="item.quantity" [disabled]="busy()"
+                       (change)="changeQuantity(item.id, $any($event.target).value)" />
+              } @else {
+                {{ item.quantity }}
+              }
+            </td>
+            <td class="num">{{ item.lineTotal | currency: 'ETB ' }}</td>
+            @if (isPending()) {
+              <td><button type="button" class="btn btn-link" [disabled]="busy() || !canRemove()"
+                          [title]="canRemove() ? 'Remove item' : 'Cancel the order instead'"
+                          (click)="removeItem(item.id)">Remove</button></td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <div class="card-head">
+      <p class="total">Total: {{ o.totalPrice | currency: 'ETB ' }}</p>
+      @if (isPending()) {
+        <div class="actions">
+          <button type="button" class="btn btn-danger" [disabled]="busy()" (click)="cancelOrder()">Cancel order</button>
+        </div>
+      }
+    </div>
+  </article>
+}

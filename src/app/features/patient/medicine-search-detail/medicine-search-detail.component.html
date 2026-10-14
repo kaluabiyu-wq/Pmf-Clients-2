@@ -80,7 +80,17 @@
           <button type="button" class="btn btn-notify" (click)="onNotifyMe()">Notify me</button>
         } @else {
           <button type="button" class="btn btn-directions" (click)="onDirections()">Directions</button>
+          @if (inventoryId() !== null) {
+            <label class="qty-label">Qty
+              <input type="number" min="1" max="100" [value]="quantity()"
+                     (change)="onQuantityChange($any($event.target).value)" />
+            </label>
+            <button type="button" class="btn btn-directions" [disabled]="isOrdering()" (click)="onPlaceOrder()">
+              {{ isOrdering() ? 'Placing…' : 'Place order' }}
+            </button>
+          }
         }
+        @if (orderError()) { <p class="status-text status-error">{{ orderError() }}</p> }
       </footer>
 
     </article>

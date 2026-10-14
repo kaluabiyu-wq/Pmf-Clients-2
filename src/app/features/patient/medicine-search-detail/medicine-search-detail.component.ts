@@ -7,6 +7,8 @@ import { SearchService } from '../../../services/search.service';
 import { PharmacyListService } from '../../../services/pharmacy-list.service';
 import { SearchResultItem } from '../../../model/search.model';
 import { PharmacyMedicineDetail } from '../../../model/inventory.model';
+import { OrderService } from '../../../services/order.service';
+import { problemMessage } from '../../../services/problem-message.service';
 
 @Component({
   selector: 'app-medicine-search-detail',
@@ -20,6 +22,7 @@ export class MedicineSearchDetailComponent {
   private readonly pharmacyService  = inject(PharmacyListService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly orderService = inject(OrderService);
 
      readonly pharmacyId = toSignal(
     this.route.paramMap.pipe(map((params) => Number(params.get('pharmacyId')))),
@@ -183,6 +186,38 @@ private readonly fullDetail = toSignal(
     return r?.lastUpdatedAt ?? r?.lastUpdated ?? null;
   });
   
+  // ---------- Place order ----------
+  readonly quantity = signal(1);
+  readonly isOrdering = signal(false);
+  readonly orderError = signal<string | null>(null);
+
+  /** Only known once the full inventory detail has loaded (search results don't carry it). */
+  readonly inventoryId = computed<number | null>(() => (this.result() as any)?.inventoryId ?? null);
+
+  onQuantityChange(raw: string): void {
+    this.quantity.set(Math.min(100, Math.max(1, Math.floor(Number(raw)) || 1)));
+  }
+
+  onPlaceOrder(): void {
+    const inventoryId = this.inventoryId();
+    if (inventoryId === null || this.isOrdering()) return;
+
+    this.isOrdering.set(true);
+    this.orderError.set(null);
+    this.orderService
+      .create({ items: [{ inventoryId, quantity: this.quantity() }] })
+      .subscribe({
+        next: (order) => {
+          this.isOrdering.set(false);
+          this.router.navigate(['/patient/orders', order.id]);
+        },
+        error: (err) => {
+          this.isOrdering.set(false);
+          this.orderError.set(problemMessage(err));
+        },
+      });
+  }
+
   onBack(): void {
     this.router.navigate(['/medicine-search']);
   }

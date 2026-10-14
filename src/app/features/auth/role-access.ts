@@ -18,10 +18,12 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { label: 'Search', path: '/patient/search', roles: PATIENT_AREA },
   { label: 'Medicine', path: '/patient/medicine', roles: PATIENT_AREA },
   { label: 'Pharmacies', path: '/patient/pharmacy-list', roles: PATIENT_AREA },
+  { label: 'My Orders', path: '/patient/orders', roles: PATIENT_AREA },
 
   // Pharmacy owner
   { label: 'Dashboard', path: '/pharmacy/dashboard', roles: PHARMACY_AREA },
   { label: 'Inventory', path: '/pharmacy/inventory', roles: PHARMACY_AREA },
+  { label: 'Orders', path: '/pharmacy/orders', roles: PHARMACY_AREA },
   { label: 'Users-Feedback', path: '/pharmacy/users-feedback-list', roles: PHARMACY_AREA },
 
   // Pharmacy admin
@@ -30,6 +32,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { label: 'Pharmacies', path: '/patient/pharmacy-list', roles: PHARMACY_ADMIN_AREA },
   { label: 'Add Medicine', path: '/pharmacy-admin/medicines/add', roles: PHARMACY_ADMIN_AREA },
   { label: 'Inventory', path: '/pharmacy/inventory', roles: PHARMACY_ADMIN_AREA },
+  { label: 'Orders', path: '/pharmacy/orders', roles: PHARMACY_ADMIN_AREA },
   { label: 'Users-Feedback', path: '/pharmacy/users-feedback-list', roles: PHARMACY_ADMIN_AREA },
   
 
