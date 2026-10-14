@@ -11,4 +11,6 @@ export const PATIENT_ROUTES: Routes = [
   { path: 'pharmacy-list/:id', loadComponent: () => import('./pharmacy-list-detail/pharmacy-list-detail.component').then(m => m.PharmacyListDetailComponent) },
   { path: 'review/:pharmacyId', loadComponent: () => import('./review/review.component').then(m => m.ReviewComponent) },
   { path: 'favourite/:userId', loadComponent: () => import('./favorite/favorite.component').then(m => m.FavoriteComponent) },
+  { path: 'orders', loadComponent: () => import('./orders/orders.componenet').then(m => m.OrdersComponenet) },
+  { path: 'orders/:id', loadComponent: () => import('./order-detail/order-detail.componenet').then(m => m.OrderDetailComponent) },
 ];

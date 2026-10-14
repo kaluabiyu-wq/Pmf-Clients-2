@@ -11,7 +11,7 @@ import { problemMessage } from '../../../services/problem-message.service';
   selector: 'app-order-detail',
   imports: [CurrencyPipe, DatePipe, LowerCasePipe, RouterLink],
   templateUrl: './order-detail.componenet.html',
-  styleUrl: '../../orders-shared.scss',
+  styleUrl: '../../auth/orders-shared.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrderDetailComponent {

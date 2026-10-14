@@ -10,4 +10,5 @@ export const PHARMACY_ROUTES: Routes = [
   { path: 'pharmacy-document/:pharmacyId', canActivate: [ownPharmacyGuard], loadComponent: () => import('./pharmacy-document/pharmacy-document.componenet').then(m => m.PharmacyDocumentComponenet) },
   { path: 'users-feedback/:pharmacyId/:id', canActivate: [ownPharmacyGuard], loadComponent: () => import('./user-feedback/user-feedback.component').then(m => m.UserFeedbackComponent) },
   { path: 'users-feedback-list', canActivate: [hasPharmacyGuard], loadComponent: () => import('./user-feedback-list/user-feedback-list.component').then(m => m.UserFeedbackListComponent) },
+  { path: 'orders', canActivate: [hasPharmacyGuard], loadComponent: () => import('./pharmacy-orders/pharmacy-orders.componenet').then(m => m.PharmacyOrdersComponent) },
 ];

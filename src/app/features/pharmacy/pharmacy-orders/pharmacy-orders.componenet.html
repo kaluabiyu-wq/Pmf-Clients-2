@@ -1,0 +1,72 @@
+<h1>Incoming orders</h1>
+
+<div class="filters">
+  @for (s of statuses; track s) {
+    <button type="button" class="chip" [class.active]="status() === s" (click)="setStatus(s)">
+      {{ s ?? 'All' }}
+    </button>
+  }
+</div>
+
+@if (actionError()) { <p class="error-banner">{{ actionError() }}</p> }
+@if (orders.error()) {
+  <p class="error-banner">Could not load orders.
+    <button type="button" class="btn-link" (click)="orders.reload()">Retry</button></p>
+}
+
+@if (orders.isLoading() && !data()) {
+  <p class="status-text">Loading orders…</p>
+} @else if (rows().length === 0 && !orders.error()) {
+  <p class="status-text">No orders here.</p>
+} @else {
+  @for (o of rows(); track o.id) {
+    <article class="card">
+      <div class="card-head">
+        <span class="card-title">Order #{{ o.id }}</span>
+        <span class="badge" [class]="'badge badge-' + (o.status | lowercase)">{{ o.status }}</span>
+      </div>
+      <p class="meta">{{ o.createdAt | date: 'medium' }} · Patient #{{ o.userId }}</p>
+
+      @if (o.requiresPrescription) {
+        <p class="warn-banner">
+          Prescription required —
+          @if (o.prescriptionStatus) { status: {{ o.prescriptionStatus }} } @else { none submitted yet }
+        </p>
+      }
+
+      <table class="items">
+        <thead><tr><th>Medicine</th><th>Qty</th><th class="num">Line total</th></tr></thead>
+        <tbody>
+          @for (item of o.items; track item.id) {
+            <tr>
+              <td>{{ item.genericName }}@if (item.brandName) { <span class="muted"> ({{ item.brandName }})</span> }</td>
+              <td>{{ item.quantity }}</td>
+              <td class="num">{{ item.lineTotal | currency: 'ETB ' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <div class="card-head">
+        <p class="total">{{ o.totalPrice | currency: 'ETB ' }}</p>
+        @if (o.status !== 'Cancelled') {
+          <div class="actions">
+            @if (o.status === 'Pending') {
+              <button type="button" class="btn btn-primary"
+                      [disabled]="busyId() === o.id || !canConfirm(o)"
+                      [title]="canConfirm(o) ? '' : 'Waiting for an approved prescription'"
+                      (click)="confirm(o)">Confirm</button>
+            }
+            <button type="button" class="btn btn-danger" [disabled]="busyId() === o.id" (click)="cancel(o)">Cancel</button>
+          </div>
+        }
+      </div>
+    </article>
+  }
+
+  <div class="pager">
+    <button type="button" class="btn" (click)="prev()" [disabled]="!data()?.hasPrevious">Previous</button>
+    <span class="muted">Page {{ data()?.page }} of {{ data()?.totalPages }}</span>
+    <button type="button" class="btn" (click)="next()" [disabled]="!data()?.hasNext">Next</button>
+  </div>
+}
