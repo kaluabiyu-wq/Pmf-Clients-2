@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, map, of, tap } from 'rxjs';
+import { Observable, catchError, from, map, of, switchMap, tap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
   CreatePharmacyDocumentRequest,
@@ -59,7 +59,36 @@ export class PharmacyDocumentService {
       }),
       // Don't leave a blank tab behind when the download failed.
       tap({ error: () => tab?.close() }),
+      // Show the API's own explanation instead of a generic message.
+      catchError((err: HttpErrorResponse) =>
+        from(this.fileErrorMessage(err)).pipe(
+          switchMap((message) => throwError(() => new Error(message))),
+        ),
+      ),
     );
+  }
+
+  /** The error body of a blob request is itself a Blob, so read the ProblemDetails out of it. */
+  private async fileErrorMessage(err: HttpErrorResponse): Promise<string> {
+    try {
+      const body = err.error;
+      const text = body instanceof Blob ? await body.text() : typeof body === 'string' ? body : '';
+      const detail = text ? JSON.parse(text)?.detail : null;
+      if (typeof detail === 'string' && detail) return detail;
+    } catch {
+      // Not JSON; fall through to the status-based messages.
+    }
+
+    switch (err.status) {
+      case 401:
+        return 'Your session has expired. Sign in again to view this file.';
+      case 403:
+        return "You don't have access to this pharmacy's documents.";
+      case 404:
+        return 'This file could not be found.';
+      default:
+        return 'Could not open the file. Please try again.';
+    }
   }
 
   create(

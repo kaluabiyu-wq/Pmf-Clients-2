@@ -9,7 +9,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 
 import { PharmacyDocumentService } from '../../../services/pharmacy-document.service';
 import { AuthService } from '../../../services/auth-service.service';
-import { ServerAlertService  } from '../../../services/serveralert.service';
+import { ServerAlertService } from '../../../services/serveralert.service';
 import {
   DocumentType,
   PharmacyDocumentResponse,
@@ -136,7 +136,11 @@ export class PharmacyDocumentComponenet implements OnInit {
     this.loadDocuments();
   }
 
-  
+  /**
+   * The signed-in user's "document rejected" alerts, newest first, keyed by document id so the
+   * pharmacy can read why a file was rejected right next to it. Best effort: the page still
+   * works if alerts can't be loaded.
+   */
   private loadRejectionMessages(): void {
     this.serverAlerts.getMine({ pageSize: 100 }).subscribe({
       next: (page) => {
@@ -166,9 +170,7 @@ export class PharmacyDocumentComponenet implements OnInit {
         console.error('Failed to open document file:', error);
         this.openingFileId.set(null);
         this.fileError.set(
-          error?.status === 404
-            ? 'This file is no longer available.'
-            : 'Could not open the file. Please try again.',
+          error instanceof Error ? error.message : 'Could not open the file. Please try again.',
         );
       },
     });
