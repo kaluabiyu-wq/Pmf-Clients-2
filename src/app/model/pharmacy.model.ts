@@ -3,13 +3,14 @@ export interface Pharmacy {
   id: number;
   name: string;
   licenseNumber: string;
-   phoneNumber: string;
-  email?: string;
+  phoneNumber: number | string;
+  email?: string | null;
   isVerified: boolean;
-  reliabilityScore: number;
+  reliablityScore: number;
   isActive: boolean;
-  freshnessThresholdHours: number;
-  lastInventoryUpdateAt: string;
+  freshnessThreshold: number;
+  lastInventoryUpdatedAt: string;
+  registeredAt?: string;
   locationId: number;
 }
 export interface PharmacyListItem extends Pharmacy {
@@ -48,5 +49,3 @@ export interface PharmacyMedicine {
   status: string;
   lastUpdatedAt: string;
 }
-
-

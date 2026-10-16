@@ -61,7 +61,7 @@
         </div>
         <div class="detail-row">
           <dt>Reliability score</dt>
-          <dd>{{ item.reliabilityScore }}</dd>
+          <dd>{{ item.reliablityScore }}</dd>
         </div>
         @if (item.location; as loc) {
           <div class="detail-row">
@@ -71,7 +71,7 @@
         }
         <div class="detail-row">
           <dt>Last inventory update</dt>
-          <dd>{{ item.lastInventoryUpdateAt | date: 'medium' }}</dd>
+          <dd>{{ item.lastInventoryUpdatedAt | date: 'medium' }}</dd>
         </div>
       </dl>
     </article>
@@ -214,4 +214,3 @@
     ></mat-paginator>
   }
 </section>
-
