@@ -31,7 +31,11 @@
         <span class="badge" [class]="'badge badge-' + (p.verificationStatus | lowercase)">{{ p.verificationStatus }}</span>
       </div>
       <p class="meta">Submitted {{ p.submittedAt | date: 'medium' }}</p>
-      <p><a [href]="p.fileUrl" target="_blank" rel="noopener noreferrer">Open prescription ↗</a></p>
+      <p>
+        <button type="button" class="btn btn-link" [disabled]="openingId() === p.id" (click)="open(p)">
+          {{ openingId() === p.id ? 'Opening…' : 'Open prescription ↗' }}
+        </button>
+      </p>
 
       @if (p.verificationStatus !== 'Pending') {
         <p class="meta">

@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 import { OrderResponse } from '../../../model/order.model';
 import { OrderService } from '../../../services/order.service';
 import { problemMessage } from '../../../services/problem-message.service';
-import { PrescriptionPanelComponent } from '../../../ui/prescription-panel/prescription-panel.componenet';
+import { PrescriptionPanelComponent } from '../../../ui/prescription-panel/prescription-panel.component';
 
 @Component({
   selector: 'app-order-detail',
@@ -33,6 +33,19 @@ export class OrderDetailComponent {
   readonly actionError = signal<string | null>(null);
 
   readonly isPending = computed(() => this.order()?.status === 'Pending');
+
+  /** Pending, prescription-only, and nothing approved yet: the patient still has something to do. */
+  readonly needsPrescription = computed(() => {
+    const o = this.order();
+    return !!o && o.status === 'Pending' && o.requiresPrescription && o.prescriptionStatus !== 'Approved';
+  });
+
+  /**
+   * Once a prescription is approved the API refuses to add to or change the quantity of
+   * prescription-only items (409 "Place a new order instead"). OrderItemResponse has no per-item
+   * prescription flag, so the UI locks every quantity rather than letting the patient hit that 409.
+   */
+  readonly quantitiesLocked = computed(() => this.isPending() && this.order()?.prescriptionStatus === 'Approved');
   readonly canRemove = computed(() => this.isPending() && (this.order()?.items.length ?? 0) > 1);
   readonly loadError = computed(() => (this.resource.error() ? 'Could not load this order.' : null));
 

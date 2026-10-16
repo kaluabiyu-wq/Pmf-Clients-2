@@ -1,1 +1,59 @@
-<p>orders works!</p>
+<h1>My orders</h1>
+
+<div class="filters">
+  @for (s of statuses; track s) {
+    <button type="button" class="chip" [class.active]="status() === s" (click)="setStatus(s)">
+      {{ s ?? 'All' }}
+    </button>
+  }
+</div>
+
+@if (orders.error()) {
+  <p class="error-banner">Could not load your orders.
+    <button type="button" class="btn-link" (click)="orders.reload()">Retry</button></p>
+}
+
+@if (orders.isLoading() && !data()) {
+  <p class="status-text">Loading orders…</p>
+} @else if (rows().length === 0 && !orders.error()) {
+  <p class="status-text">
+    @if (status()) { No {{ status() | lowercase }} orders. } @else {
+      You haven't placed an order yet. <a routerLink="/patient/search">Search for a medicine</a> to get started.
+    }
+  </p>
+} @else {
+  @for (o of rows(); track o.id) {
+    <article class="card">
+      <div class="card-head">
+        <a class="card-title" [routerLink]="['/patient/orders', o.id]">Order #{{ o.id }}</a>
+        <span class="badge" [class]="'badge badge-' + (o.status | lowercase)">{{ o.status }}</span>
+      </div>
+      <p class="meta">Placed {{ o.createdAt | date: 'medium' }} · {{ o.items.length }}
+        {{ o.items.length === 1 ? 'item' : 'items' }}</p>
+      <p>{{ itemsSummary(o) }}</p>
+
+      @if (prescriptionNote(o); as note) {
+        @if (needsPrescription(o)) {
+          <p class="warn-banner">{{ note }}</p>
+        } @else {
+          <p class="meta">{{ note }}</p>
+        }
+      }
+
+      <div class="card-head">
+        <p class="total">{{ o.totalPrice | currency: 'ETB ' }}</p>
+        <div class="actions">
+          <a class="btn btn-primary" [routerLink]="['/patient/orders', o.id]">
+            {{ needsPrescription(o) ? 'Add prescription' : 'View details' }}
+          </a>
+        </div>
+      </div>
+    </article>
+  }
+
+  <div class="pager">
+    <button type="button" class="btn" (click)="prev()" [disabled]="!data()?.hasPrevious">Previous</button>
+    <span class="muted">Page {{ data()?.page }} of {{ data()?.totalPages }}</span>
+    <button type="button" class="btn" (click)="next()" [disabled]="!data()?.hasNext">Next</button>
+  </div>
+}

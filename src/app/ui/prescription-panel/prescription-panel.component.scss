@@ -1,0 +1,10 @@
+:host { max-width: none; margin: var(--pmafs-space-3) 0 0; padding: 0; }
+h2.card-title { margin: 0; font-size: 1.1rem; }
+.rx-subtitle { font-size: 0.95rem; color: var(--pmafs-ink-muted); margin: var(--pmafs-space-3) 0 var(--pmafs-space-1); }
+.rx-form { display: grid; gap: var(--pmafs-space-1); margin-top: var(--pmafs-space-2); label { font-weight: 600; color: var(--pmafs-ink); } }
+.text-input { width: 100%; box-sizing: border-box; padding: 0.55rem 0.7rem; border: 1px solid var(--pmafs-border); border-radius: var(--pmafs-radius-sm); font: inherit; }
+.field-error { color: var(--pmafs-red); margin: 0; font-size: 0.85rem; }
+.notice { background: var(--pmafs-teal-light); border: 1px solid var(--pmafs-teal); color: var(--pmafs-teal-dark); padding: var(--pmafs-space-2) var(--pmafs-space-3); border-radius: var(--pmafs-radius-sm); margin: var(--pmafs-space-2) 0; }
+.rx-history { list-style: none; padding: 0; margin: 0; li { display: flex; gap: var(--pmafs-space-2); flex-wrap: wrap; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid var(--pmafs-border); } }
+a { color: var(--pmafs-teal-dark); }
+.file-input { width: 100%; box-sizing: border-box; padding: 0.45rem 0.5rem; border: 1px dashed var(--pmafs-border); border-radius: var(--pmafs-radius-sm); font: inherit; }

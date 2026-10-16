@@ -29,12 +29,11 @@
 
   @if (canSubmit()) {
     <form class="rx-form" (submit)="onSubmit($event)" novalidate>
-      <label for="rx-url">Link to your prescription (photo or PDF)</label>
-      <input id="rx-url" type="url" class="text-input" placeholder="https://…"
-             [attr.maxlength]="maxLength" [value]="fileUrl()" [disabled]="saving()"
-             (input)="fileUrl.set($any($event.target).value)" (blur)="touched.set(true)" />
-      @if (touched() && urlError()) { <p class="field-error">{{ urlError() }}</p> }
-      <p class="meta">Use a link the pharmacy can open without signing in.</p>
+      <label for="rx-file">Photo or PDF of your prescription</label>
+      <input #fileInput id="rx-file" type="file" class="file-input" [attr.accept]="accept"
+             [disabled]="saving()" (change)="onFileChange($event)" />
+      @if (touched() && fileError()) { <p class="field-error">{{ fileError() }}</p> }
+      <p class="meta">.pdf, .jpg or .png, up to 5 MB. Only you and the pharmacy can see it.</p>
       @if (error()) { <p class="error-banner">{{ error() }}</p> }
       <div class="actions">
         <button type="submit" class="btn btn-primary" [disabled]="saving()">
@@ -43,6 +42,8 @@
       </div>
     </form>
   }
+
+  @if (!canSubmit() && error()) { <p class="error-banner">{{ error() }}</p> }
 
   @if (history.error()) {
     <p class="error-banner">Could not load your prescriptions.
@@ -56,7 +57,9 @@
         <li>
           <span class="badge" [class]="'badge badge-' + (p.verificationStatus | lowercase)">{{ p.verificationStatus }}</span>
           <span class="muted">{{ p.submittedAt | date: 'medium' }}</span>
-          <a [href]="p.fileUrl" target="_blank" rel="noopener noreferrer">View file</a>
+          <button type="button" class="btn btn-link" [disabled]="openingId() === p.id" (click)="open(p)">
+            {{ openingId() === p.id ? 'Opening…' : 'View file' }}
+          </button>
           @if (p.reviewNote) { <span class="muted">— {{ p.reviewNote }}</span> }
         </li>
       }

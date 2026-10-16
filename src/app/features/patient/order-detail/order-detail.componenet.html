@@ -14,10 +14,10 @@
     </div>
     <p class="meta">Placed {{ o.createdAt | date: 'medium' }} · Updated {{ o.updatedAt | date: 'medium' }}</p>
 
-    @if (o.requiresPrescription) {
+    @if (needsPrescription()) {
       <p class="warn-banner">
-        This order contains prescription-only medicine. The pharmacy can only confirm it after your
-        prescription is approved.
+        This order contains prescription-only medicine. Upload a photo or PDF of your prescription
+        below; the pharmacy can only confirm the order after it approves it.
       </p>
     }
 
@@ -34,7 +34,7 @@
             <td>{{ item.unitPrice | currency: 'ETB ' }}</td>
             <td>
               @if (isPending()) {
-                <input class="qty" type="number" min="1" max="100" [value]="item.quantity" [disabled]="busy()"
+                <input class="qty" type="number" min="1" max="100" [value]="item.quantity" [disabled]="busy() || quantitiesLocked()"
                        (change)="changeQuantity(item.id, $any($event.target).value)" />
               } @else {
                 {{ item.quantity }}
@@ -50,6 +50,13 @@
         }
       </tbody>
     </table>
+
+    @if (quantitiesLocked()) {
+      <p class="meta">
+        Quantities are locked because your prescription was approved. To change them, cancel this
+        order and place a new one.
+      </p>
+    }
 
     <div class="card-head">
       <p class="total">Total: {{ o.totalPrice | currency: 'ETB ' }}</p>

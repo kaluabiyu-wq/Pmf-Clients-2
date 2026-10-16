@@ -32,6 +32,7 @@ export class PrescriptionQueueComponent {
 
   readonly maxNote = MAX_REVIEW_NOTE_LENGTH;
   readonly busyId = signal<number | null>(null);
+  readonly openingId = signal<number | null>(null);
   readonly rejectingId = signal<number | null>(null);
   readonly rejectNote = signal('');
   readonly noteTouched = signal(false);
@@ -96,6 +97,22 @@ export class PrescriptionQueueComponent {
       { verificationStatus: 'Rejected', note: this.rejectNote().trim() },
       `Rejected. The patient was notified and can submit a new prescription for order #${p.orderId}.`,
     );
+  }
+
+  /** Uploads are behind the API's auth, so fetch with the token instead of linking. */
+  open(p: PrescriptionResponse): void {
+    if (this.openingId() !== null) return;
+    this.openingId.set(p.id);
+    this.actionError.set(null);
+    this.service.openFile(p).subscribe({
+      next: () => this.openingId.set(null),
+      error: (err) => {
+        this.openingId.set(null);
+        this.actionError.set(
+          err?.status === 404 ? 'That prescription file is no longer available.' : problemMessage(err),
+        );
+      },
+    });
   }
 
   private review(p: PrescriptionResponse, request: PrescriptionReviewRequest, successNotice: string): void {
