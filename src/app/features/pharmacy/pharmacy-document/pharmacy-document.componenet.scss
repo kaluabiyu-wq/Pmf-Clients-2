@@ -281,9 +281,36 @@ textarea {
   flex-direction: column;
   gap: 6px;
 
-  input {
-    width: 130px;
+  textarea {
+    width: 240px;
+    resize: vertical;
   }
+}
+
+.link-button {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--pmafs-teal);
+  font: inherit;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    text-decoration: underline;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+}
+
+.rejection-note {
+  margin: 6px 0 0;
+  max-width: 260px;
+  color: var(--pmafs-red);
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 .review-buttons {

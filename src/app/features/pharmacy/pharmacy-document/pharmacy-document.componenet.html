@@ -69,6 +69,10 @@
     </div>
   }
 
+  @if (fileError()) {
+    <p class="form-error">{{ fileError() }}</p>
+  }
+
   @if (!loading() && !error() && documents().length > 0) {
     <div class="document-toolbar" matSort>
       <span class="sort-label">Sort by:</span>
@@ -97,7 +101,11 @@
               <td class="col-type">{{ document.documentType }}</td>
 
               <td class="col-file">
-                <a [href]="document.fileUrl" target="_blank" rel="noopener">View file</a>
+                <button type="button" class="link-button"
+                  [disabled]="openingFileId() === document.id"
+                  (click)="openFile(document)">
+                  {{ openingFileId() === document.id ? 'Opening…' : 'View file' }}
+                </button>
               </td>
 
               <td class="col-status">
@@ -106,6 +114,9 @@
                 </span>
                 @if (isExpired(document.expiresAt)) {
                   <span class="status status-expired">Expired</span>
+                }
+                @if (document.reviewStatus === 'Rejected' && rejectionMessages()[document.id]; as message) {
+                  <p class="rejection-note">{{ message }}</p>
                 }
               </td>
 
@@ -120,14 +131,17 @@
               </td>
 
               <td class="col-actions">
-                @if (reviewingId() === document.id) {
+                @if (!canReview()) {
+                  <span>—</span>
+                } @else if (reviewingId() === document.id) {
                   <div class="review-form">
                     @if (reviewError()) {
                       <p class="form-error">{{ reviewError() }}</p>
                     }
 
-                    <input type="number" min="1" placeholder="Admin user ID"
-                      [(ngModel)]="reviewerUserId" name="reviewerUserId-{{ document.id }}" />
+                    <textarea rows="3" maxlength="400"
+                      placeholder="Message to the pharmacy (required to reject), e.g. the photo is blurry or the licence has expired"
+                      [(ngModel)]="reviewReason" name="reviewReason-{{ document.id }}"></textarea>
 
                     <div class="review-buttons">
                       <button type="button" class="approve-button"

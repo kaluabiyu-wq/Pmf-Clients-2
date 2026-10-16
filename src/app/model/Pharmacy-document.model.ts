@@ -29,4 +29,6 @@ export interface CreatePharmacyDocumentRequest {
 export interface PharmacyDocumentReviewRequest {
   reviewedByUserId: number;
   reviewStatus: ReviewStatus;
+  
+  reason?: string | null;
 }

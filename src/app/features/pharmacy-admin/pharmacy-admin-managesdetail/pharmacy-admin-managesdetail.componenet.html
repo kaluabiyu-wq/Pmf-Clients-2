@@ -23,6 +23,9 @@
           {{ p.freshnessStatus }}
         </span>
       </div>
+      <a class="btn btn-primary" [routerLink]="['/pharmacy/pharmacy-document', p.id]">
+        Review documents ({{ p.pendingDocumentCount }} pending)
+      </a>
     </header>
 
     <section class="stat-grid">

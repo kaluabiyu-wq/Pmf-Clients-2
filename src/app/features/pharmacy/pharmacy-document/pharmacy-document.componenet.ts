@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit, effect, inject, signal, viewChild } from '@angular/core';
+import { Component, OnInit, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
@@ -8,6 +8,8 @@ import { MatTableDataSource } from '@angular/material/table';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 import { PharmacyDocumentService } from '../../../services/pharmacy-document.service';
+import { AuthService } from '../../../services/auth-service.service';
+import { ServerAlertService  } from '../../../services/serveralert.service';
 import {
   DocumentType,
   PharmacyDocumentResponse,
@@ -24,6 +26,11 @@ import {
 export class PharmacyDocumentComponenet implements OnInit {
   private readonly pharmacyDocumentService = inject(PharmacyDocumentService);
   private readonly route = inject(ActivatedRoute);
+  private readonly serverAlerts = inject(ServerAlertService);
+  private readonly auth = inject(AuthService);
+
+  /** Only platform admins review; the API enforces this too (SystemAdmin policy). */
+  readonly canReview = computed(() => this.auth.hasRole('PharmacyAdmin', 'SysAdmin'));
 
   pharmacyId!: number;
 
@@ -48,9 +55,17 @@ export class PharmacyDocumentComponenet implements OnInit {
   submitError = signal('');
 
   
-  reviewerUserId: number | null = null;
   reviewingId = signal<number | null>(null);
   reviewError = signal('');
+  /** Why a document is being rejected; sent to the pharmacy's staff. */
+  reviewReason = '';
+
+  /** Open a stored file in a new tab. */
+  openingFileId = signal<number | null>(null);
+  fileError = signal('');
+
+  /** documentId -> the message the admin sent when rejecting it (from the user's alerts). */
+  rejectionMessages = signal<Record<number, string>>({});
 
   readonly documentTypes: DocumentType[] = ['License', 'BusinessRegistration', 'PharmacistCredential'];
 
@@ -102,6 +117,7 @@ export class PharmacyDocumentComponenet implements OnInit {
       next: (data) => {
         this.documents.set(data ?? []);
         this.loading.set(false);
+        this.loadRejectionMessages();
       },
 
       error: (error) => {
@@ -118,6 +134,44 @@ export class PharmacyDocumentComponenet implements OnInit {
 
   refresh(): void {
     this.loadDocuments();
+  }
+
+  
+  private loadRejectionMessages(): void {
+    this.serverAlerts.getMine({ pageSize: 100 }).subscribe({
+      next: (page) => {
+        const byDocument: Record<number, string> = {};
+        for (const alert of page.items) {
+          if (
+            alert.referenceTable === 'PharmacyDocuments' &&
+            alert.eventType === 'DocumentRejected' &&
+            byDocument[alert.referenceId] === undefined
+          ) {
+            byDocument[alert.referenceId] = alert.message;
+          }
+        }
+        this.rejectionMessages.set(byDocument);
+      },
+      error: () => this.rejectionMessages.set({}),
+    });
+  }
+
+  openFile(document: PharmacyDocumentResponse): void {
+    this.fileError.set('');
+    this.openingFileId.set(document.id);
+
+    this.pharmacyDocumentService.openFile(document).subscribe({
+      next: () => this.openingFileId.set(null),
+      error: (error) => {
+        console.error('Failed to open document file:', error);
+        this.openingFileId.set(null);
+        this.fileError.set(
+          error?.status === 404
+            ? 'This file is no longer available.'
+            : 'Could not open the file. Please try again.',
+        );
+      },
+    });
   }
 
   submitDocument(): void {
@@ -159,17 +213,26 @@ export class PharmacyDocumentComponenet implements OnInit {
 
   startReview(documentId: number): void {
     this.reviewError.set('');
+    this.reviewReason = '';
     this.reviewingId.set(documentId);
   }
 
   cancelReview(): void {
     this.reviewingId.set(null);
+    this.reviewReason = '';
     this.reviewError.set('');
   }
 
   submitReview(documentId: number, reviewStatus: ReviewStatus): void {
-    if (!this.reviewerUserId) {
-      this.reviewError.set('Enter the reviewing admin user ID first.');
+    const reviewerId = this.auth.currentUser()?.id;
+    if (!reviewerId) {
+      this.reviewError.set('Sign in again to review documents.');
+      return;
+    }
+
+    const reason = this.reviewReason.trim();
+    if (reviewStatus === 'Rejected' && !reason) {
+      this.reviewError.set('Write a short message telling the pharmacy what is wrong with this file.');
       return;
     }
 
@@ -177,12 +240,14 @@ export class PharmacyDocumentComponenet implements OnInit {
 
     this.pharmacyDocumentService
       .review(this.pharmacyId, documentId, {
-        reviewedByUserId: this.reviewerUserId,
+        reviewedByUserId: reviewerId,
         reviewStatus,
+        reason: reviewStatus === 'Rejected' ? reason : null,
       })
       .subscribe({
         next: () => {
           this.reviewingId.set(null);
+          this.reviewReason = '';
           this.loadDocuments();
         },
 
