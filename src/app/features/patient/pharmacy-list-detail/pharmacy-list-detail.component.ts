@@ -10,11 +10,11 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth-service.service';
-import { PharmacyScheduleComponent } from '../../pharmacy/pharmacy-schedule/pharmacy-schedule.component';
+import { PharmacyOpeningHoursComponent } from '../pharmacy-opening-hours/pharmacy-opening-hours.component';
 
 @Component({
   selector: 'app-pharmacy-list-detail',
-  imports: [DatePipe,DecimalPipe,MatPaginator, MatSortModule, RouterLink,FormsModule],
+  imports: [DatePipe,DecimalPipe,MatPaginator, MatSortModule, RouterLink,FormsModule,PharmacyOpeningHoursComponent],
   templateUrl: './pharmacy-list-detail.component.html',
   styleUrl: './pharmacy-list-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

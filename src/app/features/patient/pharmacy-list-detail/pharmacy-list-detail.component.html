@@ -12,6 +12,7 @@
   }
 
   @if (pharmacy(); as item) {
+    <div class="detail-grid">
     <article class="detail-card">
       <header class="detail-header">
         <h1>{{ item.name }}</h1>
@@ -74,7 +75,10 @@
         </div>
       </dl>
     </article>
+    <app-pharmacy-opening-hours [pharmacyId]="item.id" />
+    </div>
   }
+  
 </section>
 
 

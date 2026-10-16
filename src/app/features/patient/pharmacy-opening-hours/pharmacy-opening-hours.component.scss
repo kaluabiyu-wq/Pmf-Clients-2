@@ -1,0 +1,121 @@
+:host {
+  display: block;
+}
+
+.hours {
+  margin-top: var(--pmafs-space-4);
+  background: var(--pmafs-surface);
+  border: 1px solid var(--pmafs-border);
+  border-radius: var(--pmafs-radius-md);
+  padding: var(--pmafs-space-4);
+}
+
+.hours__header {
+  margin-bottom: var(--pmafs-space-3);
+
+  h2 {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+
+  p {
+    margin: 4px 0 0;
+    color: var(--pmafs-ink-muted);
+    font-size: 0.9rem;
+  }
+}
+
+// Two days per row: Mon | Tue, Wed | Thu, Fri | Sat, Sun
+.hours__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--pmafs-space-3);
+  margin: 0;
+}
+
+.hours__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pmafs-space-3);
+  padding: var(--pmafs-space-2) var(--pmafs-space-3);
+  border: 1px solid var(--pmafs-border);
+  border-radius: var(--pmafs-radius-sm);
+
+  dt {
+    color: var(--pmafs-ink-muted);
+    font-weight: 500;
+  }
+
+  dd {
+    margin: 0;
+    text-align: right;
+    font-weight: 600;
+  }
+}
+
+.hours__closed {
+  color: var(--pmafs-red);
+}
+
+.hours__muted {
+  color: var(--pmafs-ink-muted);
+  font-weight: 500;
+}
+
+.hours__status {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--pmafs-ink-muted);
+
+  &--error {
+    display: flex;
+    align-items: center;
+    gap: var(--pmafs-space-3);
+    color: var(--pmafs-red);
+  }
+}
+
+.hours__retry {
+  font-family: var(--pmafs-font-display);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--pmafs-ink);
+  background: transparent;
+  border: 1px solid var(--pmafs-border);
+  border-radius: var(--pmafs-radius-sm);
+  padding: var(--pmafs-space-1) var(--pmafs-space-3);
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--pmafs-teal);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pmafs-teal);
+    outline-offset: 2px;
+  }
+}
+
+.hours__empty {
+  padding: var(--pmafs-space-4);
+  text-align: center;
+  border: 1px dashed var(--pmafs-border);
+  border-radius: var(--pmafs-radius-md);
+
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  p {
+    margin: var(--pmafs-space-1) 0 0;
+    color: var(--pmafs-ink-muted);
+  }
+}
+
+@media (max-width: 640px) {
+  .hours__list {
+    grid-template-columns: 1fr;
+  }
+}

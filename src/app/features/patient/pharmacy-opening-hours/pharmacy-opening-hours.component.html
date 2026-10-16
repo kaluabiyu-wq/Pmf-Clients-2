@@ -1,0 +1,37 @@
+<section class="hours" aria-labelledby="hours-title">
+  <header class="hours__header">
+    <h2 id="hours-title">Opening hours</h2>
+    <p>When this pharmacy is open during the week.</p>
+  </header>
+
+  @if (schedule.isLoading() && !schedule.hasValue()) {
+    <p class="hours__status">Loading opening hours…</p>
+  } @else if (schedule.error()) {
+    <div class="hours__status hours__status--error" role="alert">
+      <span>Could not load the opening hours.</span>
+      <button type="button" class="hours__retry" (click)="schedule.reload()">Try again</button>
+    </div>
+  } @else if (!hasSchedule()) {
+    <div class="hours__empty">
+      <h3>No opening hours yet</h3>
+      <p>This pharmacy has not published its weekly schedule.</p>
+    </div>
+  } @else {
+    <dl class="hours__list">
+      @for (row of rows(); track row.dayOfWeek) {
+        <div class="hours__row">
+          <dt>{{ row.label }}</dt>
+          <dd>
+            @if (!row.day) {
+              <span class="hours__muted">Not set</span>
+            } @else if (row.day.isClosed) {
+              <span class="hours__closed">Closed</span>
+            } @else {
+              {{ row.day.openTime }} – {{ row.day.closedTime }}
+            }
+          </dd>
+        </div>
+      }
+    </dl>
+  }
+</section>
