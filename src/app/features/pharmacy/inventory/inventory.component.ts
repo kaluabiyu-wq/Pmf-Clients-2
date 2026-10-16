@@ -5,10 +5,12 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
-
 import { AuthService } from '../../../services/auth-service.service';
 import { InventoryService } from '../../../services/inventory.service';
 import { PharmacyMedicineDetail } from '../../../model/inventory.model';
+import { AlertService } from '../../../services/alert.service';
+import { problemMessage } from '../../../services/problem-message.service';
+
 
 @Component({
   selector: 'app-inventory',
@@ -20,6 +22,8 @@ export class InventoryComponent {
   private readonly auth = inject(AuthService);
   private readonly inventoryService = inject(InventoryService);
   private readonly router = inject(Router);
+  private readonly alerts = inject(AlertService);
+ 
 
   // Loads only the signed-in pharmacy's stock. Stays idle while pharmacyId is null,
   // and re-fetches automatically if a different pharmacy logs in.

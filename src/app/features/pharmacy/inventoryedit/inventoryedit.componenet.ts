@@ -4,8 +4,9 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
-
+import { AlertService } from '../../../services/alert.service';
 import { InventoryService } from '../../../services/inventory.service';
+import { problemMessage } from '../../../services/problem-message.service';
 import { InventoryStatus, UpdateInventoryRequest } from '../../../model/inventory.model';
 
 @Component({
@@ -19,6 +20,7 @@ export class InventoryEditComponent {
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
   private readonly inventoryService = inject(InventoryService);
+  private readonly alerts = inject(AlertService);
 
   readonly pharmacyId = Number(this.route.snapshot.paramMap.get('pharmacyId'));
   readonly inventoryId = Number(this.route.snapshot.paramMap.get('id'));
@@ -48,7 +50,6 @@ export class InventoryEditComponent {
   });
 
   readonly saving = signal(false);
-  readonly saveError = signal('');
 
   readonly loadError = computed(() => {
     const raw: any = this.item.error();
@@ -85,34 +86,34 @@ export class InventoryEditComponent {
     if (status !== current.status) payload.status = status;
 
     if (Object.keys(payload).length === 0) {
+      this.alerts.info('No changes to save.');
       this.goToDetail();
       return;
     }
 
     this.saving.set(true);
-    this.saveError.set('');
 
     this.inventoryService.update(this.pharmacyId, this.inventoryId, payload).subscribe({
-      next: () => this.goToDetail(),
+      next: () => {
+        this.alerts.success('Inventory updated.');
+        this.goToDetail();
+      },
       error: (error) => {
         console.error('Failed to update inventory:', error);
         this.saving.set(false);
 
         if (error?.status === 403) {
-          this.saveError.set("You don't have permission to edit this pharmacy's inventory.");
+          this.alerts.error("You don't have permission to edit this pharmacy's inventory.");
           return;
         }
 
+        // Prefer the first field-level validation message, then fall back to the
+        // shared ProblemDetails parsing.
         const firstValidationMessage = error?.error?.errors
           ? (Object.values(error.error.errors).flat()[0] as string | undefined)
           : undefined;
 
-        this.saveError.set(
-          firstValidationMessage ||
-            error?.error?.detail ||
-            error?.error?.title ||
-            'Failed to save changes.',
-        );
+        this.alerts.error(firstValidationMessage || problemMessage(error, 'Failed to save changes.'));
       },
     });
   }

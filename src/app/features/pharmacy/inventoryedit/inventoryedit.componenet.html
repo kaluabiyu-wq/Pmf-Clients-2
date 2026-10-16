@@ -84,10 +84,6 @@
           }
         </div>
 
-        @if (saveError()) {
-          <div class="save-error">{{ saveError() }}</div>
-        }
-
         <div class="form-actions">
           <button type="button" class="btn-secondary" (click)="goToDetail()" [disabled]="saving()">
             Cancel

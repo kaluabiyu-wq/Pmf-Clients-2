@@ -1,0 +1,14 @@
+
+<div class="alert-stack" aria-live="polite">
+  @for (alert of alertService.alerts(); track alert.id) {
+    <div
+      class="alert"
+      [class]="'alert alert-' + alert.kind"
+      [attr.role]="alert.kind === 'error' ? 'alert' : 'status'"
+    >
+      <span class="alert-text">{{ alert.text }}</span>
+      <button type="button" class="alert-close" aria-label="Dismiss message"
+              (click)="alertService.dismiss(alert.id)">×</button>
+    </div>
+  }
+</div>
