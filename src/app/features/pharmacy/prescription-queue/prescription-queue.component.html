@@ -1,0 +1,66 @@
+<h1>Prescriptions</h1>
+
+<div class="filters">
+  @for (s of statuses; track s) {
+    <button type="button" class="chip" [class.active]="status() === s" (click)="setStatus(s)">
+      {{ s ?? 'All' }}
+    </button>
+  }
+</div>
+
+@if (notice()) {
+  <p class="notice">{{ notice() }} <a routerLink="/pharmacy/orders">Go to Orders</a></p>
+}
+@if (actionError()) { <p class="error-banner">{{ actionError() }}</p> }
+@if (prescriptions.error()) {
+  <p class="error-banner">Could not load prescriptions.
+    <button type="button" class="btn-link" (click)="prescriptions.reload()">Retry</button></p>
+}
+
+@if (prescriptions.isLoading() && !data()) {
+  <p class="status-text">Loading prescriptions…</p>
+} @else if (rows().length === 0 && !prescriptions.error()) {
+  <p class="status-text">
+    @if (status() === 'Pending') { Nothing waiting for review. } @else { No prescriptions here. }
+  </p>
+} @else {
+  @for (p of rows(); track p.id) {
+    <article class="card">
+      <div class="card-head">
+        <span class="card-title">Order #{{ p.orderId }}</span>
+        <span class="badge" [class]="'badge badge-' + (p.verificationStatus | lowercase)">{{ p.verificationStatus }}</span>
+      </div>
+      <p class="meta">Submitted {{ p.submittedAt | date: 'medium' }}</p>
+      <p><a [href]="p.fileUrl" target="_blank" rel="noopener noreferrer">Open prescription ↗</a></p>
+
+      @if (p.verificationStatus !== 'Pending') {
+        <p class="meta">
+          {{ p.verificationStatus }} {{ p.verifiedAt | date: 'medium' }}
+          @if (p.reviewNote) { — {{ p.reviewNote }} }
+        </p>
+      } @else if (rejectingId() === p.id) {
+        <label class="note-label" [for]="'note-' + p.id">Reason for rejecting (shown to the patient)</label>
+        <textarea class="note-input" [id]="'note-' + p.id" rows="3" [attr.maxlength]="maxNote"
+                  [value]="rejectNote()" [disabled]="busyId() === p.id"
+                  (input)="rejectNote.set($any($event.target).value)"
+                  (blur)="noteTouched.set(true)"></textarea>
+        @if (noteTouched() && noteError()) { <p class="field-error">{{ noteError() }}</p> }
+        <div class="actions">
+          <button type="button" class="btn" [disabled]="busyId() === p.id" (click)="cancelReject()">Back</button>
+          <button type="button" class="btn btn-danger" [disabled]="busyId() === p.id" (click)="confirmReject(p)">Confirm rejection</button>
+        </div>
+      } @else {
+        <div class="actions">
+          <button type="button" class="btn btn-danger" [disabled]="busyId() === p.id" (click)="startReject(p)">Reject</button>
+          <button type="button" class="btn btn-primary" [disabled]="busyId() === p.id" (click)="approve(p)">Approve</button>
+        </div>
+      }
+    </article>
+  }
+
+  <div class="pager">
+    <button type="button" class="btn" (click)="prev()" [disabled]="!data()?.hasPrevious">Previous</button>
+    <span class="muted">Page {{ data()?.page }} of {{ data()?.totalPages }}</span>
+    <button type="button" class="btn" (click)="next()" [disabled]="!data()?.hasNext">Next</button>
+  </div>
+}

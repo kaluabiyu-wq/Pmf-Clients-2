@@ -18,11 +18,6 @@
       <p class="warn-banner">
         This order contains prescription-only medicine. The pharmacy can only confirm it after your
         prescription is approved.
-        @if (o.prescriptionStatus) {
-          Prescription: <span class="badge" [class]="'badge badge-' + (o.prescriptionStatus | lowercase)">{{ o.prescriptionStatus }}</span>
-        } @else {
-          No prescription submitted yet.
-        }
       </p>
     }
 
@@ -65,4 +60,8 @@
       }
     </div>
   </article>
+
+  @if (o.requiresPrescription) {
+    <app-prescription-panel [order]="o" (submitted)="reloadOrder()" />
+  }
 }

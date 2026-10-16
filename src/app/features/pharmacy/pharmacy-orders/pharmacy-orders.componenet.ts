@@ -1,6 +1,7 @@
 import { CurrencyPipe, DatePipe, LowerCasePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, linkedSignal, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
 import { OrderPage, OrderResponse, OrderStatus } from '../../../model/order.model';
 import { AuthService } from '../../../services/auth-service.service';
@@ -9,7 +10,7 @@ import { problemMessage } from '../../../services/problem-message.service';
 
 @Component({
   selector: 'app-pharmacy-orders',
-  imports: [CurrencyPipe, DatePipe, LowerCasePipe],
+  imports: [CurrencyPipe, DatePipe, LowerCasePipe, RouterLink],
   templateUrl: './pharmacy-orders.componenet.html',
   styleUrl: '../../auth/orders-shared.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -6,10 +6,11 @@ import { Observable } from 'rxjs';
 import { OrderResponse } from '../../../model/order.model';
 import { OrderService } from '../../../services/order.service';
 import { problemMessage } from '../../../services/problem-message.service';
+import { PrescriptionPanelComponent } from '../../../ui/prescription-panel/prescription-panel.componenet';
 
 @Component({
   selector: 'app-order-detail',
-  imports: [CurrencyPipe, DatePipe, LowerCasePipe, RouterLink],
+  imports: [CurrencyPipe, DatePipe, LowerCasePipe, RouterLink, PrescriptionPanelComponent],
   templateUrl: './order-detail.componenet.html',
   styleUrl: '../../auth/orders-shared.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,6 +35,11 @@ export class OrderDetailComponent {
   readonly isPending = computed(() => this.order()?.status === 'Pending');
   readonly canRemove = computed(() => this.isPending() && (this.order()?.items.length ?? 0) > 1);
   readonly loadError = computed(() => (this.resource.error() ? 'Could not load this order.' : null));
+
+  /** Called after a prescription is submitted: the order's prescriptionStatus changed. */
+  reloadOrder(): void {
+    this.resource.reload();
+  }
 
   changeQuantity(itemId: number, raw: string): void {
     const quantity = Math.min(100, Math.max(1, Math.floor(Number(raw)) || 1));
