@@ -1,0 +1,69 @@
+<section class="schedule">
+  <h2 class="schedule__title">Schedule</h2>
+  <p class="schedule__subtitle">
+    Opening hours shown to patients. Mark a day as closed if the pharmacy does not open on it.
+  </p>
+
+  @if (schedule.isLoading() && !schedule.hasValue()) {
+    <p class="schedule__status">Loading opening hours…</p>
+  } @else if (schedule.error()) {
+    <div class="schedule__status schedule__status--error" role="alert">
+      <span>Could not load the opening hours.</span>
+      <button type="button" class="btn btn--secondary" (click)="schedule.reload()">Try again</button>
+    </div>
+  } @else {
+    <form class="schedule-card" [formGroup]="form" (ngSubmit)="save()">
+      <div formArrayName="days">
+        @for (day of days.controls; track day.controls.dayOfWeek.value; let last = $last) {
+          <div class="schedule-row" [class.is-last]="last" [formGroupName]="$index">
+            <span class="schedule-row__day">{{ day.controls.label.value }}</span>
+
+            <label class="closed-toggle">
+              <input type="checkbox" formControlName="isClosed" />
+              <span>Closed</span>
+            </label>
+
+            @if (day.controls.isClosed.value) {
+              <span class="schedule-row__closed">Closed all day</span>
+            } @else {
+              <div class="schedule-row__times">
+                <label class="time-field">
+                  <input
+                    type="time"
+                    formControlName="openTime"
+                    [attr.aria-label]="day.controls.label.value + ' opening time'"
+                  />
+                </label>
+
+                <span class="schedule-row__dash">–</span>
+
+                <label class="time-field">
+                  <input
+                    type="time"
+                    formControlName="closedTime"
+                    [attr.aria-label]="day.controls.label.value + ' closing time'"
+                  />
+                </label>
+              </div>
+            }
+          </div>
+
+          @if (hasCloseBeforeOpen(day)) {
+            <p class="schedule-row__error" role="alert">
+              {{ day.controls.label.value }}: closing time must be after opening time.
+            </p>
+          }
+        }
+      </div>
+
+      <div class="schedule-actions">
+        <button type="submit" class="btn btn--primary" [disabled]="saving() || form.pristine">
+          {{ saving() ? 'Saving…' : 'Save changes' }}
+        </button>
+        <button type="button" class="btn btn--secondary" [disabled]="saving() || form.pristine" (click)="discard()">
+          Discard changes
+        </button>
+      </div>
+    </form>
+  }
+</section>

@@ -2,11 +2,12 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from './services/auth-service.service';
 import { NAV_ITEMS } from './features/auth/role-access';
+import { AlertComponent } from './ui/alert/alert.componenet';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive,AlertComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

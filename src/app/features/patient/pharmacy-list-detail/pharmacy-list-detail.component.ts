@@ -10,6 +10,7 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth-service.service';
+import { PharmacyScheduleComponent } from '../../pharmacy/pharmacy-schedule/pharmacy-schedule.component';
 
 @Component({
   selector: 'app-pharmacy-list-detail',

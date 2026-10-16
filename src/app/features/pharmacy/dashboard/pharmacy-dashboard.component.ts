@@ -4,6 +4,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../services/auth-service.service';
 import { PharmacyDashboardService } from '../../../services/pharmacy-dashboard.service';
+import { PharmacyScheduleComponent } from '../pharmacy-schedule/pharmacy-schedule.component';
 
 interface DashboardStat {
   label: string;
@@ -16,7 +17,7 @@ type DayKey = 'monFri' | 'saturday' | 'sunday';
 
 @Component({
   selector: 'app-pharmacy-dashboard',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule,PharmacyScheduleComponent],
   templateUrl: './pharmacy-dashboard.component.html',
   styleUrl: './pharmacy-dashboard.component.scss',
 })
