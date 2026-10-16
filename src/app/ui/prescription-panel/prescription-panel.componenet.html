@@ -1,0 +1,65 @@
+<section class="card">
+  <div class="card-head">
+    <h2 class="card-title">Prescription</h2>
+    @if (latest(); as l) {
+      <span class="badge" [class]="'badge badge-' + (l.verificationStatus | lowercase)">{{ l.verificationStatus }}</span>
+    }
+  </div>
+
+  @switch (latest()?.verificationStatus) {
+    @case ('Pending') {
+      <p class="meta">Submitted — waiting for the pharmacy to review it.</p>
+    }
+    @case ('Approved') {
+      <p class="notice">Approved. The pharmacy can now confirm your order.</p>
+    }
+    @case ('Rejected') {
+      <p class="error-banner">
+        The pharmacy rejected your prescription.
+        @if (latest()?.reviewNote) { Reason: {{ latest()!.reviewNote }} }
+        @if (canSubmit()) { Please submit a new one below. }
+      </p>
+    }
+    @default {
+      @if (!history.isLoading() && canSubmit()) {
+        <p class="meta">This order contains prescription-only medicine. Add your prescription so the pharmacy can approve it.</p>
+      }
+    }
+  }
+
+  @if (canSubmit()) {
+    <form class="rx-form" (submit)="onSubmit($event)" novalidate>
+      <label for="rx-url">Link to your prescription (photo or PDF)</label>
+      <input id="rx-url" type="url" class="text-input" placeholder="https://…"
+             [attr.maxlength]="maxLength" [value]="fileUrl()" [disabled]="saving()"
+             (input)="fileUrl.set($any($event.target).value)" (blur)="touched.set(true)" />
+      @if (touched() && urlError()) { <p class="field-error">{{ urlError() }}</p> }
+      <p class="meta">Use a link the pharmacy can open without signing in.</p>
+      @if (error()) { <p class="error-banner">{{ error() }}</p> }
+      <div class="actions">
+        <button type="submit" class="btn btn-primary" [disabled]="saving()">
+          {{ saving() ? 'Submitting…' : 'Submit prescription' }}
+        </button>
+      </div>
+    </form>
+  }
+
+  @if (history.error()) {
+    <p class="error-banner">Could not load your prescriptions.
+      <button type="button" class="btn btn-link" (click)="history.reload()">Retry</button></p>
+  }
+
+  @if ((history.value()?.length ?? 0) > 0) {
+    <h3 class="rx-subtitle">History</h3>
+    <ul class="rx-history">
+      @for (p of history.value(); track p.id) {
+        <li>
+          <span class="badge" [class]="'badge badge-' + (p.verificationStatus | lowercase)">{{ p.verificationStatus }}</span>
+          <span class="muted">{{ p.submittedAt | date: 'medium' }}</span>
+          <a [href]="p.fileUrl" target="_blank" rel="noopener noreferrer">View file</a>
+          @if (p.reviewNote) { <span class="muted">— {{ p.reviewNote }}</span> }
+        </li>
+      }
+    </ul>
+  }
+</section>
