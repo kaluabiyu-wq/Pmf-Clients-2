@@ -3,8 +3,10 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
+  ApprovalStatus,
   CreateInventoryRequest,
   InventoryRecord,
+  InventorySubmission,
   MedicinePharmacyInventoryResponse,
   PharmacyMedicineDetail,
   UpdateInventoryRequest,
@@ -66,6 +68,24 @@ export class InventoryService {
   }
   delete(pharmacyId:number, id:number): Observable<void> {
     return this.http.delete<void>(`${this.inventoryUrl(pharmacyId)}/${id}`);
+  }
+
+    getSubmissionsByPharmacy(pharmacyId: number): Observable<InventorySubmission[]> {
+    return this.http.get<InventorySubmission[]>(`${this.inventoryUrl(pharmacyId)}/submissions`);
+  }
+
+   getSubmissions(status: ApprovalStatus | 'all' = 'Pending'): Observable<InventorySubmission[]> {
+    return this.http.get<InventorySubmission[]>(`${this.baseUrl}/inventory/submissions`, {
+      params: { status },
+    });
+  }
+
+  approve(id: number): Observable<InventorySubmission> {
+    return this.http.post<InventorySubmission>(`${this.baseUrl}/inventory/submissions/${id}/approve`, {});
+  }
+
+  reject(id: number, reason: string): Observable<InventorySubmission> {
+    return this.http.post<InventorySubmission>(`${this.baseUrl}/inventory/submissions/${id}/reject`, { reason });
   }
 
  }

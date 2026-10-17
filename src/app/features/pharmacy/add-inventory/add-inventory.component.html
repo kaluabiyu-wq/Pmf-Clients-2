@@ -1,0 +1,72 @@
+<div class="add-inventory">
+  <h2>Add Inventory</h2>
+  <p>Choose a medicine from the catalogue and set your pharmacy's price. A pharmacy admin reviews it before patients can see it.</p>
+
+  @if (loading()) {
+    <div class="state-card"><div class="spinner"></div><p>Loading medicines...</p></div>
+  } @else if (loadError(); as error) {
+    <div class="error-banner" role="alert">{{ error }}</div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="field">
+        <label for="medicineSearch">Find a medicine</label>
+        <input
+          id="medicineSearch"
+          type="search"
+          placeholder="Search by generic or brand name"
+          [value]="search()"
+          (input)="onSearch($event)"
+        />
+      </div>
+
+      <div class="field">
+        <label for="medicineId">Medicine</label>
+        <select id="medicineId" formControlName="medicineId">
+          <option [ngValue]="null" disabled>Select a medicine</option>
+          @for (m of options(); track m.id) {
+            <option [ngValue]="m.id">
+              {{ m.genericName }}{{ m.brandName ? ' (' + m.brandName + ')' : '' }}
+              {{ m.dosageForm }} {{ m.strength }}
+            </option>
+          }
+        </select>
+        @if (form.controls.medicineId.invalid && form.controls.medicineId.touched) {
+          <span class="error">Select a medicine.</span>
+        }
+        @if (options().length === 0) {
+          <span class="hint">
+            No medicines left to add. If one is missing, ask a pharmacy admin to add it to the catalogue.
+          </span>
+        }
+      </div>
+
+      @if (selected(); as medicine) {
+        <div class="preview">
+          <strong>{{ medicine.genericName }}</strong>
+          @if (medicine.brandName) { <span>{{ medicine.brandName }}</span> }
+          <span>{{ medicine.dosageForm }} {{ medicine.strength }}</span>
+          @if (medicine.category) { <span>{{ medicine.category }}</span> }
+        </div>
+      }
+
+      <div class="field">
+        <label for="price">Your price (ETB)</label>
+        <input id="price" type="number" min="1" step="0.01" formControlName="price" placeholder="e.g. 38" />
+        @if (form.controls.price.invalid && form.controls.price.touched) {
+          <span class="error">Enter a price of at least 1.</span>
+        }
+      </div>
+
+      @if (submitError(); as error) {
+        <div class="error-banner" role="alert">{{ error }}</div>
+      }
+
+      <div class="actions">
+        <button type="submit" [disabled]="isSubmitting()">
+          {{ isSubmitting() ? 'Submitting…' : 'Submit for approval' }}
+        </button>
+        <button type="button" (click)="onCancel()">Cancel</button>
+      </div>
+    </form>
+  }
+</div>

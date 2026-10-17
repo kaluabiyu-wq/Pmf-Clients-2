@@ -10,11 +10,14 @@ export class MedicineService {
   private baseUrl = `${environment.apiBaseUrl}/medicine`;
 
   getAll(page = 1, pageSize = 50): Observable<Medicine[]> {
-    return this.http
-      .get<PagedResponse<Medicine>>(this.baseUrl, {
-        params: { page: page.toString(), pageSize: pageSize.toString() },
-      })
-      .pipe(map((p) => p.items));
+    return this.getPage(page, pageSize).pipe(map((p) => p.items));
+  }
+
+  
+  getPage(page = 1, pageSize = 50): Observable<PagedResponse<Medicine>> {
+    return this.http.get<PagedResponse<Medicine>>(this.baseUrl, {
+      params: { page: page.toString(), pageSize: pageSize.toString() },
+    });
   }
 
   getById(id: number): Observable<Medicine> {
