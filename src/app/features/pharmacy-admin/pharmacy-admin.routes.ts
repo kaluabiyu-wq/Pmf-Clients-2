@@ -6,6 +6,8 @@ export const PHARMACY_ADMIN_ROUTES: Routes = [
   { path: 'manages', loadComponent: () => import('./pharmacy-admin-manages/pharmacy-admin-manages.component').then(m => m.PharmacyAdminManagesComponent) },
   { path: 'manages/:id', loadComponent: () => import('./pharmacy-admin-managesdetail/pharmacy-admin-managesdetail.componenet').then(m => m.PharmacyAdminManagesdetailComponenet) },
   { path: 'staff/:pharmacyId', loadComponent: () => import('./pharmacy-staff/pharmacy-staff.component').then(m => m.PharmacyStaffComponent) },
+ { path: 'inventory-approvals', loadComponent: () => import('./inventory-approvals/inventory-approvals.component').then(m => m.InventoryApprovalsComponent) },
+
 
   // Medicine catalogue (same catalogue the patients browse) and the add form.
   { path: 'medicines', loadComponent: () => import('../patient/medicine/medicine.component').then(m => m.MedicineComponent) },

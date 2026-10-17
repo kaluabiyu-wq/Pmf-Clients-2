@@ -4,7 +4,7 @@ import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../services/auth-service.service';
 import { InventoryService } from '../../../services/inventory.service';
 import { InventorySubmission, PharmacyMedicineDetail } from '../../../model/inventory.model';
@@ -23,6 +23,7 @@ export class InventoryComponent {
   private readonly inventoryService = inject(InventoryService);
   private readonly router = inject(Router);
   private readonly alerts = inject(AlertService);
+  private readonly route = inject(ActivatedRoute)
  
 
   // Set by the PharmacyAdmin pharmacy picker; null for a pharmacy owner, who is scoped to their own pharmacy.
@@ -95,7 +96,7 @@ export class InventoryComponent {
   }
 
   addInventory(): void {
-    this.router.navigate(['/pharmacy/inventory/add']);
+    this.router.navigate(['../add-inventory'], { relativeTo: this.route});
   }
 
   /** Lets the pharmacy clear a rejected submission so it can submit that medicine again. */

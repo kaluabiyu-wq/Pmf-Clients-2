@@ -42,6 +42,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { label: 'Medicine', path: '/pharmacy-admin/medicines', roles: PHARMACY_ADMIN_AREA },
   { label: 'Add Medicine', path: '/pharmacy-admin/medicines/add', roles: PHARMACY_ADMIN_AREA },
   { label: 'Inventory', path: '/pharmacy-admin/inventory', roles: PHARMACY_ADMIN_AREA },
+  { label: 'Approve', path: '/pharmacy-admin/inventory-approvals', roles: PHARMACY_ADMIN_AREA },
   { label: 'Orders', path: '/pharmacy-admin/orders', roles: PHARMACY_ADMIN_AREA },
   { label: 'Users-Feedback', path: '/pharmacy-admin/users-feedback', roles: PHARMACY_ADMIN_AREA },
 
