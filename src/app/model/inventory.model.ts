@@ -8,7 +8,7 @@ export type InventoryStatus =
   | 'Expired'
   | (string & {});
 
-/** pharmacy's own stock list **/
+
 export interface PharmacyMedicineDetail {
   inventoryId:number;
   medicineId: number;
@@ -48,7 +48,6 @@ export interface MedicinePharmacyInventoryResponse {
 
 
 
-/** A single inventory row —  */
 export interface InventoryRecord {
   id: number;
   medicineId: number;
@@ -60,11 +59,33 @@ export interface InventoryRecord {
 }
 
 
+
 export interface CreateInventoryRequest {
   medicineId: number;
-  updatebyUserId: number;
   price: number;
-  status: InventoryStatus;
+  updatebyUserId?: number;
+  status?: InventoryStatus;
+}
+
+export type ApprovalStatus = 'Pending' | 'Approved' | 'Rejected';
+
+export interface InventorySubmission {
+  id: number;
+  pharmacyId: number;
+  pharmacyName: string;
+  medicineId: number;
+  genericName: string;
+  brandName: string;
+  category: string | null;
+  dosageForm: string | null;
+  strength: string | null;
+  requiresPrescription: boolean;
+  price: number;
+  approvalStatus: ApprovalStatus;
+  rejectionReason: string | null;
+  submittedByUserId: number;
+  lastUpdatedAt: string;
+  reviewedAt: string | null;
 }
 export interface UpdateInventoryRequest {
   price?:number;

@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MedicineService } from '../../../services/medicine.service';
+import { AlertService } from '../../../services/alert.service';
 
 @Component({
   selector: 'app-add-medicine',
@@ -14,6 +15,10 @@ export class AddMedicineComponent {
   private fb = inject(FormBuilder);
   private api = inject(MedicineService);
   private router = inject(Router);
+  private alerts = inject(AlertService);
+
+  
+  private readonly listRoute = ['/pharmacy-admin/medicines'];
 
   isSubmitting = signal(false);
   submitError = signal<string | null>(null);
@@ -24,7 +29,6 @@ export class AddMedicineComponent {
     category: ['', Validators.required],
     dosageForm: ['Tablet', Validators.required],
     strength: ['', Validators.required],
-    price: [null as number | null, [Validators.required, Validators.min(0)]],
     quantityEstimate: [null as number | null],
     requiresPrescription: [false],
     notes: [''],
@@ -40,19 +44,27 @@ export class AddMedicineComponent {
     this.submitError.set(null);
 
     this.api.create(this.form.getRawValue()).subscribe({
-      next: () => {
+      next: (medicine) => {
         this.isSubmitting.set(false);
-        this.router.navigate(['/medicine']);
+        this.alerts.success(`${medicine.genericName} was added to the medicine catalogue.`);
+        this.router.navigate(this.listRoute);
       },
       error: (err) => {
         this.isSubmitting.set(false);
-        this.submitError.set('Could not add medicine. Make sure your .NET API is running.');
+        const message =
+          err?.status === 403
+            ? 'Only a pharmacy admin can add medicines.'
+            : err?.error?.detail ||
+              err?.error?.title ||
+              'Could not add medicine. Make sure your .NET API is running.';
+        this.submitError.set(message);
+        this.alerts.error(message);
         console.error(err);
       },
     });
   }
 
   onCancel() {
-    this.router.navigate(['/medicine']);
+    this.router.navigate(this.listRoute);
   }
 }

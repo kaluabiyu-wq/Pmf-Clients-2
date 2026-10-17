@@ -5,7 +5,6 @@ export interface Medicine {
   category?: string;
   dosageForm?: string;
   strength?: string;
-  price?: number;
   requiresPrescription: boolean;
   isActive: boolean;
 }
@@ -17,7 +16,6 @@ export interface CreateMedicineRequest {
   category?: string;
   dosageForm?: string;
   strength?: string;
-  price?: number | null;
   quantityEstimate?: number | null;
   requiresPrescription: boolean;
   notes?: string;

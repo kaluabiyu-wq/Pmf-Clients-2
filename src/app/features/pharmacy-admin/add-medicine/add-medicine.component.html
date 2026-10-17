@@ -1,5 +1,5 @@
 <h2>Add Medicine</h2>
-<p>Add a new medicine to your inventory.</p>
+<p>Add a new medicine to the catalogue. Pharmacies pick it from here and set their own price.</p>
 
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
   <div class="row">
@@ -37,19 +37,12 @@
     </div>
   </div>
 
-  <div class="row">
-    <div class="field">
-      <label for="strength">Strength</label>
-      <input id="strength" type="text" formControlName="strength" placeholder="e.g. 500mg" />
-    </div>
-
-    <div class="field">
-      <label for="price">Price (ETB)</label>
-      <input id="price" type="number" formControlName="price" placeholder="e.g. 38" />
-      @if (form.controls.price.invalid && form.controls.price.touched) {
-        <span class="error">Enter a valid price.</span>
-      }
-    </div>
+  <div class="field">
+    <label for="strength">Strength</label>
+    <input id="strength" type="text" formControlName="strength" placeholder="e.g. 500mg" />
+    @if (form.controls.strength.invalid && form.controls.strength.touched) {
+      <span class="error">Strength is required.</span>
+    }
   </div>
 
   <div class="field">
