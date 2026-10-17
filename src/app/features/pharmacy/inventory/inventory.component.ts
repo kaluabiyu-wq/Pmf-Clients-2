@@ -1,5 +1,5 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { Component, computed, effect, inject, viewChild } from '@angular/core';
+import { Component, computed, effect, inject, input, viewChild } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -25,10 +25,14 @@ export class InventoryComponent {
   private readonly alerts = inject(AlertService);
  
 
-  // Loads only the signed-in pharmacy's stock. Stays idle while pharmacyId is null,
-  // and re-fetches automatically if a different pharmacy logs in.
+  // Set by the PharmacyAdmin pharmacy picker; null for a pharmacy owner, who is scoped to their own pharmacy.
+  readonly pharmacyId = input<number | null>(null);
+  readonly activePharmacyId = computed(() => this.pharmacyId() ?? this.auth.pharmacyId());
+
+  // Loads one pharmacy's stock. Stays idle while no pharmacy is known,
+  // and re-fetches automatically if the chosen or signed-in pharmacy changes.
   readonly stock = rxResource({
-    params: () => this.auth.pharmacyId() ?? undefined,
+    params: () => this.activePharmacyId() ?? undefined,
     stream: ({ params: pharmacyId }) => this.inventoryService.getMedicinesByPharmacy(pharmacyId),
   });
 
@@ -88,7 +92,7 @@ export class InventoryComponent {
 
   // The row already carries its inventoryId, so no extra lookup request is needed.
   viewInventory(row: PharmacyMedicineDetail): void {
-    const pharmacyId = this.auth.pharmacyId();
+    const pharmacyId = this.activePharmacyId();
     if (pharmacyId === null) return;
     this.router.navigate(['/pharmacy/inventory', pharmacyId, row.inventoryId]);
   }

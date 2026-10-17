@@ -31,7 +31,7 @@
         <p class="warn-banner">
           Prescription required —
           @if (o.prescriptionStatus) { status: {{ o.prescriptionStatus }} } @else { none submitted yet }
-          · <a routerLink="/pharmacy/prescriptions">Review prescriptions</a>
+          @if (!adminView()) { · <a routerLink="/pharmacy/prescriptions">Review prescriptions</a> }
         </p>
       }
 

@@ -1,9 +1,11 @@
 import { Routes } from '@angular/router';
 import { hasPharmacyGuard, ownPharmacyGuard } from '../../guards/pharmacy-scope-guard';
+import { roleGuard } from '../../guards/role-guard';
+import { PHARMACY_AREA } from '../auth/role-access';
 
 export const PHARMACY_ROUTES: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: 'dashboard', canActivate: [hasPharmacyGuard], loadComponent: () => import('./dashboard/pharmacy-dashboard.component').then(m => m.PharmacyDashboardComponent) },
+  { path: 'dashboard', canActivate: [roleGuard, hasPharmacyGuard], data: { roles: PHARMACY_AREA }, loadComponent: () => import('./dashboard/pharmacy-dashboard.component').then(m => m.PharmacyDashboardComponent) },
   { path: 'inventory', canActivate: [hasPharmacyGuard], loadComponent: () => import('./inventory/inventory.component').then(m => m.InventoryComponent) },
   { path: 'inventory/:pharmacyId/:id', canActivate: [ownPharmacyGuard], loadComponent: () => import('./inventory-detail/inventory-detail.component').then(m => m.InventoryDetailComponent) },
   { path: 'inventory/:pharmacyId/:id/edit',canActivate: [ownPharmacyGuard],loadComponent: () => import('./inventoryedit/inventoryedit.componenet').then(m => m.InventoryEditComponent),},

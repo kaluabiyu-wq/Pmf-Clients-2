@@ -1,5 +1,5 @@
 import { CurrencyPipe, DatePipe, LowerCasePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, linkedSignal, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
@@ -19,6 +19,12 @@ export class PharmacyOrdersComponent {
   private readonly auth = inject(AuthService);
   private readonly orderService = inject(OrderService);
 
+  // Set by the PharmacyAdmin pharmacy picker; null for a pharmacy owner, who is scoped to their own pharmacy.
+  readonly pharmacyId = input<number | null>(null);
+  readonly activePharmacyId = computed(() => this.pharmacyId() ?? this.auth.pharmacyId());
+  /** True when a platform admin is looking at someone else's pharmacy. */
+  readonly adminView = computed(() => this.pharmacyId() !== null);
+
   readonly statuses: (OrderStatus | null)[] = ['Pending', 'Confirmed', 'Cancelled', null];
   readonly status = signal<OrderStatus | null>('Pending');
   readonly page = signal(1);
@@ -29,7 +35,7 @@ export class PharmacyOrdersComponent {
 
   readonly orders = rxResource({
     params: () => {
-      const pharmacyId = this.auth.pharmacyId();
+      const pharmacyId = this.activePharmacyId();
       if (pharmacyId === null) return undefined; // stay idle until we know the pharmacy
       return { pharmacyId, status: this.status(), page: this.page() };
     },

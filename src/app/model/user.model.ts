@@ -1,4 +1,3 @@
-
 export interface User {
   id: number;
   fullName: string;
@@ -43,14 +42,14 @@ export interface RoleOption {
   name: string;
 }
 
-export const USER_ROLES: readonly RoleOption[] = [
+export type RoleName = 'Patient' | 'Pharmacy' | 'PharmacyAdmin' | 'SysAdmin';
+
+export const USER_ROLES: readonly (RoleOption & { name: RoleName })[] = [
   { id: 1, name: 'Patient' },
   { id: 2, name: 'Pharmacy' },
-  { id: 3, name: 'PharmacyStaff' },
-  { id: 4, name: 'Admin' },
+  { id: 3, name: 'PharmacyAdmin' },
+  { id: 4, name: 'SysAdmin' },
 ];
-
-export type RoleName = 'Patient' | 'Pharmacy' | 'PharmacyAdmin' | 'SysAdmin';
 
 export interface LoginRequest {
   email: string;

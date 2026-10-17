@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
 import { guestGuard, homeRedirectGuard, roleGuard } from './guards/role-guard';
 import {
-  PATIENT_AREA,
-  PHARMACY_AREA,
+  PATIENT_SECTION_ACCESS,
+  PHARMACY_SECTION_ACCESS,
   PHARMACY_ADMIN_AREA,
   SYSADMIN_AREA,
 } from './features/auth/role-access';
@@ -51,14 +51,14 @@ export const routes: Routes = [
   {
     path: 'patient',
     canActivate: [roleGuard],
-    data: { roles: PATIENT_AREA },
+    data: { roles: PATIENT_SECTION_ACCESS },
     loadChildren: () =>
       import('./features/patient/patient.routes').then((m) => m.PATIENT_ROUTES),
   },
   {
     path: 'pharmacy',
     canActivate: [roleGuard],
-    data: { roles: PHARMACY_AREA },
+    data: { roles: PHARMACY_SECTION_ACCESS },
     loadChildren: () =>
       import('./features/pharmacy/pharmacy.routes').then((m) => m.PHARMACY_ROUTES),
   },

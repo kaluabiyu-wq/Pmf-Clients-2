@@ -1,0 +1,28 @@
+<section class="scope-bar">
+  <label for="pharmacy-select">Pharmacy</label>
+  <select id="pharmacy-select" (change)="select($event)">
+    <option value="" [selected]="selectedId() === null">Select a pharmacy…</option>
+    @for (p of pharmacies.value() ?? []; track p.id) {
+      <option [value]="p.id" [selected]="p.id === selectedId()">{{ p.name }}</option>
+    }
+  </select>
+  @if (pharmacies.error()) {
+    <span class="scope-error">Could not load pharmacies.</span>
+  }
+</section>
+
+@if (selectedId(); as id) {
+  @switch (view()) {
+    @case ('inventory') {
+      <app-inventory [pharmacyId]="id" />
+    }
+    @case ('orders') {
+      <app-pharmacy-orders [pharmacyId]="id" />
+    }
+    @case ('feedback') {
+      <app-user-feedback-list [pharmacyId]="id" />
+    }
+  }
+} @else {
+  <p class="scope-hint">Choose a pharmacy to manage its {{ label() }}.</p>
+}

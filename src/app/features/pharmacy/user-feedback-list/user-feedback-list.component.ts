@@ -1,4 +1,4 @@
-import { Component, computed, inject, linkedSignal, signal } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSortModule, Sort } from '@angular/material/sort';
@@ -22,6 +22,10 @@ export class UserFeedbackListComponent {
   private readonly auth = inject(AuthService);
   private readonly feedbackService = inject(UserFeedbackService);
 
+  // Set by the PharmacyAdmin pharmacy picker; null for a pharmacy owner, who is scoped to their own pharmacy.
+  readonly pharmacyId = input<number | null>(null);
+  readonly activePharmacyId = computed(() => this.pharmacyId() ?? this.auth.pharmacyId());
+
   // Paging and sorting state. Changing any of these re-runs the request below.
   readonly pageIndex = signal(0);
   readonly pageSize = signal(10);
@@ -31,7 +35,7 @@ export class UserFeedbackListComponent {
   // One request per page, scoped to the signed-in pharmacy. Stays idle while pharmacyId is null.
   readonly feedback = rxResource({
     params: () => {
-      const pharmacyId = this.auth.pharmacyId();
+      const pharmacyId = this.activePharmacyId();
       if (pharmacyId === null) return undefined;
       return {
         pharmacyId,
