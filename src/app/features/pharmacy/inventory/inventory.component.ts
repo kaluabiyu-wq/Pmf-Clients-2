@@ -7,7 +7,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth-service.service';
 import { InventoryService } from '../../../services/inventory.service';
-import { PharmacyMedicineDetail } from '../../../model/inventory.model';
+import { InventorySubmission, PharmacyMedicineDetail } from '../../../model/inventory.model';
 import { AlertService } from '../../../services/alert.service';
 import { problemMessage } from '../../../services/problem-message.service';
 
@@ -34,6 +34,13 @@ export class InventoryComponent {
   readonly stock = rxResource({
     params: () => this.activePharmacyId() ?? undefined,
     stream: ({ params: pharmacyId }) => this.inventoryService.getMedicinesByPharmacy(pharmacyId),
+  });
+
+  // Items this pharmacy submitted that are still waiting for approval, or were rejected.
+  // They are not part of `stock` (only approved items are), so they get their own list.
+  readonly submissions = rxResource({
+    params: () => this.activePharmacyId() ?? undefined,
+    stream: ({ params: pharmacyId }) => this.inventoryService.getSubmissionsByPharmacy(pharmacyId),
   });
 
   readonly errorMessage = computed(() => {
@@ -84,10 +91,33 @@ export class InventoryComponent {
 
   refresh(): void {
     this.stock.reload();
+    this.submissions.reload();
   }
 
   addInventory(): void {
-    this.router.navigate(['/inventory/create']);
+    this.router.navigate(['/pharmacy/inventory/add']);
+  }
+
+  /** Lets the pharmacy clear a rejected submission so it can submit that medicine again. */
+  removeSubmission(row: InventorySubmission): void {
+    if (!confirm(`Remove the rejected submission for ${row.genericName}? You can submit it again afterwards.`)) {
+      return;
+    }
+
+    this.inventoryService.delete(row.pharmacyId, row.id).subscribe({
+      next: () => {
+        this.alerts.success(`${row.genericName} was removed. You can submit it again.`);
+        this.submissions.reload();
+      },
+      error: (err) => {
+        this.alerts.error(err?.error?.detail || 'Could not remove this submission.');
+        console.error(err);
+      },
+    });
+  }
+
+  submissionClass(status: string): string {
+    return status === 'Rejected' ? 'status-rejected' : 'status-pending';
   }
 
   // The row already carries its inventoryId, so no extra lookup request is needed.

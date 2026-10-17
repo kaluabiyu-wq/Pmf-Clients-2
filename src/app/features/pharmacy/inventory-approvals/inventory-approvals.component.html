@@ -1,0 +1,113 @@
+<div class="approvals-page">
+
+  <div class="page-header">
+    <div>
+      <h1>Inventory Approvals</h1>
+      <p>Review the medicines pharmacies want to list. Approved items become visible to patients.</p>
+    </div>
+    <button type="button" class="refresh-button" (click)="refresh()">Refresh</button>
+  </div>
+
+  <div class="filter-bar" role="tablist" aria-label="Filter by status">
+    @for (f of filters; track f.value) {
+      <button
+        type="button"
+        role="tab"
+        [class.active]="filter() === f.value"
+        [attr.aria-selected]="filter() === f.value"
+        (click)="setFilter(f.value)"
+      >{{ f.label }}</button>
+    }
+  </div>
+
+  @if (submissions.isLoading()) {
+    <div class="state-card"><div class="spinner"></div><p>Loading submissions...</p></div>
+  }
+
+  @if (submissions.error() && !submissions.isLoading()) {
+    <div class="error-card">
+      <div class="error-icon">!</div>
+      <div>
+        <h3>Unable to load submissions</h3>
+        <p>{{ errorMessage() }}</p>
+        <button type="button" (click)="refresh()">Try Again</button>
+      </div>
+    </div>
+  }
+
+  @if (submissions.hasValue() && !submissions.isLoading()) {
+    @if ((submissions.value() ?? []).length === 0) {
+      <div class="empty-card">
+        <div class="empty-icon">✅</div>
+        <h2>Nothing to review</h2>
+        <p>There are no {{ filter() === 'all' ? '' : filter().toLowerCase() }} submissions right now.</p>
+      </div>
+    } @else {
+      <div class="table-wrap">
+        <table class="approvals-table">
+          <thead>
+            <tr>
+              <th>Medicine</th>
+              <th>Pharmacy</th>
+              <th>Form</th>
+              <th>Price (ETB)</th>
+              <th>Submitted</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of submissions.value(); track row.id) {
+              <tr>
+                <td>
+                  {{ row.genericName }}
+                  @if (row.brandName) { <small>{{ row.brandName }}</small> }
+                </td>
+                <td>{{ row.pharmacyName }}</td>
+                <td>{{ row.dosageForm }} {{ row.strength }}</td>
+                <td>{{ row.price | number: '1.2-2' }}</td>
+                <td>{{ row.lastUpdatedAt | date: 'short' }}</td>
+                <td>
+                  <span class="status" [class]="statusClass(row.approvalStatus)">{{ row.approvalStatus }}</span>
+                  @if (row.approvalStatus === 'Rejected' && row.rejectionReason) {
+                    <small>{{ row.rejectionReason }}</small>
+                  }
+                </td>
+                <td class="actions-cell">
+                  @if (row.approvalStatus === 'Pending') {
+                    <button type="button" class="approve-button" [disabled]="busyId() === row.id" (click)="approve(row)">Approve</button>
+                    <button type="button" class="reject-button" [disabled]="busyId() === row.id" (click)="startReject(row)">Reject</button>
+                  }
+                </td>
+              </tr>
+
+              @if (rejectingId() === row.id) {
+                <tr class="reject-row">
+                  <td colspan="7">
+                    <label [attr.for]="'reason-' + row.id">Reason for rejecting (the pharmacy will see this)</label>
+                    <textarea
+                      [id]="'reason-' + row.id"
+                      rows="2"
+                      maxlength="500"
+                      placeholder="e.g. Price is far above the market price"
+                      [value]="rejectReason()"
+                      (input)="onReasonInput($event)"
+                    ></textarea>
+                    @if (reasonError()) {
+                      <span class="error">A reason is required.</span>
+                    }
+                    <div class="reject-actions">
+                      <button type="button" class="reject-button" [disabled]="busyId() === row.id" (click)="confirmReject(row)">Confirm reject</button>
+                      <button type="button" class="cancel-button" (click)="cancelReject()">Cancel</button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+
+</div>

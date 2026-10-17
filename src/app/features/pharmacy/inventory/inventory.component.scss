@@ -349,6 +349,42 @@
 }
 
 
+/* Submissions waiting for approval */
+
+.submissions {
+  margin-top: var(--pmafs-space-5);
+
+  h2 {
+    font-family: var(--pmafs-font-display);
+    margin: 0 0 4px;
+    color: var(--pmafs-ink);
+    font-size: 20px;
+  }
+
+  p {
+    margin: 0 0 var(--pmafs-space-3);
+    color: var(--pmafs-ink-muted);
+    font-size: 14px;
+  }
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-rejected {
+  background: var(--pmafs-red-light);
+  color: var(--pmafs-red);
+}
+
+.reject-note {
+  white-space: normal;
+  max-width: 320px;
+  color: var(--pmafs-red);
+}
+
+
 
 @media (max-width: 700px) {
 

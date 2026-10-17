@@ -92,4 +92,52 @@
     ></mat-paginator>
   }
 
+  @if ((submissions.value() ?? []).length > 0) {
+    <section class="submissions">
+      <h2>Waiting for approval</h2>
+      <p>These medicines are not visible to patients until a pharmacy admin approves them.</p>
+
+      <div class="inventory-table-wrap">
+        <table class="inventory-table">
+          <thead>
+            <tr>
+              <th>Medicine</th>
+              <th>Form</th>
+              <th>Price</th>
+              <th>Approval</th>
+              <th>Submitted</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of submissions.value(); track row.id) {
+              <tr>
+                <td>
+                  {{ row.genericName }}
+                  @if (row.brandName) {
+                    <small>{{ row.brandName }}</small>
+                  }
+                </td>
+                <td>{{ row.dosageForm }} {{ row.strength }}</td>
+                <td>{{ row.price | number: '1.2-2' }}</td>
+                <td>
+                  <span class="status" [class]="submissionClass(row.approvalStatus)">{{ row.approvalStatus }}</span>
+                  @if (row.approvalStatus === 'Rejected' && row.rejectionReason) {
+                    <small class="reject-note">Reason: {{ row.rejectionReason }}</small>
+                  }
+                </td>
+                <td>{{ row.lastUpdatedAt | date: 'short' }}</td>
+                <td>
+                  @if (row.approvalStatus === 'Rejected') {
+                    <button type="button" class="view-button" (click)="removeSubmission(row)">Remove</button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+
 </div>
