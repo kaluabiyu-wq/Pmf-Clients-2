@@ -10,7 +10,6 @@ const patientOrPharmacyAdmin = { canActivate: [roleGuard], data: { roles: PATIEN
 export const PATIENT_ROUTES: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: 'dashboard', ...patientOnly, loadComponent: () => import('./dashboard/patient-dashboard.component').then(m => m.PatientDashboardComponent) },
-  { path: 'search', ...patientOnly, loadComponent: () => import('./medicine-search/medicine-search.component').then(m => m.MedicineSearchComponent) },
   { path: 'search/:pharmacyId/:medicineId', ...patientOnly, loadComponent: () => import('./medicine-search-detail/medicine-search-detail.component').then(m => m.MedicineSearchDetailComponent) },
   { path: 'medicine', ...patientOnly, loadComponent: () => import('./medicine/medicine.component').then(m => m.MedicineComponent) },
   { path: 'medicine/:id', ...patientOnly, loadComponent: () => import('./medicine-detail/medicine-detail.component').then(m => m.MedicineDetailComponent) },

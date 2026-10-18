@@ -23,7 +23,6 @@ export interface NavItem {
 export const NAV_ITEMS: readonly NavItem[] = [
   // Patient
   { label: 'Dashboard', path: '/patient/dashboard', roles: PATIENT_AREA },
-  { label: 'Search', path: '/patient/search', roles: PATIENT_AREA },
   { label: 'Medicine', path: '/patient/medicine', roles: PATIENT_AREA },
   { label: 'Pharmacies', path: '/patient/pharmacy-list', roles: PATIENT_AREA },
   { label: 'My Orders', path: '/patient/orders', roles: PATIENT_AREA },

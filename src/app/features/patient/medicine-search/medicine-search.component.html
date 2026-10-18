@@ -1,17 +1,39 @@
 <section class="search-page">
-  <p class="user-greeting">Hi, {{ currentUserName() }}</p>
+  @if (currentUserName()) {
+    <p class="user-greeting">Hi, {{ currentUserName() }}</p>
+  }
 
   <div class="search-bar">
-     <input
+    <svg
+      class="search-icon"
+      viewBox="0 0 24 24"
+      width="20"
+      height="20"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="11" cy="11" r="7" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
+
+    <input
       type="search"
       class="search-input"
       placeholder="Search medicine (e.g. Amoxicillin 500mg)"
+      aria-label="Search medicine"
       [(ngModel)]="searchTerm"
       (keyup.enter)="onSearch()"
     />
+
     @if (searchTerm()) {
       <button type="button" class="clear-btn" (click)="onClear()" aria-label="Clear search">✕</button>
     }
+
+    <button type="button" class="search-btn" (click)="onSearch()">Search</button>
   </div>
 
   <div class="location-row">
@@ -20,41 +42,34 @@
   </div>
 
   @if (isSearching()) {
-    <p class="status-text">Searching nearby pharmacies…</p>
-    <div class="spinner">Searching nearby pharmacies…</div>
+    <div class="spinner" role="status">Searching nearby pharmacies…</div>
   }
 
   @if (searchError()) {
-    <p class="status-text status-error">{{ searchError() }}</p>
-    <p class="error-banner">{{ searchError() }}</p>
+    <p class="error-banner" role="alert">{{ searchError() }}</p>
   }
 
   @if (hasSearched() && !isSearching() && !searchError()) {
-    <h2 class="results-heading">
-      NEARBY RESULTS · {{ results().length }} {{ results().length === 1 ? 'PHARMACY' : 'PHARMACIES' }}
-    </h2>
-
     <div class="results-meta">
-      <span>
+      <h2 class="results-heading">
         NEARBY RESULTS · {{ results().length }} {{ results().length === 1 ? 'PHARMACY' : 'PHARMACIES' }}
-      </span>
+      </h2>
     </div>
 
     @if (results().length === 0) {
-      <p class="status-text">No pharmacies currently list this medicine near you.</p>
       <div class="empty-state">
         <p>No pharmacies currently list this medicine near you.</p>
       </div>
+    } @else {
+      <div class="results-list grid">
+        @for (item of results(); track item.pharmacyId + '-' + item.medicineId) {
+          <app-medicine-search-card
+            [result]="item"
+            (directions)="onDirections($event)"
+            (viewDetails)="onViewDetails($event)"
+          />
+        }
+      </div>
     }
-
-    <div class="results-list grid">
-      @for (item of results(); track item.pharmacyId + '-' + item.medicineId) {
-        <app-medicine-search-card
-          [result]="item"
-          (directions)="onDirections($event)"
-          (viewDetails)="onViewDetails($event)"
-        />
-      }
-    </div>
   }
 </section>

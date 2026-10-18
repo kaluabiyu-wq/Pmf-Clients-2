@@ -19,7 +19,7 @@ export class MedicineSearchComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly auth = inject(AuthService);
 
-  // Derived from the logged-in user (JWT + /auth/me profile).
+  
   private readonly userId = computed(() => this.auth.currentUser()?.id ?? null);
   readonly locationId = computed(() => this.auth.currentUser()?.locationId ?? null);
   readonly locationLabel = computed(
@@ -67,6 +67,8 @@ export class MedicineSearchComponent {
 
   onClear(): void {
     this.searchTerm.set('');
+    this.results.set([]);
+    this.hasSearched.set(false);
   }
 
   onDirections(item: SearchResultItem): void {
