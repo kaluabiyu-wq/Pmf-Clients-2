@@ -1,0 +1,122 @@
+a {
+  color: var(--pmafs-teal-dark);
+}
+
+.rv-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pmafs-space-3);
+  font-family: var(--pmafs-font-display);
+  color: var(--pmafs-ink);
+}
+
+.rv {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: var(--pmafs-space-4);
+  align-items: start;
+
+  @media (max-width: 800px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rv-doc {
+  background: var(--pmafs-bg);
+  border: 1px solid var(--pmafs-border);
+  border-radius: var(--pmafs-radius-sm);
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.rv-doc__image {
+  display: block;
+  max-width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+}
+
+.rv-doc__pdf {
+  width: 100%;
+  height: 60vh;
+  border: none;
+}
+
+.rv-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pmafs-space-2);
+}
+
+.facts {
+  display: grid;
+  gap: var(--pmafs-space-2);
+  margin: 0;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--pmafs-space-3);
+    padding-bottom: var(--pmafs-space-1);
+    border-bottom: 1px solid var(--pmafs-border);
+  }
+
+  dt {
+    font-size: 0.8rem;
+    color: var(--pmafs-ink-muted);
+  }
+
+  dd {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--pmafs-ink);
+    text-align: right;
+  }
+}
+
+.rv-heading {
+  font-family: var(--pmafs-font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--pmafs-ink);
+  margin: var(--pmafs-space-2) 0 0;
+}
+
+.rv-note {
+  font-size: 0.9rem;
+  color: var(--pmafs-ink);
+  margin: var(--pmafs-space-2) 0 0;
+}
+
+.note-label {
+  display: block;
+  font-weight: 600;
+  margin: var(--pmafs-space-2) 0 0.25rem;
+  color: var(--pmafs-ink);
+}
+
+.note-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--pmafs-border);
+  border-radius: var(--pmafs-radius-sm);
+  font: inherit;
+  resize: vertical;
+}
+
+.field-error {
+  color: var(--pmafs-red);
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+}
+
+.actions {
+  margin-top: var(--pmafs-space-2);
+  display: flex;
+  gap: var(--pmafs-space-2);
+}

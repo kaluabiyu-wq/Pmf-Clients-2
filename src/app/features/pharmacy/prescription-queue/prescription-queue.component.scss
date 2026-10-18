@@ -1,33 +1,114 @@
-a { 
-    color: var(--pmafs-teal-dark);
- }
+a {
+  color: var(--pmafs-teal-dark);
+}
+
 .notice {
-     background: var(--pmafs-teal-light); 
-     border: 1px solid var(--pmafs-teal); 
-     color: var(--pmafs-teal-dark);
-      padding: var(--pmafs-space-2) var(--pmafs-space-3); 
-      border-radius: var(--pmafs-radius-sm); 
-      margin-bottom: var(--pmafs-space-3); 
-    }
-.note-label { 
-    display: block;
-    font-weight: 600; 
-    margin: var(--pmafs-space-2) 0 0.25rem; 
-    color: var(--pmafs-ink); 
+  background: var(--pmafs-teal-light);
+  border: 1px solid var(--pmafs-teal);
+  color: var(--pmafs-teal-dark);
+  padding: var(--pmafs-space-2) var(--pmafs-space-3);
+  border-radius: var(--pmafs-radius-sm);
+  margin-bottom: var(--pmafs-space-3);
 }
-.note-input { 
-    width: 100%; 
-    box-sizing: border-box;
-     padding: 0.55rem 0.7rem; 
-     border: 1px solid var(--pmafs-border); 
-    border-radius: var(--pmafs-radius-sm); 
-    font: inherit; resize: vertical; 
+
+// ── Table card (same look as the pharmacy documents table) ──
+.table-card {
+  background: var(--pmafs-surface);
+  border: 1px solid var(--pmafs-border);
+  border-radius: var(--pmafs-radius-md);
+  overflow-x: auto;
+  transition: opacity 0.15s ease;
+
+  // While the next page loads the old rows stay visible, but can't be clicked.
+  &.is-loading {
+    opacity: 0.55;
+    pointer-events: none;
+  }
 }
-.field-error {
-     color: var(--pmafs-red); 
-     margin: 0.25rem 0 0; 
-     font-size: 0.85rem;
-     }
-.actions { 
-    margin-top: var(--pmafs-space-2); 
+
+.rx-table {
+  width: 100%;
+  --mat-table-background-color: var(--pmafs-surface);
+
+  .mat-mdc-header-cell {
+    font-family: var(--pmafs-font-display);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--pmafs-ink-muted);
+    white-space: nowrap;
+  }
+
+  .mat-mdc-cell {
+    font-size: 0.9rem;
+    color: var(--pmafs-ink);
+  }
+
+  .mat-mdc-row:hover {
+    background: var(--pmafs-bg);
+  }
+}
+
+.sub {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--pmafs-ink-muted);
+}
+
+.file-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--pmafs-teal-dark);
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    text-decoration: underline;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pmafs-teal);
+    outline-offset: 2px;
+  }
+}
+
+.btn-outline {
+  font-family: var(--pmafs-font-display);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--pmafs-teal-dark);
+  background: transparent;
+  border: 1px solid var(--pmafs-teal);
+  border-radius: var(--pmafs-radius-sm);
+  padding: 6px var(--pmafs-space-3);
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: var(--pmafs-teal-light);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--pmafs-teal);
+    outline-offset: 2px;
+  }
+}
+
+mat-paginator {
+  margin-top: var(--pmafs-space-2);
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .table-card,
+  .btn-outline {
+    transition: none;
+  }
 }

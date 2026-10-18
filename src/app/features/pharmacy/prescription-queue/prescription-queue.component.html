@@ -24,47 +24,82 @@
     @if (status() === 'Pending') { Nothing waiting for review. } @else { No prescriptions here. }
   </p>
 } @else {
-  @for (p of rows(); track p.id) {
-    <article class="card">
-      <div class="card-head">
-        <span class="card-title">Order #{{ p.orderId }}</span>
-        <span class="badge" [class]="'badge badge-' + (p.verificationStatus | lowercase)">{{ p.verificationStatus }}</span>
-      </div>
-      <p class="meta">Submitted {{ p.submittedAt | date: 'medium' }}</p>
-      <p>
-        <button type="button" class="btn btn-link" [disabled]="openingId() === p.id" (click)="open(p)">
-          {{ openingId() === p.id ? 'Opening…' : 'Open prescription ↗' }}
-        </button>
-      </p>
+  <div class="table-card" [class.is-loading]="prescriptions.isLoading()">
+    <table mat-table [dataSource]="rows()" class="rx-table">
 
-      @if (p.verificationStatus !== 'Pending') {
-        <p class="meta">
-          {{ p.verificationStatus }} {{ p.verifiedAt | date: 'medium' }}
-          @if (p.reviewNote) { — {{ p.reviewNote }} }
-        </p>
-      } @else if (rejectingId() === p.id) {
-        <label class="note-label" [for]="'note-' + p.id">Reason for rejecting (shown to the patient)</label>
-        <textarea class="note-input" [id]="'note-' + p.id" rows="3" [attr.maxlength]="maxNote"
-                  [value]="rejectNote()" [disabled]="busyId() === p.id"
-                  (input)="rejectNote.set($any($event.target).value)"
-                  (blur)="noteTouched.set(true)"></textarea>
-        @if (noteTouched() && noteError()) { <p class="field-error">{{ noteError() }}</p> }
-        <div class="actions">
-          <button type="button" class="btn" [disabled]="busyId() === p.id" (click)="cancelReject()">Back</button>
-          <button type="button" class="btn btn-danger" [disabled]="busyId() === p.id" (click)="confirmReject(p)">Confirm rejection</button>
-        </div>
-      } @else {
-        <div class="actions">
-          <button type="button" class="btn btn-danger" [disabled]="busyId() === p.id" (click)="startReject(p)">Reject</button>
-          <button type="button" class="btn btn-primary" [disabled]="busyId() === p.id" (click)="approve(p)">Approve</button>
-        </div>
-      }
-    </article>
-  }
+      <ng-container matColumnDef="order">
+        <th mat-header-cell *matHeaderCellDef>Order</th>
+        <td mat-cell *matCellDef="let p">#{{ p.orderId }}</td>
+      </ng-container>
 
-  <div class="pager">
-    <button type="button" class="btn" (click)="prev()" [disabled]="!data()?.hasPrevious">Previous</button>
-    <span class="muted">Page {{ data()?.page }} of {{ data()?.totalPages }}</span>
-    <button type="button" class="btn" (click)="next()" [disabled]="!data()?.hasNext">Next</button>
+      <ng-container matColumnDef="patient">
+        <th mat-header-cell *matHeaderCellDef>Patient</th>
+        <td mat-cell *matCellDef="let p">
+          @let order = orderById().get(p.orderId);
+          @if (order) {
+            Patient #{{ order.userId }}
+          } @else if (orders.isLoading()) {
+            <span class="muted">…</span>
+          } @else {
+            <span class="muted">—</span>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="file">
+        <th mat-header-cell *matHeaderCellDef>File</th>
+        <td mat-cell *matCellDef="let p">
+          <button type="button" class="file-link" [disabled]="openingId() === p.id" (click)="open(p)">
+            {{ openingId() === p.id ? 'Opening…' : 'View file' }}
+          </button>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let p">
+          <span class="badge" [class]="'badge badge-' + (p.verificationStatus | lowercase)">{{ p.verificationStatus }}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="submitted">
+        <th mat-header-cell *matHeaderCellDef>Submitted</th>
+        <td mat-cell *matCellDef="let p">{{ p.submittedAt | date: 'short' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="reviewedBy">
+        <th mat-header-cell *matHeaderCellDef>Reviewed by</th>
+        <td mat-cell *matCellDef="let p">
+          @if (p.verifiedByUserId) {
+            Staff #{{ p.verifiedByUserId }}
+            <span class="sub">{{ p.verifiedAt | date: 'short' }}</span>
+          } @else {
+            <span class="muted">—</span>
+          }
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let p">
+          <button type="button" class="btn-outline" (click)="review(p)">
+            {{ p.verificationStatus === 'Pending' ? 'Review' : 'Details' }}
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
   </div>
+
+  <mat-paginator
+    [length]="total()"
+    [pageSize]="pageSize()"
+    [pageIndex]="page() - 1"
+    [pageSizeOptions]="pageSizeOptions"
+    (page)="onPage($event)"
+    showFirstLastButtons
+    aria-label="Select page of prescriptions"
+  />
 }

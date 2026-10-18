@@ -7,10 +7,12 @@ import { OrderPage, OrderResponse, OrderStatus } from '../../../model/order.mode
 import { AuthService } from '../../../services/auth-service.service';
 import { OrderService } from '../../../services/order.service';
 import { problemMessage } from '../../../services/problem-message.service';
+import { PrescriptionPanelComponent } from '../../../ui/prescription-panel/prescription-panel.component';
+import { PrescriptionQueueComponent } from '../prescription-queue/prescription-queue.component';
 
 @Component({
   selector: 'app-pharmacy-orders',
-  imports: [CurrencyPipe, DatePipe, LowerCasePipe, RouterLink],
+  imports: [CurrencyPipe, DatePipe, LowerCasePipe, RouterLink, PrescriptionPanelComponent, PrescriptionQueueComponent],
   templateUrl: './pharmacy-orders.componenet.html',
   styleUrl: '../../auth/orders-shared.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

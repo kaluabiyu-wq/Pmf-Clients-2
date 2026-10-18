@@ -1,0 +1,120 @@
+<h2 mat-dialog-title class="rv-title">
+  <span>Order #{{ prescription.orderId }} · Prescription</span>
+  <span class="badge" [class]="'badge badge-' + (prescription.verificationStatus | lowercase)">{{ prescription.verificationStatus }}</span>
+</h2>
+
+<mat-dialog-content class="rv">
+  <!-- The patient's file -->
+  <section class="rv-doc" aria-label="Uploaded prescription">
+    @if (file.isLoading()) {
+      <p class="status-text">Loading the document…</p>
+    } @else if (file.error()) {
+      <p class="status-text" role="alert">
+        The uploaded file could not be loaded. It may have been removed.
+        @if (isPending) { Reject the prescription and ask the patient to upload it again. }
+      </p>
+    } @else if (file.hasValue()) {
+      @switch (file.value().kind) {
+        @case ('image') {
+          <img class="rv-doc__image" [src]="file.value().objectUrl" alt="Prescription uploaded by the patient" />
+        }
+        @case ('pdf') {
+          @if (pdfUrl(); as url) {
+            <iframe class="rv-doc__pdf" [src]="url" title="Prescription PDF"></iframe>
+          }
+        }
+        @case ('link') {
+          <p class="status-text">
+            The patient submitted a link instead of uploading a file.
+            <a [href]="file.value().link" target="_blank" rel="noopener noreferrer">Open the link in a new tab</a>
+          </p>
+        }
+        @default {
+          <p class="status-text">
+            This file type can't be previewed.
+            <a [href]="file.value().objectUrl" [download]="'prescription-' + prescription.id">Download it</a>
+          </p>
+        }
+      }
+    }
+  </section>
+
+  <!-- Patient, order and decision -->
+  <section class="rv-side">
+    <dl class="facts">
+      <div>
+        <dt>Patient</dt>
+        <dd>
+          @if (order.hasValue()) { Patient #{{ order.value().userId }} }
+          @else if (order.isLoading()) { <span class="muted">…</span> }
+          @else { <span class="muted">—</span> }
+        </dd>
+      </div>
+      <div>
+        <dt>Submitted</dt>
+        <dd>{{ prescription.submittedAt | date: 'medium' }}</dd>
+      </div>
+      <div>
+        <dt>Order status</dt>
+        <dd>
+          @if (order.hasValue()) { {{ order.value().status }} } @else { <span class="muted">—</span> }
+        </dd>
+      </div>
+      @if (prescription.verifiedAt) {
+        <div>
+          <dt>Reviewed</dt>
+          <dd>{{ prescription.verifiedAt | date: 'medium' }} by Staff #{{ prescription.verifiedByUserId }}</dd>
+        </div>
+      }
+    </dl>
+
+    <h3 class="rv-heading">Ordered medicines</h3>
+    @if (order.isLoading()) {
+      <p class="status-text">Loading the order…</p>
+    } @else if (order.hasValue()) {
+      <table class="items">
+        <thead><tr><th>Medicine</th><th>Qty</th><th class="num">Line total</th></tr></thead>
+        <tbody>
+          @for (item of order.value().items; track item.id) {
+            <tr>
+              <td>{{ item.genericName }}@if (item.brandName) { <span class="muted"> ({{ item.brandName }})</span> }</td>
+              <td>{{ item.quantity }}</td>
+              <td class="num">{{ item.lineTotal | currency: 'ETB ' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    } @else {
+      <p class="status-text">Could not load the order details.</p>
+    }
+
+    <!-- Decision -->
+    @if (!isPending) {
+      @if (prescription.reviewNote) {
+        <p class="rv-note"><strong>Note to the patient:</strong> {{ prescription.reviewNote }}</p>
+      }
+    } @else if (rejecting()) {
+      <label class="note-label" for="reject-note">Reason for rejecting (shown to the patient)</label>
+      <textarea id="reject-note" class="note-input" rows="3" [attr.maxlength]="maxNote"
+                [value]="note()" [disabled]="busy()"
+                (input)="note.set($any($event.target).value)"
+                (blur)="noteTouched.set(true)"></textarea>
+      @if (noteTouched() && noteError()) { <p class="field-error">{{ noteError() }}</p> }
+      <div class="actions">
+        <button type="button" class="btn" [disabled]="busy()" (click)="cancelReject()">Back</button>
+        <button type="button" class="btn btn-danger" [disabled]="busy()" (click)="confirmReject()">Confirm rejection</button>
+      </div>
+    } @else {
+      <div class="actions">
+        <button type="button" class="btn btn-danger" [disabled]="busy()" (click)="startReject()">Reject</button>
+        <button type="button" class="btn btn-primary" [disabled]="busy()" (click)="approve()">Approve</button>
+      </div>
+    }
+
+    @if (actionError()) { <p class="error-banner" role="alert">{{ actionError() }}</p> }
+  </section>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button type="button" class="btn" mat-dialog-close [disabled]="busy()">Close</button>
+</mat-dialog-actions>
