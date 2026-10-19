@@ -1,0 +1,275 @@
+<section class="my-pharmacy">
+  <header class="page-head">
+    <h1 class="page-head__title">My Pharmacy</h1>
+    <p class="page-head__subtitle">
+      Your pharmacy's information and the verification documents administrators review.
+    </p>
+  </header>
+
+  <!-- ===================== Pharmacy information ===================== -->
+  @if (profile.isLoading() && !profile.hasValue()) {
+    <p class="state">Loading your pharmacy…</p>
+  } @else if (profile.error()) {
+    <div class="state state--error" role="alert">
+      <span>Could not load your pharmacy.</span>
+      <button type="button" class="btn btn--secondary" (click)="profile.reload()">Try again</button>
+    </div>
+  } @else if (profile.value(); as p) {
+    <div class="card">
+      <div class="card__head">
+        <h2 class="card__title">Information</h2>
+
+        <div class="badges">
+          <span class="badge" [class.badge--ok]="p.isVerified" [class.badge--warn]="!p.isVerified">
+            {{ p.isVerified ? 'Verified' : 'Not verified yet' }}
+          </span>
+          <span class="badge" [class.badge--ok]="p.isActive" [class.badge--bad]="!p.isActive">
+            {{ p.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </div>
+      </div>
+
+      @if (!editing()) {
+        <dl class="facts">
+          <div><dt>Name</dt><dd>{{ p.name }}</dd></div>
+          <div><dt>Licence number</dt><dd>{{ p.licenseNumber }}</dd></div>
+          <div><dt>Location</dt><dd>{{ locationLabel() }}</dd></div>
+          <div><dt>Phone</dt><dd>+251 {{ p.phoneNumber }}</dd></div>
+          <div><dt>Email</dt><dd>{{ p.email || '—' }}</dd></div>
+          <div><dt>Stock freshness window</dt><dd>{{ p.freshnessThreshold }} hours ({{ p.freshnessStatus }})</dd></div>
+          <div><dt>Reliability score</dt><dd>{{ p.reliablityScore }}</dd></div>
+          <div>
+            <dt>Patient rating</dt>
+            <dd>
+              @if (p.averageRating !== null) {
+                {{ p.averageRating.toFixed(1) }} / 5 ({{ p.reviewCount }} reviews)
+              } @else {
+                No reviews yet
+              }
+            </dd>
+          </div>
+          <div><dt>Staff (active)</dt><dd>{{ p.activeStaffCount }} of {{ p.totalStaffCount }}</dd></div>
+          <div><dt>Inventory items</dt><dd>{{ p.inventoryItemCount }}</dd></div>
+          <div>
+            <dt>Documents</dt>
+            <dd>
+              {{ p.approvedDocumentCount }} approved · {{ p.pendingDocumentCount }} pending ·
+              {{ p.rejectedDocumentCount }} rejected
+            </dd>
+          </div>
+          <div><dt>Last inventory update</dt><dd>{{ p.lastInventoryUpdatedAt | date: 'medium' }}</dd></div>
+          <div><dt>Registered</dt><dd>{{ p.registeredAt | date: 'mediumDate' }}</dd></div>
+        </dl>
+
+        <div class="actions">
+          <button type="button" class="btn btn--primary" (click)="startEdit()">Edit information</button>
+        </div>
+      } @else {
+        <form class="edit-form" [formGroup]="form" (ngSubmit)="saveProfile()">
+          <label class="field">
+            <span>Pharmacy name</span>
+            <input type="text" formControlName="name" maxlength="200" />
+            @if (form.controls.name.touched && form.controls.name.invalid) {
+              <small class="field__error">Enter the pharmacy name.</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Licence number</span>
+            <input type="text" formControlName="licenseNumber" maxlength="30" />
+            @if (form.controls.licenseNumber.touched && form.controls.licenseNumber.invalid) {
+              <small class="field__error">Enter the licence number.</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Location</span>
+            <select formControlName="locationId">
+              @for (l of locationOptions(); track l.id) {
+                <option [ngValue]="l.id">{{ l.label }}{{ l.subcity ? ' — ' + l.subcity : '' }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Phone (9 digits, without +251)</span>
+            <input type="tel" formControlName="phoneNumber" inputmode="numeric" maxlength="9" />
+            @if (form.controls.phoneNumber.touched && form.controls.phoneNumber.invalid) {
+              <small class="field__error">The phone number must be exactly 9 digits.</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Email (leave empty to remove)</span>
+            <input type="email" formControlName="email" />
+            @if (form.controls.email.touched && form.controls.email.invalid) {
+              <small class="field__error">Enter a valid email address.</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Stock freshness window (hours, 0–100)</span>
+            <input type="number" formControlName="freshnessThreshold" min="0" max="100" />
+            @if (form.controls.freshnessThreshold.touched && form.controls.freshnessThreshold.invalid) {
+              <small class="field__error">Enter a number of hours between 0 and 100.</small>
+            }
+          </label>
+
+          <div class="actions">
+            <button type="submit" class="btn btn--primary" [disabled]="saving()">
+              {{ saving() ? 'Saving…' : 'Save changes' }}
+            </button>
+            <button type="button" class="btn btn--secondary" [disabled]="saving()" (click)="cancelEdit()">
+              Cancel
+            </button>
+          </div>
+        </form>
+      }
+    </div>
+  }
+
+  <!-- ===================== Documents ===================== -->
+  <div class="card">
+    <div class="card__head">
+      <h2 class="card__title">Verification documents</h2>
+      <button type="button" class="btn btn--secondary" (click)="documents.reload()">Refresh</button>
+    </div>
+    <p class="card__hint">
+      Administrators review each file. You will see a message here when one is approved, and the
+      reason when one is rejected — replace the file to send it back for review.
+    </p>
+
+    @if (documents.isLoading() && !documents.hasValue()) {
+      <p class="state">Loading documents…</p>
+    } @else if (documents.error()) {
+      <div class="state state--error" role="alert">
+        <span>Could not load the documents.</span>
+        <button type="button" class="btn btn--secondary" (click)="documents.reload()">Try again</button>
+      </div>
+    } @else if ((documents.value() ?? []).length === 0) {
+      <p class="state">No documents yet. Upload your licence, business registration and pharmacist credential below.</p>
+    } @else {
+      <ul class="docs">
+        @for (d of documents.value(); track d.id) {
+          <li class="doc">
+            <div class="doc__main">
+              <div class="doc__row">
+                <strong class="doc__type">{{ d.documentType }}</strong>
+                <span class="status" [class]="statusClass(d)">{{ d.reviewStatus }}</span>
+                @if (isExpired(d.expiresAt)) {
+                  <span class="status status--expired">Expired</span>
+                }
+              </div>
+
+              <p class="doc__meta">
+                Uploaded {{ d.uploadedAt | date: 'medium' }}
+                @if (d.expiresAt) { · Expires {{ d.expiresAt | date: 'mediumDate' }} }
+              </p>
+
+              @if (d.reviewStatus === 'Rejected') {
+                <div class="note note--rejected" role="alert">
+                  <strong>Rejected by the administrator</strong>
+                  <p>{{ d.reviewNote || 'No reason was given. Please upload a clearer or updated file.' }}</p>
+                </div>
+              } @else if (d.reviewStatus === 'Approved') {
+                <div class="note note--approved">This document was approved.</div>
+              } @else {
+                <div class="note note--pending">Waiting for an administrator to review it.</div>
+              }
+            </div>
+
+            <div class="doc__actions">
+              <button
+                type="button"
+                class="btn btn--secondary"
+                [disabled]="openingId() === d.id"
+                (click)="openFile(d)"
+              >
+                {{ openingId() === d.id ? 'Opening…' : 'View file' }}
+              </button>
+
+              <label class="btn btn--primary file-btn" [class.is-disabled]="replacingId() === d.id">
+                {{ replacingId() === d.id ? 'Replacing…' : 'Replace file' }}
+                <input
+                  type="file"
+                  [accept]="acceptedFiles"
+                  [disabled]="replacingId() === d.id"
+                  (change)="onReplaceFileChosen(d, $event)"
+                />
+              </label>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+
+    <form #uploadForm class="upload" (submit)="$event.preventDefault()">
+      <h3 class="upload__title">Add another document</h3>
+
+      @if (uploadError()) {
+        <p class="field__error" role="alert">{{ uploadError() }}</p>
+      }
+
+      <div class="upload__row">
+        <label class="field">
+          <span>Type</span>
+          <select [value]="uploadType()" (change)="uploadType.set($any($event.target).value)">
+            @for (t of documentTypes; track t) {
+              <option [value]="t">{{ t }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Expires (optional)</span>
+          <input type="date" [value]="uploadExpiresAt()" (change)="uploadExpiresAt.set($any($event.target).value)" />
+        </label>
+
+        <label class="field">
+          <span>File (.pdf, .jpg, .png — max 5 MB)</span>
+          <input type="file" [accept]="acceptedFiles" (change)="onUploadFileChosen($event)" />
+        </label>
+      </div>
+
+      <button type="button" class="btn btn--primary" [disabled]="uploading()" (click)="submitUpload(uploadForm)">
+        {{ uploading() ? 'Uploading…' : 'Upload document' }}
+      </button>
+    </form>
+  </div>
+
+  <!-- ===================== Delete ===================== -->
+  @if (profile.value(); as p) {
+    <div class="card card--danger">
+      <h2 class="card__title">Remove this pharmacy</h2>
+      <p class="card__hint">
+        The pharmacy is deactivated and stops appearing in patient searches. Its staff, documents,
+        inventory and reviews are kept, so an administrator can restore it.
+      </p>
+
+      @if (!confirmingDelete()) {
+        <button type="button" class="btn btn--danger" (click)="startDelete()">Remove pharmacy</button>
+      } @else {
+        <div class="confirm">
+          <label class="field">
+            <span>Type <strong>{{ p.name }}</strong> to confirm</span>
+            <input type="text" [formControl]="deleteConfirmation" autocomplete="off" />
+          </label>
+
+          <div class="actions">
+            <button
+              type="button"
+              class="btn btn--danger"
+              [disabled]="!canConfirmDelete() || deleting()"
+              (click)="confirmDelete()"
+            >
+              {{ deleting() ? 'Removing…' : 'Yes, remove my pharmacy' }}
+            </button>
+            <button type="button" class="btn btn--secondary" [disabled]="deleting()" (click)="cancelDelete()">
+              Cancel
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</section>

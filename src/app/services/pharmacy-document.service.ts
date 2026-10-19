@@ -4,6 +4,7 @@ import { Observable, catchError, from, map, of, switchMap, tap, throwError } fro
 import { environment } from '../../environments/environment';
 import {
   CreatePharmacyDocumentRequest,
+  DocumentType,
   PharmacyDocumentResponse,
   PharmacyDocumentReviewRequest,
 } from '../model/Pharmacy-document.model';
@@ -68,7 +69,7 @@ export class PharmacyDocumentService {
     );
   }
 
-  /** The error body of a blob request is itself a Blob, so read the ProblemDetails out of it. */
+
   private async fileErrorMessage(err: HttpErrorResponse): Promise<string> {
     try {
       const body = err.error;
@@ -76,7 +77,7 @@ export class PharmacyDocumentService {
       const detail = text ? JSON.parse(text)?.detail : null;
       if (typeof detail === 'string' && detail) return detail;
     } catch {
-      // Not JSON; fall through to the status-based messages.
+  
     }
 
     switch (err.status) {
@@ -89,6 +90,33 @@ export class PharmacyDocumentService {
       default:
         return 'Could not open the file. Please try again.';
     }
+  }
+
+  
+  upload(
+    pharmacyId: number,
+    documentType: DocumentType,
+    file: File,
+    expiresAt?: string | null,
+  ): Observable<PharmacyDocumentResponse> {
+    const data = new FormData();
+    data.append('DocumentType', documentType);
+    data.append('File', file, file.name);
+    if (expiresAt) data.append('ExpiresAt', expiresAt);
+    return this.http.post<PharmacyDocumentResponse>(`${this.documentsUrl(pharmacyId)}/upload`, data);
+  }
+
+  
+  replaceFile(
+    pharmacyId: number,
+    id: number,
+    file: File,
+    expiresAt?: string | null,
+  ): Observable<PharmacyDocumentResponse> {
+    const data = new FormData();
+    data.append('File', file, file.name);
+    if (expiresAt) data.append('ExpiresAt', expiresAt);
+    return this.http.put<PharmacyDocumentResponse>(`${this.documentsUrl(pharmacyId)}/${id}/file`, data);
   }
 
   create(

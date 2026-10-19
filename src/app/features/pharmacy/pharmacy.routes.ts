@@ -6,6 +6,7 @@ import { PHARMACY_AREA } from '../auth/role-access';
 export const PHARMACY_ROUTES: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: 'dashboard', canActivate: [roleGuard, hasPharmacyGuard], data: { roles: PHARMACY_AREA }, loadComponent: () => import('./dashboard/pharmacy-dashboard.component').then(m => m.PharmacyDashboardComponent) },
+  { path: 'my-pharmacy', canActivate: [roleGuard, hasPharmacyGuard], data: { roles: PHARMACY_AREA }, loadComponent: () => import('./my-pharmacy/my-pharmacy.component').then(m => m.MyPharmacyComponent) },
   { path: 'inventory', canActivate: [hasPharmacyGuard], loadComponent: () => import('./inventory/inventory.component').then(m => m.InventoryComponent) },
   { path: 'inventory/:pharmacyId/:id', canActivate: [ownPharmacyGuard], loadComponent: () => import('./inventory-detail/inventory-detail.component').then(m => m.InventoryDetailComponent) },
   { path: 'add-inventory', canActivate: [hasPharmacyGuard], loadComponent: () => import('./add-inventory/add-inventory.component').then(m => m.AddInventoryComponent) },

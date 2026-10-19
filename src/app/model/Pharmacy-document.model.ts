@@ -16,6 +16,7 @@ export interface PharmacyDocumentResponse {
   reviewedByUserId: number | null;
   reviewStatus: ReviewStatus;
   expiresAt: string | null;
+  reviewNote?: string | null;
 }
 
 

@@ -33,6 +33,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { label: 'Orders', path: '/pharmacy/orders', roles: PHARMACY_AREA },
   { label: 'Prescriptions', path: '/pharmacy/prescriptions', roles: PHARMACY_AREA },
   { label: 'Users-Feedback', path: '/pharmacy/users-feedback-list', roles: PHARMACY_AREA },
+  { label: 'My Pharmacy', path: '/pharmacy/my-pharmacy', roles: PHARMACY_AREA },
 
   // Pharmacy admin (platform-wide: picks a pharmacy on the inventory, orders and feedback pages)
   { label: 'Dashboard', path: '/pharmacy-admin/dashboard', roles: PHARMACY_ADMIN_AREA },

@@ -17,4 +17,9 @@ export class ServerAlertService {
     if (query.isRead !== undefined) params = params.set('isRead', query.isRead);
     return this.http.get<PagedResponse<ServerAlert>>(this.baseUrl, { params });
   }
+
+  
+  markRead(id: number): Observable<void> {
+    return this.http.patch<void>(`${this.baseUrl}/${id}/read`, {});
+  }
 }
