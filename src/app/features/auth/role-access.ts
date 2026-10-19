@@ -26,6 +26,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { label: 'Medicine', path: '/patient/medicine', roles: PATIENT_AREA },
   { label: 'Pharmacies', path: '/patient/pharmacy-list', roles: PATIENT_AREA },
   { label: 'My Orders', path: '/patient/orders', roles: PATIENT_AREA },
+  { label: 'My Account', path: '/patient/my-account', roles: PATIENT_AREA },
 
   // Pharmacy owner
   { label: 'Dashboard', path: '/pharmacy/dashboard', roles: PHARMACY_AREA },

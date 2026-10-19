@@ -99,6 +99,18 @@ export class AuthService {
       pharmacyId: user.pharmacyId,
     });
   }
+    /** Keep the nav bar and stored profile in step after the account's name or email is edited. */
+  updateIdentity(fullName: string, email: string): void {
+    const user = this._currentUser();
+    if (!user) return;
+    this._currentUser.set({ ...user, email });
+    this.applyProfile({
+      fullName,
+      locationId: user.locationId,
+      locationLabel: user.locationLabel,
+      pharmacyId: user.pharmacyId,
+    });
+  }
 
   private applyProfile(profile: UserProfile): void {
     const user = this._currentUser();

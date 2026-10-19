@@ -1,0 +1,148 @@
+<section class="my-account">
+  <header class="page-head">
+    <h1 class="page-head__title">My Account</h1>
+    <p class="page-head__subtitle">Your details, password and account settings.</p>
+  </header>
+
+  @if (account.isLoading() && !account.hasValue()) {
+    <p class="state">Loading your account…</p>
+  } @else if (account.error()) {
+    <div class="state state--error" role="alert">
+      <span>Could not load your account.</span>
+      <button type="button" class="btn btn--secondary" (click)="account.reload()">Try again</button>
+    </div>
+  } @else if (account.value(); as a) {
+    <!-- ===================== Details ===================== -->
+    <div class="card">
+      <h2 class="card__title">Your details</h2>
+
+      @if (!editing()) {
+        <dl class="facts">
+          <div><dt>Full name</dt><dd>{{ a.fullName }}</dd></div>
+          <div><dt>Email</dt><dd>{{ a.email }}</dd></div>
+          <div><dt>Location</dt><dd>{{ a.locationLabel }} — {{ a.subcity }}, woreda {{ a.woreda }}</dd></div>
+          <div><dt>Member since</dt><dd>{{ a.createdAt | date: 'mediumDate' }}</dd></div>
+        </dl>
+
+        <div class="stats">
+          <a class="stat" routerLink="/patient/orders">
+            <strong>{{ a.orderCount }}</strong><span>Orders ({{ a.openOrderCount }} open)</span>
+          </a>
+          <div class="stat"><strong>{{ a.favoriteCount }}</strong><span>Favourite pharmacies</span></div>
+          <div class="stat"><strong>{{ a.reviewCount }}</strong><span>Reviews written</span></div>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn btn--primary" (click)="startEdit()">Edit details</button>
+        </div>
+      } @else {
+        <form class="edit-form" [formGroup]="form" (ngSubmit)="saveDetails()">
+          <label class="field">
+            <span>Full name</span>
+            <input type="text" formControlName="fullName" maxlength="100" />
+            @if (form.controls.fullName.touched && form.controls.fullName.invalid) {
+              <small class="field__error">Enter your name (2–100 characters).</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Email (you will use this to log in)</span>
+            <input type="email" formControlName="email" autocomplete="email" />
+            @if (form.controls.email.touched && form.controls.email.invalid) {
+              <small class="field__error">Enter a valid email address.</small>
+            }
+          </label>
+
+          <fieldset class="field field--wide">
+            <legend>Your location</legend>
+            <app-location-fields [group]="locationGroup" />
+          </fieldset>
+
+          <div class="actions">
+            <button type="submit" class="btn btn--primary" [disabled]="saving()">
+              {{ saving() ? 'Saving…' : 'Save changes' }}
+            </button>
+            <button type="button" class="btn btn--secondary" [disabled]="saving()" (click)="cancelEdit()">
+              Cancel
+            </button>
+          </div>
+        </form>
+      }
+    </div>
+
+    <!-- ===================== Password ===================== -->
+    <div class="card">
+      <h2 class="card__title">Change password</h2>
+      <form class="edit-form" [formGroup]="passwordForm" (ngSubmit)="savePassword()">
+        <label class="field">
+          <span>Current password</span>
+          <input type="password" formControlName="currentPassword" autocomplete="current-password" />
+        </label>
+
+        <label class="field">
+          <span>New password (at least 8 characters)</span>
+          <input type="password" formControlName="newPassword" autocomplete="new-password" />
+          @if (passwordForm.controls.newPassword.touched && passwordForm.controls.newPassword.invalid) {
+            <small class="field__error">Use at least 8 characters.</small>
+          }
+        </label>
+
+        <label class="field">
+          <span>Confirm new password</span>
+          <input type="password" formControlName="confirmPassword" autocomplete="new-password" />
+          @if (passwordForm.touched && passwordForm.hasError('mismatch')) {
+            <small class="field__error">The two passwords do not match.</small>
+          }
+        </label>
+
+        <div class="actions">
+          <button type="submit" class="btn btn--primary" [disabled]="changingPassword()">
+            {{ changingPassword() ? 'Changing…' : 'Change password' }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- ===================== Delete ===================== -->
+    <div class="card card--danger">
+      <h2 class="card__title">Delete my account</h2>
+      <p class="card__hint">
+        You will be signed out and will not be able to log in again. Your past orders and reviews
+        are kept so pharmacies' records stay correct, and the email address stays reserved.
+      </p>
+
+      @if (hasOpenOrders()) {
+        <p class="field__error" role="alert">
+          You have {{ a.openOrderCount }} pending or confirmed order(s). Cancel or collect them first —
+          <a routerLink="/patient/orders">go to my orders</a>.
+        </p>
+      }
+
+      @if (!confirmingDelete()) {
+        <button type="button" class="btn btn--danger" [disabled]="hasOpenOrders()" (click)="startDelete()">
+          Delete my account
+        </button>
+      } @else {
+        <div class="confirm">
+          <label class="field">
+            <span>Enter your password to confirm</span>
+            <input type="password" [formControl]="deletePassword" autocomplete="current-password" />
+          </label>
+          <div class="actions">
+            <button
+              type="button"
+              class="btn btn--danger"
+              [disabled]="deletePassword.invalid || deleting()"
+              (click)="confirmDelete()"
+            >
+              {{ deleting() ? 'Deleting…' : 'Yes, delete my account' }}
+            </button>
+            <button type="button" class="btn btn--secondary" [disabled]="deleting()" (click)="cancelDelete()">
+              Cancel
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</section>

@@ -19,4 +19,5 @@ export const PATIENT_ROUTES: Routes = [
   { path: 'favourite/:userId', ...patientOrPharmacyAdmin, loadComponent: () => import('./favorite/favorite.component').then(m => m.FavoriteComponent) },
   { path: 'orders', ...patientOnly, loadComponent: () => import('./orders/orders.componenet').then(m => m.OrdersComponenet) },
   { path: 'orders/:id', ...patientOnly, loadComponent: () => import('./order-detail/order-detail.componenet').then(m => m.OrderDetailComponent) },
+  { path: 'my-account', ...patientOnly, loadComponent: () => import('./my-account/my-account.component').then(m => m.MyAccountComponent) },
 ];
