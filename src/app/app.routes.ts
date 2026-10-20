@@ -16,6 +16,24 @@ export const routes: Routes = [
       import('./features/auth/login/login.componenet').then((m) => m.LoginComponent),
   },
   {
+    path: 'forgot-password',
+    canActivate: [guestGuard],
+    data: { mode: 'request' },
+    loadComponent: () =>
+      import('./features/auth/password-recovery/password-recovery.component').then(
+        (m) => m.PasswordRecoveryComponent,
+      ),
+  },
+  {
+    path: 'reset-password',
+    canActivate: [guestGuard],
+    data: { mode: 'reset' },
+    loadComponent: () =>
+      import('./features/auth/password-recovery/password-recovery.component').then(
+        (m) => m.PasswordRecoveryComponent,
+      ),
+  },
+  {
     path: 'signup/patient',
     canActivate: [guestGuard],
     loadComponent: () =>
@@ -79,7 +97,7 @@ export const routes: Routes = [
       import('./features/sysadmin/sysadmin.routes').then((m) => m.SYSADMIN_ROUTES),
   },
 
-  // ---------- Fallbacks ----------
+  
   { path: '', pathMatch: 'full', canActivate: [homeRedirectGuard], children: [] },
   { path: '**', canActivate: [homeRedirectGuard], children: [] },
 ];

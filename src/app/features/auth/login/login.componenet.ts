@@ -21,7 +21,8 @@ export class LoginComponent {
   readonly isSubmitting = signal(false);
   readonly submitError = signal<string | null>(null);
 
-  // Set by the signup pages via ?registered=patient|pharmacy
+  // Set by the signup pages via ?registered=patient|pharmacy, and by the
+  // reset-password page via ?registered=reset
   readonly notice = signal<string | null>(this.noticeFromQuery());
 
   readonly form = this.fb.nonNullable.group({
@@ -44,7 +45,9 @@ export class LoginComponent {
       error: (err: HttpErrorResponse) => {
         this.isSubmitting.set(false);
         this.submitError.set(
-          err.status === 401 || err.status === 400
+          err.status === 403 && err.error?.detail
+            ? err.error.detail // e.g. "This account is suspended: <reason>"
+            : err.status === 401 || err.status === 400
             ? 'Invalid email or password.'
             : err.status === 0
               ? 'Cannot reach the server. Please try again.'
@@ -58,6 +61,8 @@ export class LoginComponent {
     switch (this.route.snapshot.queryParamMap.get('registered')) {
       case 'patient':
         return 'Account created. Log in to continue.';
+      case 'reset':
+        return 'Your password was changed. Log in with the new one.';
       case 'pharmacy':
         return 'Registration received. Your documents will be reviewed by an admin before your pharmacy is verified.';
       default:
