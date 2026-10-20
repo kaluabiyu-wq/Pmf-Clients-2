@@ -1,0 +1,42 @@
+<section class="page">
+  <header class="page-head">
+    <div>
+      <h1>Roles and permissions</h1>
+      <p>What each role can do. Assign or revoke a role from the user's page.</p>
+    </div>
+  </header>
+
+  <p class="note">
+    Every administrative action in the system requires the <strong>SysAdmin</strong> role, and the API checks it on every
+    request. Nobody can change their own role, and the last active administrator can never be demoted, suspended,
+    deactivated or deleted.
+  </p>
+
+  @if (roles.isLoading() && !roles.hasValue()) {
+    <p class="state">Loading roles…</p>
+  } @else if (roles.error()) {
+    <div class="state state--error" role="alert">
+      <span>Could not load roles.</span>
+      <button type="button" class="btn btn--secondary" (click)="roles.reload()">Try again</button>
+    </div>
+  } @else {
+    <div class="grid grid--wide">
+      @for (r of roles.value() ?? []; track r.id) {
+        <div class="card">
+          <div class="card__head">
+            <h2 class="card__title">{{ r.name }}</h2>
+            <a class="btn btn--secondary" [routerLink]="['/sysadmin/users']" [queryParams]="{ roleId: r.id }">
+              {{ r.userCount }} {{ r.userCount === 1 ? 'user' : 'users' }}
+            </a>
+          </div>
+          @if (r.description) { <p class="hint">{{ r.description }}</p> }
+          <ul>
+            @for (p of r.permissions; track p) {
+              <li>{{ p }}</li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+  }
+</section>

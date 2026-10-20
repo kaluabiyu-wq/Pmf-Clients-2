@@ -1,0 +1,94 @@
+<section class="page">
+  <a class="back" routerLink="/sysadmin/users">← All users</a>
+
+  <header class="page-head">
+    <div>
+      <h1>New user</h1>
+      <p>Create an account with any role.</p>
+    </div>
+  </header>
+
+  @if (created(); as result) {
+    <div class="card">
+      <h2 class="card__title">Account created</h2>
+      <p class="hint">{{ result.detail.user.fullName }} — {{ result.detail.user.email }} ({{ result.detail.user.roleName }})</p>
+
+      @if (result.temporaryPassword; as password) {
+        <div class="note note--ok">
+          <p style="margin: 0 0 0.5rem">Temporary password — give it over a secure channel. It is not shown again.</p>
+          <div class="secret">
+            <code>{{ password }}</code>
+            <button type="button" class="btn btn--secondary" (click)="copy(password)">Copy</button>
+          </div>
+        </div>
+      }
+
+      @if (result.emailSent) {
+        <p class="note note--ok" style="margin-top: 1rem">A reset link was emailed to the user.</p>
+      }
+
+      <div class="actions" style="margin-top: 1rem">
+        <a class="btn btn--primary" [routerLink]="['/sysadmin/users', result.detail.user.id]">Open account</a>
+        <a class="btn btn--secondary" routerLink="/sysadmin/users">Back to users</a>
+      </div>
+    </div>
+  } @else {
+    <form class="card" [formGroup]="form" (ngSubmit)="submit()">
+      <div class="form-grid">
+        <label class="field">
+          <span>Full name</span>
+          <input type="text" formControlName="fullName" maxlength="100" />
+          @if (form.controls.fullName.touched && form.controls.fullName.invalid) {
+            <small class="field__error">Enter a name (2–100 characters).</small>
+          }
+        </label>
+
+        <label class="field">
+          <span>Email</span>
+          <input type="email" formControlName="email" />
+          @if (form.controls.email.touched && form.controls.email.invalid) {
+            <small class="field__error">Enter a valid email address.</small>
+          }
+        </label>
+
+        <label class="field">
+          <span>Role</span>
+          <select formControlName="roleId">
+            <option [ngValue]="0" disabled>Choose a role…</option>
+            @for (r of roles.value() ?? []; track r.id) {
+              <option [ngValue]="r.id">{{ r.name }}</option>
+            }
+          </select>
+          @if (form.controls.roleId.touched && form.controls.roleId.invalid) {
+            <small class="field__error">Choose a role.</small>
+          }
+        </label>
+
+        <label class="field">
+          <span>Password (optional — leave empty to generate one)</span>
+          <input type="password" formControlName="password" autocomplete="new-password" />
+          @if (form.controls.password.touched && form.controls.password.invalid) {
+            <small class="field__error">Use at least 8 characters.</small>
+          }
+        </label>
+
+        <label class="check wide">
+          <input type="checkbox" formControlName="sendResetEmail" />
+          Also email the person a link to choose their own password
+        </label>
+
+        <fieldset class="field wide">
+          <legend>Location</legend>
+          <app-location-fields [group]="locationGroup" />
+        </fieldset>
+
+        <div class="actions wide">
+          <button type="submit" class="btn btn--primary" [disabled]="saving()">
+            {{ saving() ? 'Creating…' : 'Create account' }}
+          </button>
+          <a class="btn btn--secondary" routerLink="/sysadmin/users">Cancel</a>
+        </div>
+      </div>
+    </form>
+  }
+</section>

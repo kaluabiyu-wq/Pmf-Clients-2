@@ -1,0 +1,159 @@
+<section class="page">
+  <header class="page-head">
+    <div>
+      <h1>System overview</h1>
+      <p>Accounts, pharmacies, catalogue, recent administrative activity and system health.</p>
+    </div>
+    <button type="button" class="btn btn--secondary" (click)="refresh()">Refresh</button>
+  </header>
+
+  <!-- ===================== Health ===================== -->
+  <div class="card">
+    <div class="card__head">
+      <h2 class="card__title">API health</h2>
+      @if (health.value(); as h) {
+        <span class="badge" [class]="'badge badge--' + h.status.toLowerCase()">{{ h.status }}</span>
+      }
+    </div>
+
+    @if (health.isLoading() && !health.hasValue()) {
+      <p class="state">Checking…</p>
+    } @else if (health.error()) {
+      <p class="note note--bad" role="alert">
+        The API did not answer the health check. It may be down, or your session may have expired.
+      </p>
+    } @else if (health.value(); as h) {
+      <dl class="facts">
+        <div><dt>Database</dt><dd>{{ h.databaseOk ? 'Connected' : 'Unreachable' }} ({{ h.databaseLatencyMs }} ms)</dd></div>
+        <div><dt>Round trip from your browser</dt><dd>{{ h.roundTripMs }} ms</dd></div>
+        <div><dt>Uptime</dt><dd>{{ uptime(h.uptimeSeconds) }}</dd></div>
+        <div><dt>Memory</dt><dd>{{ h.memoryMb }} MB</dd></div>
+        <div><dt>Environment</dt><dd>{{ h.environment }}</dd></div>
+        <div><dt>Email</dt><dd>{{ h.emailConfigured ? 'Configured' : 'Not configured' }}</dd></div>
+        <div><dt>Checked</dt><dd>{{ h.checkedAt | date: 'mediumTime' }} (refreshes every 30 s)</dd></div>
+      </dl>
+
+      @if (h.alerts.length > 0) {
+        <h3 class="card__title" style="margin-top: 1.25rem">Important alerts</h3>
+        <div style="display: grid; gap: 0.5rem">
+          @for (a of h.alerts; track a.message) {
+            <p
+              class="note"
+              [class.note--bad]="a.severity === 'Critical'"
+              [class.note--warn]="a.severity === 'Warning'"
+              style="margin: 0"
+            >
+              <strong>{{ a.severity }}:</strong> {{ a.message }}
+            </p>
+          }
+        </div>
+      } @else {
+        <p class="note note--ok" style="margin-top: 1rem">No alerts. Everything looks fine.</p>
+      }
+    }
+  </div>
+
+  @if (overview.isLoading() && !overview.hasValue()) {
+    <p class="state">Loading overview…</p>
+  } @else if (overview.error()) {
+    <div class="state state--error" role="alert">
+      <span>Could not load the overview.</span>
+      <button type="button" class="btn btn--secondary" (click)="overview.reload()">Try again</button>
+    </div>
+  } @else if (overview.value(); as o) {
+    <!-- ===================== Users ===================== -->
+    <div class="card">
+      <div class="card__head">
+        <h2 class="card__title">Users</h2>
+        <a class="btn btn--secondary" routerLink="/sysadmin/users">Manage users</a>
+      </div>
+      <div class="grid">
+        <div class="stat"><strong>{{ o.totalUsers }}</strong><span>Total accounts</span></div>
+        <div class="stat"><strong>{{ o.newUsersLast7Days }}</strong><span>New in 7 days</span></div>
+        <div class="stat"><strong>{{ o.newUsersLast30Days }}</strong><span>New in 30 days</span></div>
+        <div class="stat stat--ok"><strong>{{ o.activeUsers }}</strong><span>Active</span></div>
+        <div class="stat" [class.stat--warn]="o.suspendedUsers > 0"><strong>{{ o.suspendedUsers }}</strong><span>Suspended</span></div>
+        <div class="stat" [class.stat--bad]="o.inactiveUsers > 0"><strong>{{ o.inactiveUsers }}</strong><span>Inactive</span></div>
+      </div>
+
+      <div class="grid grid--wide" style="margin-top: 1.25rem">
+        <div>
+          <h3 class="card__title">By role</h3>
+          @for (r of o.usersByRole; track r.name) {
+            <p style="display: flex; justify-content: space-between; margin: 0.25rem 0">
+              <span>{{ r.name }}</span><strong>{{ r.count }}</strong>
+            </p>
+          }
+        </div>
+
+        <div>
+          <h3 class="card__title">Sign-ups, last 14 days</h3>
+          <div style="display: flex; align-items: flex-end; gap: 4px; height: 90px" aria-label="Sign-ups per day">
+            @for (d of o.signupsLast14Days; track d.date) {
+              <div style="flex: 1; display: grid; justify-items: center; gap: 2px" [title]="d.date + ': ' + d.count">
+                <div
+                  [style.height.px]="d.count === 0 ? 2 : (d.count / maxSignups()) * 70 + 4"
+                  style="width: 100%; background: var(--pmafs-teal); border-radius: 3px 3px 0 0"
+                ></div>
+                <small style="color: var(--pmafs-ink-faint); font-size: 0.65rem">{{ shortDay(d.date) }}</small>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== Pharmacies and catalogue ===================== -->
+    <div class="card">
+      <h2 class="card__title">Pharmacies and medicines</h2>
+      <div class="grid">
+        <div class="stat"><strong>{{ o.totalPharmacies }}</strong><span>Registered pharmacies</span></div>
+        <div class="stat stat--ok"><strong>{{ o.verifiedPharmacies }}</strong><span>Verified</span></div>
+        <div class="stat" [class.stat--warn]="o.unverifiedPharmacies > 0"><strong>{{ o.unverifiedPharmacies }}</strong><span>Awaiting verification</span></div>
+        <div class="stat"><strong>{{ o.inactivePharmacies }}</strong><span>Inactive pharmacies</span></div>
+        <div class="stat"><strong>{{ o.medicinesInCatalogue }}</strong><span>Medicines in catalogue</span></div>
+        <div class="stat"><strong>{{ o.inventoryListings }}</strong><span>Inventory listings</span></div>
+      </div>
+    </div>
+
+    <!-- ===================== Waiting for review ===================== -->
+    <div class="card">
+      <h2 class="card__title">Waiting for review</h2>
+      <div class="grid">
+        <div class="stat" [class.stat--warn]="o.pendingDocuments > 0"><strong>{{ o.pendingDocuments }}</strong><span>Pharmacy documents pending</span></div>
+        <div class="stat"><strong>{{ o.rejectedDocuments }}</strong><span>Documents rejected</span></div>
+        <div class="stat" [class.stat--warn]="o.pendingPrescriptions > 0"><strong>{{ o.pendingPrescriptions }}</strong><span>Prescriptions pending</span></div>
+        <div class="stat"><strong>{{ o.pendingOrders }}</strong><span>Orders pending</span></div>
+      </div>
+    </div>
+
+    <!-- ===================== Recent activity ===================== -->
+    <div class="card">
+      <div class="card__head">
+        <h2 class="card__title">Recent administrative activity</h2>
+        <a class="btn btn--secondary" routerLink="/sysadmin/audit">View all</a>
+      </div>
+
+      @if (o.recentActivity.length === 0) {
+        <p class="state">Nothing has been logged yet.</p>
+      } @else {
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>When</th><th>Administrator</th><th>Action</th><th>Account</th><th>Detail</th></tr></thead>
+            <tbody>
+              @for (e of o.recentActivity; track e.id) {
+                <tr>
+                  <td class="muted">{{ e.createdAt | date: 'medium' }}</td>
+                  <td>{{ e.actorName }}</td>
+                  <td><span class="badge">{{ label(e.action) }}</span></td>
+                  <td><a [routerLink]="['/sysadmin/users', e.targetId]">#{{ e.targetId }}</a></td>
+                  <td class="muted">{{ e.detail }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+</section>
