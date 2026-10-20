@@ -5,10 +5,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { switchMap } from 'rxjs';
 import { LocationService } from '../../../services/location.service';
 import { UserService } from '../../../services/user.service';
-import { USER_ROLES } from '../../../model/user.model';
 import { LocationFieldsComponent } from '../../../ui/location-fields/location-fields.componenet';
-
-const PATIENT_ROLE_ID = USER_ROLES.find((r) => r.name === 'Patient')!.id;
 
 @Component({
   selector: 'app-signup-patient',
@@ -62,12 +59,12 @@ export class SignupPatientComponent {
       })
       .pipe(
         switchMap((created) =>
-          this.users.create({
+          // The API forces the Patient role; the browser can no longer ask for another one.
+          this.users.registerPatient({
             fullName: raw.fullName,
             email: raw.email,
             password: raw.password,
             locationId: created.id,
-            roleId: PATIENT_ROLE_ID,
           }),
         ),
       )

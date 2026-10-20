@@ -48,8 +48,10 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { label: 'Users-Feedback', path: '/pharmacy-admin/users-feedback', roles: PHARMACY_ADMIN_AREA },
 
   // System admin
+  { label: 'Overview', path: '/sysadmin/overview', roles: SYSADMIN_AREA },
   { label: 'Users', path: '/sysadmin/users', roles: SYSADMIN_AREA },
-  { label: 'Create Account', path: '/register', roles: SYSADMIN_AREA },
+  { label: 'Roles', path: '/sysadmin/roles', roles: SYSADMIN_AREA },
+  { label: 'Activity log', path: '/sysadmin/audit', roles: SYSADMIN_AREA },
 ];
 
 /** Where each role lands after login. */

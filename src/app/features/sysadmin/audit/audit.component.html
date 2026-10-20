@@ -1,0 +1,62 @@
+<section class="page">
+  <header class="page-head">
+    <div>
+      <h1>Activity log</h1>
+      <p>Every administrative change to an account, newest first.</p>
+    </div>
+    <button type="button" class="btn btn--secondary" (click)="entries.reload()">Refresh</button>
+  </header>
+
+  <div class="filters">
+    <label class="field">
+      <span>Action</span>
+      <select [ngModel]="action()" (ngModelChange)="setAction($event)">
+        <option value="">All actions</option>
+        @for (a of actions; track a) {
+          <option [value]="a">{{ label(a) }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  @if (entries.isLoading() && !entries.hasValue()) {
+    <p class="state">Loading activity…</p>
+  } @else if (entries.error()) {
+    <div class="state state--error" role="alert">
+      <span>Could not load the activity log.</span>
+      <button type="button" class="btn btn--secondary" (click)="entries.reload()">Try again</button>
+    </div>
+  } @else if (entries.value(); as page) {
+    @if (page.items.length === 0) {
+      <p class="state">Nothing has been logged yet.</p>
+    } @else {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>When</th><th>Administrator</th><th>Action</th><th>Account</th><th>Detail</th></tr>
+          </thead>
+          <tbody>
+            @for (e of page.items; track e.id) {
+              <tr>
+                <td class="muted">{{ e.createdAt | date: 'medium' }}</td>
+                <td>{{ e.actorName }}</td>
+                <td><span class="badge">{{ label(e.action) }}</span></td>
+                <td><a [routerLink]="['/sysadmin/users', e.targetId]">#{{ e.targetId }}</a></td>
+                <td class="muted">{{ e.detail }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <mat-paginator
+        [length]="page.totalCount"
+        [pageIndex]="pageIndex()"
+        [pageSize]="pageSize()"
+        [pageSizeOptions]="[10, 20, 50]"
+        showFirstLastButtons
+        (page)="onPage($event)"
+      />
+    }
+  }
+</section>
