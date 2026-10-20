@@ -1,0 +1,219 @@
+<section class="page">
+  <a class="back" routerLink="/sysadmin/users">← All users</a>
+
+  @if (detail.isLoading() && !detail.hasValue()) {
+    <p class="state">Loading account…</p>
+  } @else if (detail.error()) {
+    <div class="state state--error" role="alert">
+      <span>Could not load this account. It may not exist.</span>
+      <button type="button" class="btn btn--secondary" (click)="detail.reload()">Try again</button>
+    </div>
+  } @else if (detail.value(); as d) {
+    <header class="page-head">
+      <div>
+        <h1>{{ d.user.fullName }}</h1>
+        <p>{{ d.user.email }}</p>
+      </div>
+      <span class="badge" [class]="'badge badge--' + d.user.status.toLowerCase()">{{ d.user.status }}</span>
+    </header>
+
+    @if (isSelf()) {
+      <p class="note note--warn">
+        This is your own account. Role, status and deletion are locked here so you cannot lock yourself out —
+        ask another administrator to change them.
+      </p>
+    }
+
+    @if (d.user.status === 'Suspended') {
+      <p class="note note--warn">
+        Suspended {{ d.user.suspendedAt | date: 'medium' }}{{ d.user.suspensionReason ? ': ' + d.user.suspensionReason : '.' }}
+      </p>
+    }
+
+    <!-- ===================== Overview ===================== -->
+    <div class="card">
+      <h2 class="card__title">Account</h2>
+      <dl class="facts">
+        <div><dt>Role</dt><dd>{{ d.user.roleName }}</dd></div>
+        <div><dt>Registered</dt><dd>{{ d.user.createdAt | date: 'medium' }}</dd></div>
+        <div><dt>Last login</dt><dd>{{ d.user.lastLoginAt ? (d.user.lastLoginAt | date: 'medium') : 'Never' }}</dd></div>
+        <div><dt>Location</dt><dd>{{ d.user.locationLabel }}</dd></div>
+        @if (d.user.pharmacyName) {
+          <div><dt>Pharmacy</dt><dd>{{ d.user.pharmacyName }}</dd></div>
+        }
+        <div><dt>Orders</dt><dd>{{ d.orderCount }} ({{ d.openOrderCount }} open)</dd></div>
+        <div><dt>Reviews</dt><dd>{{ d.reviewCount }}</dd></div>
+        <div><dt>Favourites</dt><dd>{{ d.favoriteCount }}</dd></div>
+      </dl>
+    </div>
+
+    @if (d.user.status !== 'Deleted') {
+      <!-- ===================== Profile ===================== -->
+      <div class="card">
+        <h2 class="card__title">Profile</h2>
+        <form class="form-grid" [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+          <label class="field">
+            <span>Full name</span>
+            <input type="text" formControlName="fullName" maxlength="100" />
+            @if (profileForm.controls.fullName.touched && profileForm.controls.fullName.invalid) {
+              <small class="field__error">Enter a name (2–100 characters).</small>
+            }
+          </label>
+          <label class="field">
+            <span>Email</span>
+            <input type="email" formControlName="email" />
+            @if (profileForm.controls.email.touched && profileForm.controls.email.invalid) {
+              <small class="field__error">Enter a valid email address.</small>
+            }
+          </label>
+          <div class="actions wide">
+            <button type="submit" class="btn btn--primary" [disabled]="busy() === 'profile'">
+              {{ busy() === 'profile' ? 'Saving…' : 'Save profile' }}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ===================== Role ===================== -->
+      <div class="card">
+        <h2 class="card__title">Role and permissions</h2>
+        <p class="hint">
+          An account has exactly one role. To revoke administrator or pharmacy rights, assign the Patient role.
+          The last active administrator can never be demoted.
+        </p>
+        <div class="form-grid">
+          <label class="field">
+            <span>Role</span>
+            <select
+              [value]="roleChoice()"
+              [disabled]="isSelf()"
+              (change)="roleChoice.set(+$any($event.target).value)"
+            >
+              @for (r of roles.value() ?? []; track r.id) {
+                <option [value]="r.id" [selected]="r.id === roleChoice()">{{ r.name }}</option>
+              }
+            </select>
+          </label>
+          <div class="actions">
+            <button
+              type="button"
+              class="btn btn--primary"
+              [disabled]="isSelf() || roleChoice() === d.user.roleId || busy() === 'role'"
+              (click)="saveRole()"
+            >
+              {{ busy() === 'role' ? 'Saving…' : 'Apply role' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================== Status ===================== -->
+      <div class="card">
+        <h2 class="card__title">Account status</h2>
+        <p class="hint">
+          <strong>Suspend</strong> blocks sign-in temporarily and keeps everything as it is.
+          <strong>Deactivate</strong> closes the account. Either takes effect within seconds, even for people already
+          signed in. <strong>Restore</strong> brings an account back.
+        </p>
+
+        @if (d.user.status === 'Active') {
+          @if (!confirmingSuspend()) {
+            <div class="actions">
+              <button type="button" class="btn btn--warn" [disabled]="isSelf()" (click)="confirmingSuspend.set(true)">Suspend…</button>
+              <button type="button" class="btn btn--danger" [disabled]="isSelf() || busy() === 'deactivate'" (click)="deactivate()">
+                {{ busy() === 'deactivate' ? 'Working…' : 'Deactivate' }}
+              </button>
+            </div>
+          } @else {
+            <div class="form-grid">
+              <label class="field wide">
+                <span>Reason (shown to the person if they try to log in)</span>
+                <input type="text" [formControl]="suspendReason" maxlength="300" />
+              </label>
+              <div class="actions wide">
+                <button type="button" class="btn btn--warn" [disabled]="busy() === 'suspend'" (click)="suspend()">
+                  {{ busy() === 'suspend' ? 'Suspending…' : 'Suspend account' }}
+                </button>
+                <button type="button" class="btn btn--secondary" (click)="confirmingSuspend.set(false)">Cancel</button>
+              </div>
+            </div>
+          }
+        } @else {
+          <div class="actions">
+            <button type="button" class="btn btn--primary" [disabled]="busy() === 'restore'" (click)="restore()">
+              {{ busy() === 'restore' ? 'Restoring…' : 'Restore account' }}
+            </button>
+            @if (d.user.status === 'Suspended') {
+              <button type="button" class="btn btn--danger" [disabled]="busy() === 'deactivate'" (click)="deactivate()">Deactivate instead</button>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- ===================== Password ===================== -->
+      <div class="card">
+        <h2 class="card__title">Password</h2>
+        <p class="hint">
+          Passwords are stored as hashes, so nobody can read them. Email a one-hour link so the person chooses their
+          own, or set a temporary password that is shown once.
+        </p>
+
+        <div class="actions">
+          <button type="button" class="btn btn--primary" [disabled]="busy() === 'email'" (click)="sendResetEmail()">
+            {{ busy() === 'email' ? 'Sending…' : 'Email a reset link' }}
+          </button>
+          <button type="button" class="btn btn--secondary" [disabled]="busy() === 'password'" (click)="setTemporaryPassword()">
+            {{ busy() === 'password' ? 'Working…' : 'Set a temporary password' }}
+          </button>
+        </div>
+
+        @if (tempPassword(); as password) {
+          <div class="note note--ok" style="margin-top: 1rem">
+            <p style="margin: 0 0 0.5rem">Give this to the person over a secure channel. It is not shown again.</p>
+            <div class="secret">
+              <code>{{ password }}</code>
+              <button type="button" class="btn btn--secondary" (click)="copyPassword()">Copy</button>
+              <button type="button" class="btn btn--secondary" (click)="hidePassword()">Hide</button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- ===================== Delete ===================== -->
+      <div class="card card--danger">
+        <h2 class="card__title">Delete account</h2>
+        <p class="hint">
+          Deleting anonymises the person's name and email and removes their devices, favourites, search history and
+          alerts. Orders, reviews and prescriptions are kept so pharmacies' records stay correct, and they show
+          "Deleted user". This cannot be undone.
+        </p>
+
+        @if (d.openOrderCount > 0) {
+          <p class="note note--bad">
+            This account has {{ d.openOrderCount }} pending or confirmed order(s). They must be completed or cancelled first.
+          </p>
+        } @else if (!confirmingDelete()) {
+          <button type="button" class="btn btn--danger" [disabled]="isSelf()" (click)="confirmingDelete.set(true)">Delete account…</button>
+        } @else {
+          <div class="form-grid">
+            <label class="field wide">
+              <span>Type <strong>{{ d.user.email }}</strong> to confirm</span>
+              <input type="text" [formControl]="deleteConfirmEmail" autocomplete="off" />
+            </label>
+            <div class="actions wide">
+              <button
+                type="button"
+                class="btn btn--danger"
+                [disabled]="!canConfirmDelete(d.user.email) || busy() === 'delete'"
+                (click)="confirmDelete(d.user.email)"
+              >
+                {{ busy() === 'delete' ? 'Deleting…' : 'Yes, delete this account' }}
+              </button>
+              <button type="button" class="btn btn--secondary" (click)="confirmingDelete.set(false)">Cancel</button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</section>

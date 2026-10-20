@@ -18,6 +18,13 @@ export interface CreateUserRequest {
 }
 
 
+export interface RegisterPatientRequest {
+  fullName: string;
+  email: string;
+  password: string;
+  locationId: number;
+}
+
 export interface PagedUserQuery {
   page?: number;
   pageSize?: number;
@@ -65,13 +72,6 @@ export interface AuthUser {
   id: number | null;
   email: string | null;
   role: RoleName | null;
-}
-
-export interface RegisterPatientRequest {
-  fullName: string;
-  email: string;
-  password: string;
-  locationId: number;
 }
 
 export type PharmacyDocumentType = 'License' | 'BusinessRegistration' | 'PharmacistCredential';
