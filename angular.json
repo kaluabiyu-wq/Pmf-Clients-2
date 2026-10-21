@@ -60,17 +60,20 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular/build:dev-server",
-          "configurations": {
-            "production": {
-              "buildTarget": "pmf-client:build:production"
-            },
-            "development": {
-              "buildTarget": "pmf-client:build:development"
-            }
+            "builder": "@angular/build:dev-server",
+        "options": {
+          "proxyConfig": "proxy.conf.json"
           },
-          "defaultConfiguration": "development"
-        },
+       "configurations": {
+       "production": {
+          "buildTarget": "pmf-client:build:production"
+         },
+    "development": {
+      "buildTarget": "pmf-client:build:development"
+         }
+      },
+       "defaultConfiguration": "development"
+      },
         "test": {
           "builder": "@angular/build:unit-test"
         }

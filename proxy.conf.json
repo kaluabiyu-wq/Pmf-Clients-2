@@ -1,0 +1,9 @@
+{
+  "/hubs": {
+    "target": "http://localhost:5135",
+    "secure": false,
+    "ws": true,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

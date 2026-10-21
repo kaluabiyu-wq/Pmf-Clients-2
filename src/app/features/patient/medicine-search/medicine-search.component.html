@@ -1,7 +1,5 @@
 <section class="search-page">
-  @if (currentUserName()) {
-    <p class="user-greeting">Hi, {{ currentUserName() }}</p>
-  }
+  
 
   <div class="search-bar">
     <svg
@@ -38,7 +36,6 @@
 
   <div class="location-row">
     <span class="location-label">{{ locationLabel() }}</span>
-    <button type="button" class="change-link">Change</button>
   </div>
 
   @if (isSearching()) {

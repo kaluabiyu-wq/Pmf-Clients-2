@@ -1,9 +1,10 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
+import { ApplicationConfig, inject, provideAppInitializer, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter, withComponentInputBinding} from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { jwtInterceptor } from './interceptors/jwt-interceptor';
+import { LiveSyncService } from './services/live-sync.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -13,6 +14,7 @@ export const appConfig: ApplicationConfig = {
      provideAnimationsAsync(),
      provideHttpClient(),
     provideHttpClient(withInterceptors([jwtInterceptor])),
+     provideAppInitializer(() => inject(LiveSyncService).activate()),
   
   ],
 };
