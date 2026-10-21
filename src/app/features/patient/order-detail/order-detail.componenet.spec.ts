@@ -10,8 +10,8 @@ const order = (over: Partial<OrderResponse> = {}): OrderResponse => ({
   id: 7, userId: 1, pharmacyId: 1, status: 'Pending',
   createdAt: '2026-10-01T10:00:00Z', updatedAt: '2026-10-01T10:00:00Z', totalPrice: 200,
   items: [
-    { id: 1, orderId: 7, inventoryId: 1, medicineId: 1, genericName: 'Amoxicillin', brandName: '', quantity: 1, unitPrice: 100, lineTotal: 100 },
-    { id: 2, orderId: 7, inventoryId: 2, medicineId: 2, genericName: 'Paracetamol', brandName: '', quantity: 1, unitPrice: 100, lineTotal: 100 },
+    { id: 1, orderId: 7, inventoryId: 1, medicineId: 1, genericName: 'Amoxicillin',pharmacyName:'', brandName: '', quantity: 1, unitPrice: 100, lineTotal: 100 },
+    { id: 2, orderId: 7, inventoryId: 2, medicineId: 2, genericName: 'Paracetamol',pharmacyName:'', brandName: '', quantity: 1, unitPrice: 100, lineTotal: 100 },
   ],
   requiresPrescription: true, prescriptionStatus: null, ...over,
 });

@@ -26,9 +26,11 @@ export interface OrderItemResponse {
   medicineId: number;
   genericName: string;
   brandName: string;
+  pharmacyName:string;
   quantity: number;
   unitPrice: number;
   lineTotal: number;
+  
 }
 
 export interface OrderResponse {

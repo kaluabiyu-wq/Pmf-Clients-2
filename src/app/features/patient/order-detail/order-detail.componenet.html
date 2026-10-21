@@ -25,12 +25,13 @@
 
     <table class="items">
       <thead>
-        <tr><th>Medicine</th><th>Unit price</th><th>Qty</th><th class="num">Line total</th>@if (isPending()) { <th></th> }</tr>
+        <tr><th>Medicine</th><th>Pharmacy</th><th>Unit price</th><th>Qty</th><th class="num">Line total</th>@if (isPending()) { <th></th> }</tr>
       </thead>
       <tbody>
         @for (item of o.items; track item.id) {
           <tr>
             <td>{{ item.genericName }}@if (item.brandName) { <span class="muted"> ({{ item.brandName }})</span> }</td>
+            <td>{{ item.pharmacyName }}</td>
             <td>{{ item.unitPrice | currency: 'ETB ' }}</td>
             <td>
               @if (isPending()) {
