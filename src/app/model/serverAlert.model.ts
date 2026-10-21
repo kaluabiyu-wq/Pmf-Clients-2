@@ -19,3 +19,8 @@ export interface ServerAlert {
   isRead: boolean;
   createdAt: string;
 }
+
+
+export interface AlertCount {
+  count: number;
+}

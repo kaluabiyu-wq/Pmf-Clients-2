@@ -2,12 +2,17 @@ import { HttpClient } from '@angular/common/http';
 import { Service, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { CreateUserRequest, PagedResponse, PagedUserQuery, User } from '../model/user.model';
+import { CreateUserRequest, PagedResponse, PagedUserQuery, RegisterPatientRequest, User } from '../model/user.model';
 
 @Service()
 export class UserService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiBaseUrl}/user`;
+
+  /** Public sign-up. Always creates a Patient; the role is decided by the API, not sent. */
+  registerPatient(request: RegisterPatientRequest): Observable<void> {
+    return this.http.post<void>(`${environment.apiBaseUrl}/auth/register-patient`, request);
+  }
 
   create(request: CreateUserRequest): Observable<User> {
     return this.http.post<User>(this.baseUrl, request);

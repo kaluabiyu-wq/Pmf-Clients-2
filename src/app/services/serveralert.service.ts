@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { PagedResponse } from '../model/location.model';
-import { ServerAlert } from '../model/serverAlert.model';
+import { AlertCount, ServerAlert } from '../model/serverAlert.model';
 
 @Injectable({ providedIn: 'root' })
 export class ServerAlertService {
@@ -21,5 +21,15 @@ export class ServerAlertService {
   
   markRead(id: number): Observable<void> {
     return this.http.patch<void>(`${this.baseUrl}/${id}/read`, {});
+  }
+
+  /** One cheap number for the dashboard badge. */
+  getUnreadCount(): Observable<AlertCount> {
+    return this.http.get<AlertCount>(`${this.baseUrl}/unread-count`);
+  }
+
+  /** Marks every alert read; the response says how many actually changed. */
+  markAllRead(): Observable<AlertCount> {
+    return this.http.post<AlertCount>(`${this.baseUrl}/read-all`, {});
   }
 }

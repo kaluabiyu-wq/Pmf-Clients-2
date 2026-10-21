@@ -1,8 +1,164 @@
 <div class="dashboard">
-  <section class="search-card">
-    <h2 class="search-card__title">Find a medicine near you</h2>
-    <p class="search-card__subtitle">Search by generic or brand name</p>
+  <header class="welcome">
+    <h1 class="welcome__title">Welcome back{{ firstName() ? ', ' + firstName() : '' }}</h1>
+    <p class="welcome__subtitle">Find medicine, follow your orders and keep up with updates from pharmacies.</p>
+  </header>
 
+  <!-- Summary tiles -->
+  <section class="tiles" aria-label="Summary">
+    <a class="tile" routerLink="/patient/orders">
+      <span class="tile__value">{{ pendingCount() ?? '–' }}</span>
+      <span class="tile__label">Pending orders</span>
+    </a>
+    <a class="tile" [class.tile--warn]="needsAttention().length > 0" routerLink="/patient/orders">
+      <span class="tile__value">{{ pendingOrders.hasValue() ? needsAttention().length : '–' }}</span>
+      <span class="tile__label">Need a prescription</span>
+    </a>
+    <a class="tile" [class.tile--accent]="(unreadCount() ?? 0) > 0" href="#notifications">
+      <span class="tile__value">{{ unreadCount() ?? '–' }}</span>
+      <span class="tile__label">Unread notifications</span>
+    </a>
+    <a class="tile" [routerLink]="userId() ? ['/patient/favourite', userId()] : null">
+      <span class="tile__value">{{ favouriteCount() ?? '–' }}</span>
+      <span class="tile__label">Favourite pharmacies</span>
+    </a>
+  </section>
+
+  <!-- Search (existing) -->
+  <section class="panel">
+    <h2 class="panel__title">Find a medicine near you</h2>
+    <p class="panel__subtitle">Search by generic or brand name</p>
     <app-medicine-search />
+  </section>
+
+  <!-- Needs attention: only shown when there is something to do -->
+  @if (needsAttention().length > 0) {
+    <section class="panel panel--warn" aria-labelledby="attention-title">
+      <h2 class="panel__title" id="attention-title">Needs your attention</h2>
+      <ul class="rows">
+        @for (o of needsAttention(); track o.id) {
+          <li class="row">
+            <div class="row__main">
+              <a class="row__title" [routerLink]="['/patient/orders', o.id]">Order #{{ o.id }}</a>
+              <span class="row__meta">{{ itemsSummary(o) }}</span>
+              <span class="row__note">{{ attentionText(o) }}</span>
+            </div>
+            <a class="btn btn-primary" [routerLink]="['/patient/orders', o.id]">Add prescription</a>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+  <div class="columns">
+    <!-- Recent orders -->
+    <section class="panel" aria-labelledby="orders-title">
+      <div class="panel__head">
+        <h2 class="panel__title" id="orders-title">Recent orders</h2>
+        <a class="panel__link" routerLink="/patient/orders">View all</a>
+      </div>
+
+      @if (recentOrders.error()) {
+        <p class="state state--error">Could not load your orders.
+          <button type="button" class="btn-link" (click)="recentOrders.reload()">Retry</button></p>
+      } @else if (recentOrders.isLoading() && !recentOrders.hasValue()) {
+        <p class="state">Loading orders…</p>
+      } @else if (recentRows().length === 0) {
+        <p class="state">No orders yet. Search for a medicine above to place your first one.</p>
+      } @else {
+        <ul class="rows">
+          @for (o of recentRows(); track o.id) {
+            <li class="row">
+              <div class="row__main">
+                <a class="row__title" [routerLink]="['/patient/orders', o.id]">Order #{{ o.id }}</a>
+                <span class="row__meta">{{ itemsSummary(o) }}</span>
+                <span class="row__meta">{{ o.createdAt | date: 'mediumDate' }} · {{ o.totalPrice | currency: 'ETB ' }}</span>
+              </div>
+              <span class="badge" [class]="'badge badge-' + (o.status | lowercase)">{{ o.status }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <!-- Notifications -->
+    <section class="panel" id="notifications" aria-labelledby="notifications-title">
+      <div class="panel__head">
+        <h2 class="panel__title" id="notifications-title">Notifications</h2>
+        @if ((unreadCount() ?? 0) > 0) {
+          <button type="button" class="panel__link panel__link--button" (click)="markAllRead()" [disabled]="markingAll()">
+            Mark all read
+          </button>
+        }
+      </div>
+
+      @if (alerts.error()) {
+        <p class="state state--error">Could not load notifications.
+          <button type="button" class="btn-link" (click)="alerts.reload()">Retry</button></p>
+      } @else if (alerts.isLoading() && !alerts.hasValue()) {
+        <p class="state">Loading notifications…</p>
+      } @else if (alertRows().length === 0) {
+        <p class="state">You're all caught up. Order and prescription updates will show up here.</p>
+      } @else {
+        <ul class="rows">
+          @for (a of alertRows(); track a.id) {
+            <li>
+              <button type="button" class="alert" [class.alert--unread]="!a.isRead" (click)="openAlert(a)">
+                <span class="alert__dot" aria-hidden="true"></span>
+                <span class="alert__body">
+                  <span class="alert__message">{{ a.message }}</span>
+                  <span class="alert__time">{{ a.createdAt | date: 'medium' }}</span>
+                </span>
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+
+  <!-- Favourite pharmacies -->
+  <section class="panel" aria-labelledby="favourites-title">
+    <div class="panel__head">
+      <h2 class="panel__title" id="favourites-title">Favourite pharmacies</h2>
+      @if (userId()) {
+        <a class="panel__link" [routerLink]="['/patient/favourite', userId()]">Manage</a>
+      }
+    </div>
+
+    @if (favourites.error()) {
+      <p class="state state--error">Could not load your favourites.
+        <button type="button" class="btn-link" (click)="favourites.reload()">Retry</button></p>
+    } @else if (favourites.isLoading() && !favourites.hasValue()) {
+      <p class="state">Loading favourites…</p>
+    } @else if (favouriteRows().length === 0) {
+      <p class="state">No favourites yet. Open a pharmacy from the <a routerLink="/patient/pharmacy-list">pharmacy list</a> to save it.</p>
+    } @else {
+      <ul class="fav-grid">
+        @for (f of favouriteRows(); track f.id) {
+          <li>
+            <a class="fav" [routerLink]="['/patient/pharmacy-list', f.pharmacyId]">
+              <span class="fav__name">{{ f.name }}</span>
+              <span class="fav__cta">View pharmacy →</span>
+            </a>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  <!-- Quick links -->
+  <section class="panel" aria-labelledby="links-title">
+    <h2 class="panel__title" id="links-title">Quick links</h2>
+    <ul class="link-grid">
+      @for (l of quickLinks(); track l.path) {
+        <li>
+          <a class="link-card" [routerLink]="l.path">
+            <span class="link-card__label">{{ l.label }}</span>
+            <span class="link-card__hint">{{ l.hint }}</span>
+          </a>
+        </li>
+      }
+    </ul>
   </section>
 </div>

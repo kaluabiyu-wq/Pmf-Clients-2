@@ -1,10 +1,12 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { RouterLink } from '@angular/router';
 import { AdminService } from '../../../services/admin.service';
+import { AuditEntry,  } from '../../../model/admin.model';
+import { PagedResponse } from '../../../model/location.model';
 
 @Component({
   selector: 'app-audit',
@@ -24,11 +26,21 @@ export class AuditComponent {
   readonly pageIndex = signal(0);
   readonly pageSize = signal(20);
 
-  readonly entries = rxResource({
-    params: () => ({ action: this.action(), page: this.pageIndex() + 1, pageSize: this.pageSize() }),
+  readonly entries = rxResource<
+    PagedResponse<AuditEntry>,
+    { action: string; page: number; pageSize: number }
+  >({
+    params: () => ({
+      action: this.action(),
+      page: this.pageIndex() + 1,
+      pageSize: this.pageSize(),
+    }),
     stream: ({ params: p }) =>
       this.admin.audit({ action: p.action || undefined, page: p.page, pageSize: p.pageSize }),
   });
+
+  /** Typed, un-narrowed view of the current page for the template. */
+  readonly page = computed<PagedResponse<AuditEntry> | undefined>(() => this.entries.value());
 
   setAction(value: string): void {
     this.action.set(value);

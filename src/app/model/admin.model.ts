@@ -68,6 +68,10 @@ export interface AuditEntry {
   detail: string | null;
   createdAt: string;
 }
+export interface PagedResponse<T> {
+  items: T[];
+  totalCount: number;
+}
 
 export interface AuditQuery {
   page?: number;
