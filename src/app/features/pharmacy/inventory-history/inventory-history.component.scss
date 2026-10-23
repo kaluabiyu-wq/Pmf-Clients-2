@@ -1,0 +1,112 @@
+.inventory-history {
+  min-height: 100vh;
+  padding: var(--pmafs-space-5);
+  background: var(--pmafs-bg);
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--pmafs-space-4);
+  margin-bottom: var(--pmafs-space-4);
+
+  h1 {
+    font-family: var(--pmafs-font-display);
+    margin: var(--pmafs-space-2) 0 6px;
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--pmafs-ink);
+  }
+
+  p {
+    margin: 0;
+    color: var(--pmafs-ink-muted);
+  }
+}
+
+.back-button {
+  color: var(--pmafs-teal-dark);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.header-actions {
+  display: flex;
+  gap: var(--pmafs-space-2);
+}
+
+.secondary-button {
+  border: 1px solid var(--pmafs-teal-dark);
+  background: var(--pmafs-surface);
+  color: var(--pmafs-teal-dark);
+  padding: 10px var(--pmafs-space-4);
+  border-radius: var(--pmafs-radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.state-card,
+.error-card,
+.empty-card {
+  background: var(--pmafs-surface);
+  border-radius: var(--pmafs-radius-sm);
+  padding: var(--pmafs-space-5);
+  text-align: center;
+  color: var(--pmafs-ink-muted);
+}
+
+.error-card {
+  display: flex;
+  gap: var(--pmafs-space-4);
+  text-align: left;
+  color: var(--pmafs-red);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  background: var(--pmafs-surface);
+  border-radius: var(--pmafs-radius-sm);
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 12px var(--pmafs-space-4);
+    text-align: left;
+    border-bottom: 1px solid var(--pmafs-bg);
+    white-space: nowrap;
+  }
+
+  th {
+    font-size: 13px;
+    color: var(--pmafs-ink-muted);
+    font-weight: 600;
+  }
+
+  .num {
+    text-align: right;
+  }
+}
+
+.delta {
+  font-weight: 600;
+
+  &.up {
+    color: var(--pmafs-red);
+  }
+  &.down {
+    color: var(--pmafs-teal-dark);
+  }
+  &.flat {
+    color: var(--pmafs-ink-muted);
+  }
+}

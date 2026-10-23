@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -6,8 +6,11 @@ import {
   ApprovalStatus,
   CreateInventoryRequest,
   InventoryRecord,
+  InventoryPriceChange,
   InventorySubmission,
   MedicinePharmacyInventoryResponse,
+  PagedHistoryQuery,
+  PagedResponse,
   PharmacyMedicineDetail,
   UpdateInventoryRequest,
 } from '../model/inventory.model';
@@ -72,6 +75,22 @@ export class InventoryService {
 
     getSubmissionsByPharmacy(pharmacyId: number): Observable<InventorySubmission[]> {
     return this.http.get<InventorySubmission[]>(`${this.inventoryUrl(pharmacyId)}/submissions`);
+  }
+
+  /** Price history of one inventory row, newest first. Authorized by the API against the owning pharmacy. */
+  getPriceHistory(
+    inventoryId: number,
+    query: PagedHistoryQuery = {},
+  ): Observable<PagedResponse<InventoryPriceChange>> {
+    let params = new HttpParams();
+    if (query.page) params = params.set('page', query.page);
+    if (query.pageSize) params = params.set('pageSize', query.pageSize);
+    if (query.descending !== undefined) params = params.set('descending', query.descending);
+
+    return this.http.get<PagedResponse<InventoryPriceChange>>(
+      `${this.baseUrl}/inventory/${inventoryId}/history`,
+      { params },
+    );
   }
 
    getSubmissions(status: ApprovalStatus | 'all' = 'Pending'): Observable<InventorySubmission[]> {

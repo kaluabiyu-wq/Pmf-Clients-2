@@ -101,3 +101,23 @@ export interface PagedResponse<T> {
   hasPrevious: boolean;
   hasNext: boolean;
 }
+
+
+
+export interface InventoryPriceChange {
+  id: number;
+  inventoryId: number;
+  medicineId: number;
+  pharmacyId: number;
+  changedByUserId: number;
+  changedByName: string | null;
+  oldPrice: number;
+  newPrice: number;
+  changedAt: string;
+}
+
+export interface PagedHistoryQuery {
+  page?: number;
+  pageSize?: number;
+  descending?: boolean;
+}

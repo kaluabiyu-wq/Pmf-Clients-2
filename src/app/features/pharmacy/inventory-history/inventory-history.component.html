@@ -1,0 +1,88 @@
+<div class="inventory-history">
+
+  <div class="page-header">
+    <div>
+      <a [routerLink]="['/pharmacy/inventory', pharmacyId, inventoryId]" class="back-button">
+        Back to Inventory Details
+      </a>
+      <h1>Price History</h1>
+      <p>Every price change recorded for inventory #{{ inventoryId }}.</p>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" class="secondary-button" (click)="toggleOrder()">
+        {{ descending() ? 'Newest first' : 'Oldest first' }}
+      </button>
+      <button type="button" class="secondary-button" (click)="refresh()">Refresh</button>
+    </div>
+  </div>
+
+  @if (history.isLoading() && !page()) {
+    <div class="state-card">
+      <div class="spinner"></div>
+      <p>Loading price history...</p>
+    </div>
+  }
+
+  @if (history.error() && !history.isLoading()) {
+    <div class="error-card">
+      <div class="error-icon">!</div>
+      <div>
+        <h3>Unable to load price history</h3>
+        <p>{{ errorMessage() }}</p>
+        <button type="button" (click)="refresh()">Try Again</button>
+      </div>
+    </div>
+  }
+
+  @if (page() && total() === 0) {
+    <div class="empty-card">
+      <h2>No price changes yet</h2>
+      <p>A row appears here each time the price of this medicine is edited.</p>
+    </div>
+  }
+
+  @if (page() && total() > 0) {
+    <div class="table-wrap">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Changed</th>
+            <th>By</th>
+            <th class="num">Old price</th>
+            <th class="num">New price</th>
+            <th class="num">Change</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of rows(); track row.id) {
+            <tr>
+              <td>{{ row.changedAt | date: 'medium' }}</td>
+              <td>{{ row.changedByName ?? 'User #' + row.changedByUserId }}</td>
+              <td class="num">{{ row.oldPrice | number: '1.2-2' }}</td>
+              <td class="num">{{ row.newPrice | number: '1.2-2' }}</td>
+              <td class="num">
+                <span class="delta" [class]="row.direction">
+                  {{ row.delta > 0 ? '+' : '' }}{{ row.delta | number: '1.2-2' }}
+                  @if (row.percent !== null) {
+                    ({{ row.percent > 0 ? '+' : '' }}{{ row.percent | number: '1.0-1' }}%)
+                  }
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <mat-paginator
+      [length]="total()"
+      [pageIndex]="pageIndex()"
+      [pageSize]="pageSize()"
+      [pageSizeOptions]="[5, 10, 25]"
+      (page)="onPage($event)"
+      showFirstLastButtons
+    ></mat-paginator>
+  }
+
+</div>
