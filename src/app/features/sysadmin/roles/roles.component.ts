@@ -10,5 +10,7 @@ import { AdminService } from '../../../services/admin.service';
   styleUrl: '../sysadmin-shared.scss',
 })
 export class RolesComponent {
-  readonly roles = rxResource({ stream: () => inject(AdminService).roles() });
+  private readonly admin = inject(AdminService);
+
+  readonly roles = rxResource({ stream: () => this.admin.roles() });
 }
