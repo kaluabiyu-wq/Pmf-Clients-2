@@ -2,47 +2,13 @@
 
   <div class="page-header">
     <div>
-      <a routerLink="/patient/pharmacy-list" class="back-button">Back to Pharmacies</a>
+      <a routerLink="/pharmacy-admin/manages" class="back-button">Back to Pharmacies</a>
       <h1>Verification Documents</h1>
       <p>Licenses, business registration, and pharmacist credentials on file for this pharmacy.</p>
     </div>
   </div>
 
-  <div class="card form-card">
-    <h2>Upload a Document</h2>
-
-    @if (submitError()) {
-      <p class="form-error">{{ submitError() }}</p>
-    }
-
-    <form (ngSubmit)="submitDocument()">
-      <div class="form-row">
-        <label>
-          Document Type
-          <select name="documentType" [(ngModel)]="newDocumentType" required>
-            @for (type of documentTypes; track type) {
-              <option [value]="type">{{ type }}</option>
-            }
-          </select>
-        </label>
-
-        <label>
-          Expires At (optional)
-          <input type="date" name="expiresAt" [(ngModel)]="newExpiresAt" />
-        </label>
-      </div>
-
-      <label class="file-url-label">
-        File URL
-        <input type="text" name="fileUrl" [(ngModel)]="newFileUrl" required
-          placeholder="https://..." />
-      </label>
-
-      <button type="submit" class="add-button" [disabled]="submitting()">
-        {{ submitting() ? 'Uploading...' : 'Upload Document' }}
-      </button>
-    </form>
-  </div>
+  
 
   @if (loading()) {
     <div class="state-card">
