@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://YOUR-API-NAME.onrender.com/api',
-  hubUrl: 'https://YOUR-API-NAME.onrender.com/hubs/pmf',
+  apiBaseUrl: 'https://pmfapi.onrender.com/api',
+  hubUrl: 'https://pmfapi.onrender.com/hubs/pmf',
 };
