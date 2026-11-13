@@ -49,7 +49,13 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.production.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,
@@ -60,20 +66,20 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-            "builder": "@angular/build:dev-server",
-        "options": {
-          "proxyConfig": "proxy.conf.json"
+          "builder": "@angular/build:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
           },
-       "configurations": {
-       "production": {
-          "buildTarget": "pmf-client:build:production"
-         },
-    "development": {
-      "buildTarget": "pmf-client:build:development"
-         }
-      },
-       "defaultConfiguration": "development"
-      },
+          "configurations": {
+            "production": {
+              "buildTarget": "pmf-client:build:production"
+            },
+            "development": {
+              "buildTarget": "pmf-client:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
         "test": {
           "builder": "@angular/build:unit-test"
         }
